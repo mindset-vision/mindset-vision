@@ -136,7 +136,7 @@ class GrabNet:
             if num_classes is not None:
                 net.fc = nn.Linear(net.fc.in_features, num_classes)
         else:
-            net = cls.get_other_nets(architecture_name, imagenet_pt, **kwargs)
+            net = cls.get_other_nets(architecture_name, num_classes, imagenet_pt, **kwargs)
             assert (
                 False if net is False else True
             ), f"Network name {architecture_name} not recognized"
@@ -215,7 +215,7 @@ class Logs:
     def __repr__(self):
         return f"{self.value}"
 
-    def __repl__(self):
+    def __repr__(self):
         return str(self.value)
 
     def __str__(self):
@@ -310,20 +310,6 @@ class ExpMovingAverage(Logs):
             self.value = args[0]
         else:
             self.value = self.alpha * args[0] + (1 - self.alpha) * self.value
-        return self
-
-
-class CumulativeAverage(Logs):
-    value = None
-    n = 0
-
-    def add(self, *args):
-        if self.value is None:
-            self.value = args[0]
-
-        else:
-            self.value = (args[0] + self.n * self.value) / (self.n + 1)
-        self.n += 1
         return self
 
 

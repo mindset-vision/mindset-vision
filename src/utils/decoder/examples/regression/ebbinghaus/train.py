@@ -3,7 +3,7 @@ import pandas as pd
 import toml
 import inspect
 
-from src.utils.decoder.tra import decoder_train
+from src.utils.decoder.train import decoder_train
 import pathlib
 
 

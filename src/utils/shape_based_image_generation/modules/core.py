@@ -145,7 +145,7 @@ class ShapeCoreFunctions:
 
         # Calculate the new size after shrinking
         new_size = (int(cropped.width * factor), int(cropped.height * factor))
-        shrunk = cropped.resize(new_size, Image.ANTIALIAS)
+        shrunk = cropped.resize(new_size, Image.LANCZOS)
 
         new_canvas = Image.new("RGBA", (self.initial_image_size,) * 2, (0, 0, 0, 0))
 

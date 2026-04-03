@@ -43,13 +43,14 @@ def change_range(x, initial_range, finale_range):
     return transformed_x
 
 
-img = Image.new("RGB", (100, 100), "white")
-draw = ImageDraw.Draw(img)
+if __name__ == "__main__":
+    img = Image.new("RGB", (100, 100), "white")
+    draw = ImageDraw.Draw(img)
 
-vertices = generate_random_polygon(7)
-rescaled_vertices = [
-    tuple(change_range(x, [np.min(vertices), np.max(vertices)], [0, 100]))
-    for x in vertices
-]
-draw.line(rescaled_vertices, width=1, fill="black")
-img.show()
+    vertices = generate_random_polygon(7)
+    rescaled_vertices = [
+        tuple(change_range(x, [np.min(vertices), np.max(vertices)], [0, 100]))
+        for x in vertices
+    ]
+    draw.line(rescaled_vertices, width=1, fill="black")
+    img.show()

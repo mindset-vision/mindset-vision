@@ -4,7 +4,7 @@ import toml
 import inspect
 
 from src.utils.dataset_utils import ImageNetClasses
-from src.utils.imagenet_classification.eval import classification_evaluate
+from src.utils.imagenet_ood_classification.eval import classification_evaluate
 import pathlib
 from pathlib import Path
 from src.generate_datasets_from_toml import generate_datasets_from_toml_file

@@ -706,7 +706,7 @@ def generate_all(
                             [
                                 path,
                                 v_in_out,
-                                vernier_type,
+                                v,
                                 ds.background,
                                 shape_code,
                                 shape_size,

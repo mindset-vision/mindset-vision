@@ -1,29 +1,32 @@
-from typing import Any
-import toml
-import inspect
-
-from datetime import datetime
-from src.utils.dataset_utils import get_dataloader
-
-from src.utils.decoder.train_utils import (
-    decoder_step,
-    log_neptune_init_info,
-)
-from src.utils.device_utils import set_global_device, to_global_device
-from src.utils.net_utils import ExpMovingAverage, CumulativeAverage, GrabNet, run
-from src.utils.misc import weblog_dataset_info, pretty_print_dict, update_dict
-from src.utils.callbacks import *
 import argparse
-import torch.backends.cudnn as cudnn
-from src.utils.net_utils import load_pretraining
-from functools import partial
+import inspect
+import os
 import pathlib
+from datetime import datetime
+from functools import partial
+
+import numpy as np
+import sty
+import toml
+import torch
+
+from src.utils.callbacks import (
+    Callback, CallbackList, DuringTrainingTest, PrintConsole,
+    PrintNeptune, ProgressBar, SaveInfoCsv, SaveModelAndOpt,
+    StopWhenMetricIs, TriggerActionWhenReachingValue,
+)
+from src.utils.dataset_utils import get_dataloader
+from src.utils.decoder.train_utils import decoder_step, log_neptune_init_info
+from src.utils.device_utils import set_global_device, to_global_device
+from src.utils.misc import weblog_dataset_info, pretty_print_dict, update_dict
+from src.utils.net_utils import (
+    ExpMovingAverage, CumulativeAverage, GrabNet, run, load_pretraining,
+)
 
 try:
     import neptune
-except:
+except ImportError:
     pass
-import inspect
 
 
 def decoder_train(
@@ -92,7 +95,6 @@ def decoder_train(
     set_global_device(toml_config["gpu_idx"])
 
     train_loader = get_dataloader(
-        toml_config,
         toml_config["task_type"],
         ds_config=toml_config["training"]["dataset"],
         transf_config=toml_config["transformation"],
@@ -102,7 +104,6 @@ def decoder_train(
     test_loaders = (
         [
             get_dataloader(
-                toml_config,
                 toml_config["task_type"],
                 ds_config=i,
                 transf_config=toml_config["transformation"],
@@ -110,7 +111,7 @@ def decoder_train(
             )
             for i in toml_config["eval"]["datasets"]
         ]
-        if toml_config["training"]["evaluate_during_training"] in toml_config
+        if toml_config["training"]["evaluate_during_training"]
         else []
     )
 
@@ -330,13 +331,13 @@ def decoder_train(
     (
         all_callbacks.append(
             TriggerActionWhenReachingValue(
-                mode="min",
+                mode="max",
                 patience=20,
                 value_to_reach=toml_config["training"]["stopping_conditions"][
                     "stop_at_accuracy"
                 ],
                 check_every=10,
-                metric_name="ema_loss",
+                metric_name=f"ema_{log_type}_0",
                 action=stop,
                 action_name=f"goal [{toml_config['training']['stopping_conditions']['stop_at_accuracy']}]",
             )

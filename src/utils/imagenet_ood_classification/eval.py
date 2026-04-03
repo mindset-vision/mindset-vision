@@ -1,22 +1,18 @@
-import json
+import inspect
 import os
-import torch
-import torch.backends.cudnn as cudnn
+import pathlib
 
-from src.utils.callbacks import *
+import numpy as np
+import pandas
+import sty
+import toml
+import torch
+from tqdm import tqdm
+
 from src.utils.dataset_utils import ImageNetClasses, get_dataloader
 from src.utils.device_utils import set_global_device, to_global_device
 from src.utils.misc import pretty_print_dict, update_dict
-from src.utils.net_utils import load_pretraining, GrabNet, ResNet152decoders
-from torch.utils.data import DataLoader
-from torchvision.datasets import ImageFolder
-from tqdm import tqdm
-from pathlib import Path
-import pandas
-import toml
-import inspect
-
-import inspect
+from src.utils.net_utils import load_pretraining, GrabNet
 
 
 def classification_evaluate(
@@ -80,34 +76,34 @@ def classification_evaluate(
             + sty.rs.fg
         )
 
-        for _, data in enumerate(tqdm(dataloader, colour="yellow")):
-            images, labels, path = data
-            images = to_global_device(images)
-            labels = to_global_device(labels)
-            output = net(images)
-            for i in range(len(labels)):
-                # Top 5 prediction
-                prediction = torch.topk(output[i], 5).indices.tolist()
+        with torch.no_grad():
+            for _, data in enumerate(tqdm(dataloader, colour="yellow")):
+                images, labels, path = data
+                images = to_global_device(images)
+                labels = to_global_device(labels)
+                output = net(images)
+                for i in range(len(labels)):
+                    prediction = torch.topk(output[i], 5).indices.tolist()
 
-                results_final.append(
-                    {
-                        "image_path": path[i],
-                        "label_idx": labels[i].item(),
-                        "label_class_name": imagenet_classes.idx2label[
-                            labels[i].item()
-                        ],
-                        **{f"prediction_idx_top_{i}": prediction[i] for i in range(5)},
-                        **{
-                            f"prediction_class_name_top_{i}": imagenet_classes.idx2label[
-                                prediction[i]
-                            ]
-                            for i in range(5)
-                        },
-                        "Top-5 At Least One Correct": np.any(
-                            [labels[i].item() in prediction]
-                        ),
-                    }
-                )
+                    results_final.append(
+                        {
+                            "image_path": path[i],
+                            "label_idx": labels[i].item(),
+                            "label_class_name": imagenet_classes.idx2label[
+                                labels[i].item()
+                            ],
+                            **{f"prediction_idx_top_{k}": prediction[k] for k in range(5)},
+                            **{
+                                f"prediction_class_name_top_{k}": imagenet_classes.idx2label[
+                                    prediction[k]
+                                ]
+                                for k in range(5)
+                            },
+                            "Top-5 At Least One Correct": np.any(
+                                [labels[i].item() in prediction]
+                            ),
+                        }
+                    )
 
         results_final_pandas = pandas.DataFrame(results_final)
         results_final_pandas.to_csv(

@@ -14,7 +14,7 @@ import math
 
 try:
     import neptune
-except:
+except ImportError:
     pass
 
 
@@ -456,8 +456,8 @@ class SaveModelAndOpt(Callback):
     def on_batch_end(self, batch, logs=None):
         if self.output_folder is not None:
             if (
-                ((logs["tot_iter"] - self.last_iter) > self.max_iter)
-                or ((self.last_loss - logs[self.loss_metric_name]) > self.epsilone_loss)
+                (((logs["tot_iter"] - self.last_iter) > self.max_iter)
+                or ((self.last_loss - logs[self.loss_metric_name]) > self.epsilone_loss))
                 and ((logs["tot_iter"] - self.last_iter) > self.min_iter)
             ):
                 self.last_iter = logs["tot_iter"]
@@ -761,7 +761,7 @@ class DuringTrainingTest(Callback):
 
     def on_batch_end(self, batch, logs=None):
         if (
-            (self.every_x_iter is not None and logs["tot_iter"] % self.every_x_iter)
+            (self.every_x_iter is not None and logs["tot_iter"] % self.every_x_iter == 0)
             or (
                 self.every_x_sec is not None
                 and self.every_x_sec < time.time() - self.time_from_last_test
@@ -772,7 +772,7 @@ class DuringTrainingTest(Callback):
                 > self.multiple_sec_of_test_time * self.test_time
             )
         ):
-            if self.every_x_iter is not None and logs["tot_iter"] % self.every_x_iter:
+            if self.every_x_iter is not None and logs["tot_iter"] % self.every_x_iter == 0:
                 print(f"\nTest every {self.every_x_iter} iterations")
             if (
                 self.every_x_sec is not None

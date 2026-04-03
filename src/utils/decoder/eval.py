@@ -1,19 +1,17 @@
-import json
+import inspect
 import os
-import torch
-import torch.backends.cudnn as cudnn
+import pathlib
 
-from src.utils.callbacks import *
+import pandas
+import sty
+import toml
+import torch
+from tqdm import tqdm
+
 from src.utils.dataset_utils import get_dataloader
 from src.utils.device_utils import set_global_device, to_global_device
 from src.utils.misc import pretty_print_dict, update_dict
 from src.utils.net_utils import load_pretraining, GrabNet
-from tqdm import tqdm
-import pandas
-import toml
-import inspect
-
-import inspect
 
 
 def decoder_evaluate(
@@ -33,7 +31,6 @@ def decoder_evaluate(
 
     test_loaders = [
         get_dataloader(
-            toml_config=toml_config,
             task_type=toml_config["task_type"],
             ds_config=i,
             transf_config=toml_config["transformation"],

@@ -1,5 +1,8 @@
+import os
 import pathlib
+import random
 import shutil
+import subprocess
 from typing import List
 
 import PIL
@@ -17,8 +20,7 @@ from src.utils.similarity_judgment.misc import draw_random_from_ranges
 try:
     import neptune
     from neptune.types import File
-
-except:
+except ImportError:
     pass
 
 
@@ -124,7 +126,8 @@ def weblog_dataset_info(
         dataset_name = "no_name" if dataset_name is None else dataset_name
         stats["mean"] = [0.5, 0.5, 0.5]
         stats["std"] = [0.2, 0.2, 0.2]
-        Warning(
+        import warnings
+        warnings.warn(
             "MEAN, STD AND DATASET_NAME NOT SET FOR NEPTUNE LOGGING. This message is not referring to normalizing in PyTorch"
         )
 
@@ -188,16 +191,6 @@ def imshow_batch(inp, stats=None, labels=None, title_more="", maximize=True, ax=
     plt.tight_layout()
     plt.subplots_adjust(top=1, bottom=0.01, left=0, right=1, hspace=0.2, wspace=0.01)
     return ax
-
-
-def conver_tensor_to_plot(tensor, mean, std):
-    tensor = tensor.numpy().transpose((1, 2, 0))
-    # mean = np.array([0.485, 0.456, 0.406])
-    image = std * tensor + mean
-    image = np.clip(image, 0, 1)
-    if np.shape(image)[2] == 1:
-        image = np.squeeze(image)
-    return image
 
 
 def convert_lists_to_strings(obj):
@@ -341,15 +334,8 @@ def delete_and_recreate_path(path: pathlib.Path):
     path.mkdir(parents=True, exist_ok=True)
 
 
-import random
-
-
 def generate_random_color():
     return (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
-
-
-import os
-import subprocess
 
 
 def check_download_ETH_80_dataset(destination_dir):

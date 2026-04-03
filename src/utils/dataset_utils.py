@@ -85,7 +85,7 @@ def add_compute_stats(obj_class):
 
             elif stats == "ImageNet":
                 self.stats = {}
-                self.stats["mean"] = [0.491, 0.482, 0.44]
+                self.stats["mean"] = [0.491, 0.482, 0.447]
                 self.stats["std"] = [0.247, 0.243, 0.262]
                 print(
                     fg.red
@@ -243,7 +243,7 @@ def get_dataloader(
         img_path_col=ds_config["img_path_col_name"],
         label_cols=ds_config["label_cols"],
         filters=ds_config["filters"],
-        neg_filters=ds_config['neg_filters'],
+        neg_filters=ds_config.get('neg_filters', None),
         transform=None,  # transform is added in fix_dataset
         return_path=return_path,
     )
@@ -253,7 +253,7 @@ def get_dataloader(
         transf_values=transf_config["values"],
         fill_color=transf_config["fill_color"],
         name_ds=ds_config["name"],
-        size=transf_config["size"],
+        size=transf_config.get("size", 224),
     )
 
     return DataLoader(
@@ -267,13 +267,6 @@ def get_dataloader(
 
 
 from torch.utils.data import Dataset
-import pandas as pd
-
-import json
-from torchvision.models import ResNet50_Weights
-
-ResNet50_Weights.IMAGENET1K_V1.value.meta["categories"]
-
 import pandas as pd
 import json
 

@@ -255,7 +255,7 @@ def generate_all(
                 "Type",
                 "BackgroundColor",
                 "RedLength",
-                "BlueLegnth",
+                "BlueLength",
                 "UpperLineColor",
                 "NumRailLines",
                 "IterNum",
@@ -297,6 +297,7 @@ def generate_all(
                         red_l,
                         blue_l,
                         upper_line_color,
+                        num_rail_lines,
                         i,
                     ]
                 )
