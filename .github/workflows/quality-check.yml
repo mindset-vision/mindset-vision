@@ -1,0 +1,45 @@
+name: quality-check
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 9 * * 1"  # every monday 9am UTC
+
+permissions:
+  contents: write
+  pages: write
+
+jobs:
+  generate-illusion-report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          allow-prereleases: true
+
+      - name: install dependencies
+        run: |
+          pip install -e .
+          pip install pyyaml beautifulsoup4 opencv-contrib-python
+
+      - name: generate HTML report
+        run: python .github/workflows/illusion-report/generate_report.py
+
+      - name: verify no residual files
+        run: |
+          git status --porcelain
+          test -z "$(git status --porcelain)" || (echo "error: residual files detected" && exit 1)
+
+      - name: deploy to github pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: /tmp/mindset-report-site
+          force_orphan: true
