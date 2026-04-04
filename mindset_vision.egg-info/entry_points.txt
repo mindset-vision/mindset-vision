@@ -1,0 +1,2 @@
+[console_scripts]
+mindset = mindset.cli:main

@@ -38,6 +38,7 @@ temp/*
 # specific files
 .bashrc*
 .env
+todo.md
 
 # macOS specific
 Icon*

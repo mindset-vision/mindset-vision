@@ -2,8 +2,8 @@
 Script for regression test / revisit doc string later
 """
 
-from src.utils.generate_default_pars_toml_file import create_config, generate_lite
-from src.generate_datasets_from_toml import generate_datasets_from_toml_file
+from mindset.utils.generate_default_pars_toml_file import create_config, generate_lite
+from mindset.generate_datasets_from_toml import generate_datasets_from_toml_file
 from pathlib import Path
 import toml
 import inspect
@@ -14,7 +14,7 @@ from collections import defaultdict
 import base64
 from nbformat import v4 as nbf
 from nbconvert import PDFExporter
-from src.utils.misc import modify_toml
+from mindset.utils.misc import modify_toml
 
 
 def encode_image_base64(image_path):
@@ -104,7 +104,7 @@ def generate_summary(dataset_structure, save_to):
         f.write(html_data)
 
 
-import src.utils.generate_default_pars_toml_file
+import mindset.utils.generate_default_pars_toml_file
 import sty
 
 
