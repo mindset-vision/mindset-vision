@@ -18,7 +18,7 @@ def generate_report(result_csv_path=None):
     report_folder.mkdir(exist_ok=True, parents=True)
     try:
         pm.execute_notebook(
-            "src/utils/similarity_judgment/report_template.ipynb",
+            "mindset/utils/similarity_judgment/report_template.ipynb",
             str(report_folder / "report.ipynb"),
             parameters=parameters,
             progress_bar=False,

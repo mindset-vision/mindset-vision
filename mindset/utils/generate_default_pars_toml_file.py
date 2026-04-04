@@ -136,13 +136,16 @@ from multiprocessing import Pool
 
 def create_config(save_to):
     datasets = glob.glob(
-        "src/generate_datasets/**/generate_dataset**.py", recursive=True
+        "mindset/generate_datasets/**/generate_dataset**.py", recursive=True
     )
     config = {}
     comments = {}
     descriptions = {}
     datasets_to_process = datasets
-    with Pool(len(datasets_to_process)) as p:
+    if not datasets_to_process:
+        print("no generators found")
+        return
+    with Pool(max(1, len(datasets_to_process))) as p:
         all_help_text = p.map(extract_help_text, datasets_to_process)
 
     for idx, dataset_path in tqdm(enumerate(datasets_to_process)):
