@@ -12,10 +12,6 @@ import signal, os
 import time
 import math
 
-try:
-    import neptune
-except ImportError:
-    pass
 
 
 class CallbackList(object):
@@ -242,7 +238,7 @@ class TriggerActionWithPatience(Callback):
         check_every=100,
         triggered_action=None,
         action_name="",
-        weblogger=False,
+
         verbose=False,
     ):
         super().__init__()
@@ -259,7 +255,7 @@ class TriggerActionWithPatience(Callback):
         self.metric_name = metric_name
         self.action_name = action_name
         self.first_iter = True
-        self.weblogger = weblogger
+
         self.exp_metric = None
         self.patience = self.patience // self.check_every
         if patience == 0:
@@ -613,21 +609,6 @@ class SaveInfoCsv(Callback):
             self.update(logs)
 
 
-class PrintNeptune(PrintLogs):
-    def __init__(self, weblogger, convert_str=False, log_prefix="", **kwargs):
-        self.convert_str = convert_str
-        self.weblogger = weblogger
-        self.log_prefix = log_prefix
-        super().__init__(**kwargs)
-
-    def print_logs(self, values, logs):
-        if isinstance(self.weblogger, neptune.Run):
-            if self.convert_str:
-                self.weblogger[self.log_prefix + self.id].log(str(values))
-            else:
-                self.weblogger[self.log_prefix + self.id].log(values)
-
-
 class DuringTrainingTest(Callback):
     test_time = 0
     num_tests = 0
@@ -639,7 +620,7 @@ class DuringTrainingTest(Callback):
         eval_mode=True,
         every_x_iter=None,
         every_x_sec=None,
-        weblogger=False,
+
         logs_prefix="rndtxt",
         multiple_sec_of_test_time=None,
         auto_increase=False,
@@ -662,7 +643,7 @@ class DuringTrainingTest(Callback):
         self.every_x_sec = every_x_sec
         if self.auto_increase:
             self.every_x_sec = 20
-        self.weblogger = weblogger
+
         self.log_text = log_text
         self.call_run = call_run
         self.time_from_last_test = None
@@ -680,7 +661,6 @@ class DuringTrainingTest(Callback):
                 check_after_batch=False,
             )
         ]
-        # cb.append(PlotImagesEveryOnceInAWhile(self.weblogger, testing_loader.dataset, plot_every=1, plot_only_n_times=1, plot_at_the_end=False, max_images=20, text=f"Test no. {self.num_tests}")) if self.plot_samples_corr_incorr else None
         return cb
 
     def run_tests(self, logs, last_test=False):

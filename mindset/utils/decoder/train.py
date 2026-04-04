@@ -12,21 +12,16 @@ import torch
 
 from mindset.utils.callbacks import (
     Callback, CallbackList, DuringTrainingTest, PrintConsole,
-    PrintNeptune, ProgressBar, SaveInfoCsv, SaveModelAndOpt,
+    ProgressBar, SaveInfoCsv, SaveModelAndOpt,
     StopWhenMetricIs, TriggerActionWhenReachingValue,
 )
 from mindset.utils.dataset_utils import get_dataloader
-from mindset.utils.decoder.train_utils import decoder_step, log_neptune_init_info
+from mindset.utils.decoder.train_utils import decoder_step
 from mindset.utils.device_utils import set_global_device, to_global_device
-from mindset.utils.misc import weblog_dataset_info, pretty_print_dict, update_dict
+from mindset.utils.misc import pretty_print_dict, update_dict
 from mindset.utils.net_utils import (
     ExpMovingAverage, CumulativeAverage, GrabNet, run, load_pretraining,
 )
-
-try:
-    import neptune
-except ImportError:
-    pass
 
 
 def decoder_train(
@@ -69,22 +64,6 @@ def decoder_train(
     )
     results_folder_id.mkdir(parents=True, exist_ok=True)
     model_output_folder_id.mkdir(parents=True, exist_ok=True)
-
-    weblogger = False
-    if toml_config["training"]["monitoring"]["neptune_proj_name"]:
-        try:
-            neptune_run = neptune.init_run(
-                api_token=os.environ["NEPTUNE_API_TOKEN"],
-                project=toml_config["training"]["monitoring"]["neptune_proj_name"],
-            )
-            weblogger = neptune_run
-            print(sty.fg.blue + "~~ NEPTUNE LOGGING ACTIVE ~~" + sty.rs.fg)
-        except:
-            print(
-                "Initializing neptune didn't work, maybe you don't have the neptune client installed or you haven't set up the API token (https://docs.neptune.ai/getting-started/installation). Neptune logging won't be used :("
-            )
-
-    log_neptune_init_info(weblogger, toml_config, tags=None) if weblogger else None
 
     toml.dump(
         toml_config,
@@ -162,21 +141,6 @@ def decoder_train(
 
     net.train()
 
-    (
-        weblog_dataset_info(
-            train_loader, weblogger=weblogger, num_batches_to_log=1, log_text="train"
-        )
-        if weblogger
-        else None
-    )
-
-    [
-        weblog_dataset_info(
-            td, weblogger=weblogger, num_batches_to_log=1, log_text="test"
-        )
-        for td in test_loaders
-    ]
-
     step = decoder_step
 
     def call_run(loader, train, callbacks, method, logs_prefix="", logs=None, **kwargs):
@@ -229,11 +193,6 @@ def decoder_train(
                 *[f"ema_{log_type}_{i}" for i in range(num_decoders)],
             ],
         ),
-        PrintNeptune(id="ema_loss", plot_every=10, weblogger=weblogger),
-        *[
-            PrintNeptune(id=f"ema_{log_type}_{i}", plot_every=10, weblogger=weblogger)
-            for i in range(num_decoders)
-        ],
         TriggerActionWhenReachingValue(
             mode="max",
             patience=1,
@@ -252,7 +211,6 @@ def decoder_train(
                 eval_mode=False,
                 every_x_epochs=1,
                 auto_increase=False,
-                weblogger=weblogger,
                 log_text="test during train TRAINmode",
                 logs_prefix=f"{tl.dataset.name}/",
                 call_run=partial(call_run, method=toml_config["task_type"]),
@@ -267,13 +225,6 @@ def decoder_train(
                             ],
                         ],
                         path=str(results_folder_id / f"{tl.dataset.name}.csv"),
-                    ),
-                    # if you don't use neptune, this will be ignored
-                    PrintNeptune(
-                        id=f"{tl.dataset.name}/{log_type}",
-                        plot_every=np.inf,
-                        log_prefix="test_TRAIN",
-                        weblogger=weblogger,
                     ),
                     PrintConsole(
                         id=f"{tl.dataset.name}/{log_type}",
@@ -347,7 +298,6 @@ def decoder_train(
     )
 
     net, logs = call_run(train_loader, True, all_callbacks, toml_config["task_type"])
-    weblogger.stop() if weblogger else None
     toml_config["training"]["completed"] = True
     toml.dump(
         toml_config,

@@ -63,12 +63,6 @@ stop_after_n_epochs = 50
 stop_at_loss = false
 stop_at_accuracy = false
 
-[training.monitoring]
-# If you want to log in neptune.ai, specify the project name. You need an account there + you need to have created a project with the correct name through their UI + You need to set up your API token: \nhttps://docs.neptune.ai/getting-started/installation. The API should be in an environmental variable called NEPTUNE_API_TOKEN.
-# If everything is setup correctly, put your project name here, and you should get a lot of good logging for your training session'
-neptune_proj_name = false
-
-
 [saving_folders]
 # The paths for saving the results and the model. If false, no saving will occur. Notice that, during training, the `train_id` will be appended to these folders. 
 results_folder = 'results/decoder/'
