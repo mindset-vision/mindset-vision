@@ -1,51 +1,39 @@
-name: Python CI/CD
+name: CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
 
-permissions: write-all
+permissions:
+  contents: read
 
 jobs:
-  build:
-    # -------- https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs
+  test:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-20.04] 
-        python-version: ["3.10"]
+        os: [windows-latest, macos-latest, ubuntu-latest]
+        python-version: ["3.14"]
 
     steps:
-      # -------- https://github.com/actions/checkout
-      # check out your repository files onto the runner, so that the workflow can access them
       - uses: actions/checkout@v4
         with:
           lfs: false
           fetch-depth: 1
 
-      # - name: Checkout LFS objects
-      #   run: git lfs checkout
-
-      # -------- https://github.com/actions/setup-python
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+      - name: setup python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+          allow-prereleases: true
 
-      # --------
-      - name: Install dependencies
+      - name: install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install black pytest
-          pip install -r requirements.txt
+          pip install pytest
+          pip install -e .
 
-      # --------
-      - name: Test with pytest
-        run: |
-          pytest -s
-
-
+      - name: test
+        run: pytest -s

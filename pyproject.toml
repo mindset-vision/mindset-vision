@@ -13,7 +13,7 @@ dependencies = [
     "ipython>=8.15.0",
     "matplotlib>=3.7.0",
     "natsort>=8.4.0",
-    "numpy>=1.24.0,<2.0.0",
+    "numpy>=1.24.0",
     "opencv_python>=4.9.0",
     "pandas>=2.0.0",
     "perlin_noise>=1.12",
@@ -38,3 +38,7 @@ mindset = "mindset.cli:main"
 
 [tool.setuptools.packages.find]
 include = ["mindset*"]
+
+[tool.pytest.ini_options]
+testpaths = ["."]
+python_files = ["_test.py"]
