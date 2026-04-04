@@ -44,50 +44,51 @@ def main():
 
     registry = _load_registry()
 
-    if args.command == "list":
-        from mindset.generators import list_generators
-        for category, names in list_generators().items():
-            print(f"\n  {category}:")
-            for name in names:
-                config_cls = registry[name]["config_cls"]
-                print(f"    {name:30s} {config_cls.__doc__.strip()}")
+    match args.command:
+        case "list":
+            from mindset.generators import list_generators
+            for category, names in list_generators().items():
+                print(f"\n  {category}:")
+                for name in names:
+                    config_cls = registry[name]["config_cls"]
+                    print(f"    {name:30s} {config_cls.__doc__.strip()}")
 
-    elif args.command == "generate":
-        if args.dataset == "all":
-            for name, info in registry.items():
-                print(f"\ngenerating {name}...")
-                info["func"]()
-        else:
-            from mindset.generators import get_generator
-            info = get_generator(args.dataset)
-            config_cls = info["config_cls"]
+        case "generate":
+            if args.dataset == "all":
+                for name, info in registry.items():
+                    print(f"\ngenerating {name}...")
+                    info["func"]()
+            else:
+                from mindset.generators import get_generator
+                info = get_generator(args.dataset)
+                config_cls = info["config_cls"]
 
-            if args.save_config:
-                defaults = asdict(config_cls())
-                path = f"{args.dataset}.yaml"
-                with open(path, "w") as f:
-                    yaml.dump(defaults, f, default_flow_style=False, sort_keys=False)
-                print(f"config saved to {path}")
-                return
+                if args.save_config:
+                    defaults = asdict(config_cls())
+                    out_path = f"{args.dataset}.yaml"
+                    with open(out_path, "w") as fh:
+                        yaml.dump(defaults, fh, default_flow_style=False, sort_keys=False)
+                    print(f"config saved to {out_path}")
+                    return
 
-            kwargs = {}
-            if args.config:
-                with open(args.config) as f:
-                    kwargs = yaml.safe_load(f)
-            if args.output:
-                kwargs["output_folder"] = args.output
-            if args.canvas_size:
-                kwargs["canvas_size"] = args.canvas_size
-            if args.samples:
-                for f in fields(config_cls):
-                    if "samples" in f.name or "num_samples" in f.name:
-                        kwargs[f.name] = args.samples
+                kwargs = {}
+                if args.config:
+                    with open(args.config) as fh:
+                        kwargs = yaml.safe_load(fh)
+                if args.output:
+                    kwargs["output_folder"] = args.output
+                if args.canvas_size:
+                    kwargs["canvas_size"] = args.canvas_size
+                if args.samples:
+                    for fld in fields(config_cls):
+                        if "samples" in fld.name:
+                            kwargs[fld.name] = args.samples
 
-            info["func"](**kwargs)
+                info["func"](**kwargs)
 
-    elif args.command == "eval":
-        print(f"eval: {args.pipeline}")
-        print("  (eval dispatch will be implemented in PR 6)")
+        case "eval":
+            print(f"eval: {args.pipeline}")
+            print("  (eval dispatch will be implemented in PR 6)")
 
 
 if __name__ == "__main__":

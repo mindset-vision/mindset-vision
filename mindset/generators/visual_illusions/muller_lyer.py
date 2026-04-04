@@ -34,10 +34,6 @@ def generate_all(config: MullerLyerConfig):
         width=1,
     )
 
-    def get_random_params():
-        """generate random parameters for one stimulus."""
-        return ds.get_random_params()
-
     with open(output_folder / "annotation.csv", "w", newline="") as annfile:
         writer = csv.writer(annfile)
         writer.writerow(["Path", "Type", "BackgroundColor", "LineLength", "LinePosition", "ArrowLength", "CapArrowAngle", "ArrowAngle", "IterNum"])

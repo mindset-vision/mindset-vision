@@ -1,9 +1,9 @@
 """base infrastructure for dataset generators: config dataclass, decorator, and registration."""
+import dataclasses
 import json
 import functools
 from dataclasses import dataclass, field, fields, asdict
 from pathlib import Path
-from typing import Optional
 
 import sty
 
@@ -61,23 +61,25 @@ def config_to_argparser(config_cls, description=""):
     """build argparse.ArgumentParser from a config dataclass."""
     import argparse
     parser = argparse.ArgumentParser(description=description)
-    for f in fields(config_cls):
-        name = f"--{f.name}"
-        kwargs = {}
-        if f.type == bool:
-            parser.add_argument(name, action="store_true", default=f.default)
-            continue
-        if f.type == list:
-            kwargs["nargs"] = "+"
-            kwargs["type"] = int
-        elif f.type == int:
-            kwargs["type"] = int
-        elif f.type == float:
-            kwargs["type"] = float
-        elif f.type == str:
-            kwargs["type"] = str
-        kwargs["default"] = f.default if not callable(f.default) else f.default_factory()
-        meta = f.metadata
+    for fld in fields(config_cls):
+        name = f"--{fld.name}"
+        default = fld.default if fld.default is not dataclasses.MISSING else fld.default_factory()
+        meta = fld.metadata
+
+        match fld.type:
+            case t if t == bool:
+                parser.add_argument(name, action="store_true", default=default)
+                continue
+            case t if t == list:
+                kwargs = {"nargs": "+", "type": int}
+            case t if t == int:
+                kwargs = {"type": int}
+            case t if t == float:
+                kwargs = {"type": float}
+            case _:
+                kwargs = {"type": str}
+
+        kwargs["default"] = default
         if "choices" in meta:
             kwargs["choices"] = meta["choices"]
         if "label" in meta:
