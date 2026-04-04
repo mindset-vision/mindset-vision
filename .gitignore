@@ -40,6 +40,7 @@ temp/*
 .env
 todo.md
 *.egg-info/
+mindset-report-site/
 
 # macOS specific
 Icon*

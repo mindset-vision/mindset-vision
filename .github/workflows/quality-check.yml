@@ -2,16 +2,12 @@ name: quality-check
 
 on:
   workflow_dispatch:
-    inputs:
-      send_email:
-        description: "send PDF via email"
-        type: boolean
-        default: true
   schedule:
     - cron: "0 9 * * 1"  # every monday 9am UTC
 
 permissions:
-  contents: read
+  contents: write
+  pages: write
 
 jobs:
   generate-illusion-report:
@@ -32,41 +28,17 @@ jobs:
           pip install -e .
           pip install pyyaml beautifulsoup4 opencv-contrib-python
 
-      - name: generate PDF report
-        run: |
-          python .github/workflows/illusion-report/generate_report.py
-          PDF_PATH=$(ls /tmp/mindset-illusion-report-*.pdf)
-          echo "PDF_PATH=$PDF_PATH" >> $GITHUB_ENV
+      - name: generate HTML report
+        run: python .github/workflows/illusion-report/generate_report.py
 
       - name: verify no residual files
         run: |
-          git diff --name-only
-          test -z "$(git diff --name-only)" || (echo "error: residual files detected" && exit 1)
+          git status --porcelain
+          test -z "$(git status --porcelain)" || (echo "error: residual files detected" && exit 1)
 
-      - name: upload artifact
-        uses: actions/upload-artifact@v4
+      - name: deploy to github pages
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          name: illusion-report-${{ github.run_number }}
-          path: ${{ env.PDF_PATH }}
-          retention-days: 90
-
-      - name: send email via gmail API
-        if: inputs.send_email != 'false'
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          secure: true
-          username: ${{ secrets.GMAIL_USER }}
-          password: ${{ secrets.GMAIL_APP_PASSWORD }}
-          subject: "mindset-vision quality check #${{ github.run_number }}"
-          body: |
-            automated illusion sample report from mindset-vision.
-
-            commit: ${{ github.sha }}
-            triggered by: ${{ github.actor }}
-
-            PDF attached. 8-10 illusion types, 12 samples each in 3x4 grids.
-          to: dy323@cam.ac.uk, mlle@itu.dk
-          from: ${{ secrets.GMAIL_USER }}
-          attachments: ${{ env.PDF_PATH }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: /tmp/mindset-report-site
+          force_orphan: true
