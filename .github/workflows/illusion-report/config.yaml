@@ -1,0 +1,85 @@
+recipients:
+  - dy323@cam.ac.uk
+  - mlle@itu.dk
+
+grid:
+  cols: 3
+  rows: 4
+
+pdf:
+  title: "mindset-vision illusion samples"
+  dpi: 150
+  max_size_mb: 10
+  jpeg_quality: 85
+
+# shared defaults applied to all illusions unless overridden
+shared:
+  canvas_size: [224, 224]
+  background_color: [0, 0, 0]
+
+illusions:
+  ebbinghaus:
+    label: "Ebbinghaus Illusion"
+    legacy_path: mindset.generate_datasets.visual_illusions.ebbinghaus_illusion.generate_dataset
+    params:
+      num_samples_scrambled: 6
+      num_samples_illusory: 6
+
+  muller_lyer:
+    label: "Muller-Lyer Illusion"
+    legacy_path: mindset.generate_datasets.visual_illusions.muller_lyer_illusion.generate_dataset
+    params:
+      num_samples_scrambled: 6
+      num_samples_illusory: 6
+
+  ponzo:
+    label: "Ponzo Illusion"
+    legacy_path: mindset.generate_datasets.visual_illusions.ponzo_illusion.generate_dataset
+    params:
+      num_samples_scrambled: 6
+      num_samples_illusory: 6
+
+  jastrow:
+    label: "Jastrow Illusion"
+    legacy_path: mindset.generate_datasets.visual_illusions.jastrow_illusion.generate_dataset
+    params:
+      num_samples_illusory: 4
+      num_samples_random: 4
+      num_samples_aligned: 2
+      num_samples_random_same_size: 2
+
+  tilt:
+    label: "Tilt Illusion"
+    legacy_path: mindset.generate_datasets.visual_illusions.tilt_illusion.generate_dataset
+    params:
+      num_samples_only_center: 4
+      num_samples_only_context: 4
+      num_samples_center_context: 4
+
+  lightness_contrast:
+    label: "Lightness Contrast Illusion"
+    legacy_path: mindset.generate_datasets.visual_illusions.lightness_contrast_illusion.generate_dataset
+    params: {}
+
+  adelson_checkerboard:
+    label: "Adelson Checkerboard Illusion"
+    legacy_path: mindset.generate_datasets.visual_illusions.adelson_checkerboard_illusion.generate_dataset
+    params: {}
+
+  grayscale_shapes:
+    label: "Grayscale Shapes"
+    legacy_path: mindset.generate_datasets.visual_illusions.grayscale_shapes.generate_dataset
+    params:
+      num_samples: 12
+
+  thatcher_face:
+    label: "Thatcher Illusion (Face)"
+    legacy_path: mindset.generate_datasets.visual_illusions.thatcher_illusion_face.generate_dataset
+    params: {}
+
+  thatcher_words:
+    label: "Thatcher Illusion (Words)"
+    legacy_path: mindset.generate_datasets.visual_illusions.thatcher_illusion_words.generate_dataset
+    params:
+      num_words: 3
+      num_samples_per_word: 4
