@@ -39,6 +39,7 @@ temp/*
 .bashrc*
 .env
 todo.md
+*.egg-info/
 
 # macOS specific
 Icon*
