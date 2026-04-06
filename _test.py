@@ -16,25 +16,24 @@ def test_package_imports():
 
 
 def test_generator_registry():
-    """verify the decorator + registry pattern works."""
-    import mindset.generators.visual_illusions.ebbinghaus  # noqa: F401
-    import mindset.generators.visual_illusions.muller_lyer  # noqa: F401
-    import mindset.generators.shape_recognition.linedrawings  # noqa: F401
-    from mindset.generators import REGISTRY, list_generators, get_generator
+    """verify all 33 generators register via auto-discovery."""
+    from mindset.cli import _load_registry
+    from mindset.generators import list_generators
 
-    assert len(REGISTRY) >= 3
-    assert "ebbinghaus" in REGISTRY
+    registry = _load_registry()
+    assert len(registry) == 33
 
     cats = list_generators()
     assert "visual_illusions" in cats
-
-    info = get_generator("ebbinghaus")
-    assert callable(info["func"])
-    assert info["config_cls"] is not None
+    assert "low_mid_vision" in cats
+    assert "shape_recognition" in cats
+    assert len(cats["visual_illusions"]) == 10
+    assert len(cats["low_mid_vision"]) == 9
+    assert len(cats["shape_recognition"]) == 14
 
 
 def test_generate_ebbinghaus():
-    """smoke test: generate a small ebbinghaus dataset and verify output."""
+    """smoke test: generate a small ebbinghaus dataset via new path."""
     from mindset.generators.visual_illusions.ebbinghaus import generate_all
 
     out = Path("/tmp/mindset_ci_ebbinghaus")
@@ -50,12 +49,11 @@ def test_generate_ebbinghaus():
     assert Path(result).exists()
     assert (out / "annotation.csv").exists()
     assert len(list(out.rglob("*.png"))) >= 3
-
     shutil.rmtree(out)
 
 
 def test_generate_legacy():
-    """smoke test: verify a legacy generator still works via the old import path."""
+    """smoke test: verify old import path still works."""
     from mindset.generate_datasets.visual_illusions.ebbinghaus_illusion.generate_dataset import generate_all
 
     out = Path("/tmp/mindset_ci_legacy")
@@ -70,7 +68,6 @@ def test_generate_legacy():
 
     assert Path(result).exists()
     assert (out / "annotation.csv").exists()
-
     shutil.rmtree(out)
 
 
