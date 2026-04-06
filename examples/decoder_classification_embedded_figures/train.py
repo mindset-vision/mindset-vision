@@ -20,7 +20,7 @@ from mindset.generate_datasets.shape_and_object_recognition.embedded_figures.gen
 )
 
 # Notice: below is how you create datasets in script, specifying the arguments in code. However, you could also create dataset with
-# python -m src.generate_datasets_from_toml src/utils/decoder/examples/classification/embedded_figures/generate_embedded_figures.toml - in which case the config parameters used in the toml file will be used.
+# python -m src.generate_datasets_from_toml examples/decoder_classification_embedded_figures/generate_embedded_figures.toml - in which case the config parameters used in the toml file will be used.
 if not pathlib.Path(dataset_folder).exists():
     embedded_figures_generate(
         output_folder=dataset_folder,

@@ -18,7 +18,10 @@ def _load_registry():
             if gen_file.name.startswith("_"):
                 continue
             module_path = f"mindset.generators.{category_dir.name}.{gen_file.stem}"
-            import_module(module_path)
+            try:
+                import_module(module_path)
+            except ImportError:
+                pass
 
     from mindset.generators import REGISTRY
     return REGISTRY

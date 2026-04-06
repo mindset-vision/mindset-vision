@@ -8,21 +8,18 @@ import pathlib
 
 
 dataset_folder = (
-    pathlib.Path("examples")
-    / "data"
-    / "shape_and_object_recognition"
-    / "embedded_figures"
+    pathlib.Path("examples") / "data" / "visual_illusion" / "ebbinghaus_illusion"
 )
 
 # We create a dataset just for this example.
-from mindset.generate_datasets.shape_and_object_recognition.embedded_figures.generate_dataset import (
-    generate_all as embedded_figures_generate,
+from mindset.generate_datasets.visual_illusions.ebbinghaus_illusion.generate_dataset import (
+    generate_all as ebbinghaus_illusion_generate,
 )
 
 # Notice: below is how you create datasets in script, specifying the arguments in code. However, you could also create dataset with
-# python -m src.generate_datasets_from_toml src/utils/decoder/examples/classification/embedded_figures/generate_embedded_figures.toml - in which case the config parameters used in the toml file will be used.
+# python -m src.generate_datasets_from_toml examples/decoder_regression_ebbinghaus/generate_ebbinghaus_illusion.toml - in which case the config parameters used in the toml file will be used.
 if not pathlib.Path(dataset_folder).exists():
-    embedded_figures_generate(
+    ebbinghaus_illusion_generate(
         output_folder=dataset_folder,
         num_samples=1000,
     )

@@ -17,7 +17,7 @@ from mindset.generate_datasets.visual_illusions.ebbinghaus_illusion.generate_dat
 )
 
 # Notice: below is how you create datasets in script, specifying the arguments in code. However, you could also create dataset with
-# python -m src.generate_datasets_from_toml src/utils/decoder/examples/regression/ebbinghaus/generate_ebbinghaus_illusion.toml - in which case the config parameters used in the toml file will be used.
+# python -m src.generate_datasets_from_toml examples/decoder_regression_ebbinghaus/generate_ebbinghaus_illusion.toml - in which case the config parameters used in the toml file will be used.
 if not pathlib.Path(dataset_folder).exists():
     ebbinghaus_illusion_generate(
         output_folder=dataset_folder,
