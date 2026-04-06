@@ -74,18 +74,6 @@ def decoder_step(
         [optimizers[i].step() for i in range(num_decoders)]
 
 
-def log_neptune_init_info(neptune_logger, toml_config, tags=None):
-    tags = [] if tags is None else tags
-    neptune_logger["sys/name"] = toml_config["train_info"][
-        "run_id"
-    ]  # to be consistent with before
-    neptune_logger["toml_config"] = convert_lists_to_strings(toml_config)
-    neptune_logger["toml_config_file"].upload(
-        toml_config["train_info"]["save_folder"] + "/toml_config.txt"
-    )
-    neptune_logger["sys/tags"].add(tags)
-
-
 def replace_layer(net, layer_class, new_layer_class):
     """This function replaces a specific layer class in a given neural network with a new layer class. The input parameters are:
     net: The neural network object in which the layer replacement is to be done

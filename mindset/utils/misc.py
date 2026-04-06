@@ -17,11 +17,6 @@ import tqdm
 
 from mindset.utils.similarity_judgment.misc import draw_random_from_ranges
 
-try:
-    import neptune
-    from neptune.types import File
-except ImportError:
-    pass
 
 
 def assert_exists(path):
@@ -86,60 +81,6 @@ def convert_normalized_tensor_to_plottable_array(tensor, mean, std, text):
     image = cv2.UMat.get(umat)
     image = np.array(image, np.uint8)
     return image
-
-
-def weblog_dataset_info(
-    dataloader,
-    log_text="",
-    dataset_name=None,
-    weblogger=1,
-    plotter=None,
-    num_batches_to_log=2,
-):
-    stats = {}
-
-    def simple_plotter(idx, data):
-        images, labels, *more = data
-        plot_images = images[0 : np.max((4, len(images)))]
-        metric_str = "Debug/{} example images".format(log_text)
-        lab = [f"{i.item():.3f}" for i in labels]
-        if isinstance(weblogger, neptune.Run):
-            [
-                weblogger[metric_str].log(
-                    File.as_image(
-                        convert_normalized_tensor_to_plottable_array(
-                            im, stats["mean"], stats["std"], text=lb
-                        )
-                        / 255
-                    )
-                )
-                for im, lb in zip(plot_images, lab)
-            ]
-
-    if plotter is None:
-        plotter = simple_plotter
-    if "stats" in dir(dataloader.dataset):
-        dataset = dataloader.dataset
-        dataset_name = dataset.name
-        stats = dataloader.dataset.stats
-    else:
-        dataset_name = "no_name" if dataset_name is None else dataset_name
-        stats["mean"] = [0.5, 0.5, 0.5]
-        stats["std"] = [0.2, 0.2, 0.2]
-        import warnings
-        warnings.warn(
-            "MEAN, STD AND DATASET_NAME NOT SET FOR NEPTUNE LOGGING. This message is not referring to normalizing in PyTorch"
-        )
-
-    if isinstance(weblogger, neptune.Run):
-        weblogger["Logs"] = f'{dataset_name} mean: {stats["mean"]}, std: {stats["std"]}'
-
-    for idx, data in enumerate(dataloader):
-        plotter(idx, data)
-        if idx + 1 >= num_batches_to_log:
-            break
-
-    # weblogger[weblogger_text].log(File.as_image(image))
 
 
 def imshow_batch(inp, stats=None, labels=None, title_more="", maximize=True, ax=None):
