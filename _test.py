@@ -21,12 +21,12 @@ def test_generator_registry():
     from mindset.generators import list_generators
 
     registry = _load_registry()
-    assert len(registry) >= 30
+    assert len(registry) == 33
 
     cats = list_generators()
-    assert "visual_illusions" in cats
-    assert "low_mid_vision" in cats
-    assert "shape_recognition" in cats
+    assert len(cats["visual_illusions"]) == 10
+    assert len(cats["low_mid_vision"]) == 9
+    assert len(cats["shape_recognition"]) == 14
 
 
 def test_generate_ebbinghaus():
