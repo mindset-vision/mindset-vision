@@ -72,7 +72,7 @@ name_dataset = os.path.basename(os.path.dirname(__file__))
 DEFAULTS.update(
     {
         "object_longest_side": 200,
-        "image_input_folder": "assets/baker_2018_linedrawings/cropped/",
+        "image_input_folder": "mindset/assets/baker_2018_linedrawings/cropped/",
         "output_folder": f"data/{category_folder}/{name_dataset}_from_linedrawings_baker_2018",
         "antialiasing": False,
         "input_image_type": "linedrawings",
@@ -81,7 +81,7 @@ DEFAULTS.update(
 
 DEFAULTS_bis = DEFAULTS.copy()
 DEFAULTS_bis["input_image_type"] = "silhouettes"
-DEFAULTS_bis["image_input_folder"] = "assets/baker_2022_silhouettes/cropped"
+DEFAULTS_bis["image_input_folder"] = "mindset/assets/baker_2022_silhouettes/cropped"
 DEFAULTS_bis["output_folder"] = (
     f"data/{category_folder}/{name_dataset}_from_silhouettes_baker_2022"
 )

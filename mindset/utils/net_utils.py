@@ -3,6 +3,8 @@ from typing import List
 import numpy as np
 from torchvision.transforms import transforms
 
+import timm
+import timm.data
 import torch.nn.functional as F
 import torchvision
 import torch.nn as nn
@@ -15,137 +17,46 @@ from mindset.utils.device_utils import to_global_device
 
 
 class GrabNet:
+    """unified model factory using timm for standard architectures."""
+
+    _DECODER_ARCHITECTURES = {"resnet152_decoder", "resnet152_decoder_residual"}
+
     @classmethod
     def get_net(cls, architecture_name, imagenet_pt=False, num_classes=None, **kwargs):
-        """
-        @num_classes = None indicates that the last layer WILL NOT be changed.
-        """
-        norm_values = dict(mean=[0.491, 0.482, 0.447], std=[0.247, 0.243, 0.262])
-        resize_value = 224
-
+        """return (model, norm_values, resize_value) for any timm-supported or custom decoder architecture."""
         if imagenet_pt:
             print(fg.red + "Loading ImageNet Pretraining" + rs.fg)
 
-        pretrained_weights = "IMAGENET1K_V1" if imagenet_pt else None
-        nc = 1000 if imagenet_pt else num_classes
+        if architecture_name in cls._DECODER_ARCHITECTURES:
+            return cls._build_decoder(architecture_name, imagenet_pt, num_classes)
 
-        kwargs = dict(num_classes=nc) if nc is not None else dict()
-        if architecture_name == "resnet152_decoder":
-            net = ResNet152decoders(
-                imagenet_pt=imagenet_pt,
-                num_outputs=num_classes,
-                use_residual_decoder=False,
-            )
-        elif architecture_name == "resnet152_decoder_residual":
-            net = ResNet152decoders(
-                imagenet_pt=imagenet_pt,
-                num_outputs=num_classes,
-                use_residual_decoder=True,
-            )
-        elif architecture_name == "vgg11":
-            net = torchvision.models.vgg11(
-                weights=pretrained_weights, progress=True, **kwargs
-            )
-            if num_classes is not None:
-                net.classifier[-1] = nn.Linear(
-                    net.classifier[-1].in_features, num_classes
-                )
-        elif architecture_name == "vgg11bn":
-            net = torchvision.models.vgg11_bn(
-                weights=pretrained_weights, progress=True, **kwargs
-            )
-            if num_classes is not None:
-                net.classifier[-1] = nn.Linear(
-                    net.classifier[-1].in_features, num_classes
-                )
-        elif architecture_name == "vgg16":
-            net = torchvision.models.vgg16(
-                weights=pretrained_weights, progress=True, **kwargs
-            )
-            if num_classes is not None:
-                net.classifier[-1] = nn.Linear(
-                    net.classifier[-1].in_features,
-                    num_classes,
-                )
-        elif architecture_name == "vgg16bn":
-            net = torchvision.models.vgg16_bn(
-                weights=pretrained_weights, progress=True, **kwargs
-            )
-            if num_classes is not None:
-                net.classifier[-1] = nn.Linear(
-                    net.classifier[-1].in_features, num_classes
-                )
-        elif architecture_name == "vgg19bn":
-            net = torchvision.models.vgg19_bn(
-                weights=pretrained_weights, progress=True, **kwargs
-            )
-            if num_classes is not None:
-                net.classifier[-1] = nn.Linear(
-                    net.classifier[-1].in_features,
-                    num_classes,
-                )
-        elif architecture_name == "resnet18":
-            net = torchvision.models.resnet18(
-                weights=pretrained_weights, progress=True, **kwargs
-            )
-            if num_classes is not None:
-                net.fc = nn.Linear(net.fc.in_features, num_classes)
-        elif architecture_name == "resnet50":
-            net = torchvision.models.resnet50(
-                weights=pretrained_weights, progress=True, **kwargs
-            )
-            if num_classes is not None:
-                net.fc = nn.Linear(net.fc.in_features, num_classes)
-        elif architecture_name == "resnet152":
-            net = torchvision.models.resnet152(
-                weights=pretrained_weights, progress=True, **kwargs
-            )
-            if num_classes is not None:
-                net.fc = nn.Linear(net.fc.in_features, num_classes)
-        elif architecture_name == "alexnet":
-            net = torchvision.models.alexnet(
-                weights=pretrained_weights, progress=True, **kwargs
-            )
-            if num_classes is not None:
-                net.classifier[-1] = nn.Linear(
-                    net.classifier[-1].in_features, num_classes
-                )
-        elif architecture_name == "inception_v3":  # nope
-            net = torchvision.models.inception_v3(
-                weights=pretrained_weights, progress=True, **kwargs
-            )
-            resize_value = 299
-            if num_classes is not None:
-                net.fc = nn.Linear(net.fc.in_features, num_classes)
-        elif architecture_name == "densenet121":
-            net = torchvision.models.densenet121(
-                weights=pretrained_weights, progress=True, **kwargs
-            )
-            if num_classes is not None:
-                net.classifier = nn.Linear(net.classifier.in_features, num_classes)
-        elif architecture_name == "densenet201":
-            net = torchvision.models.densenet201(
-                weights=pretrained_weights, progress=True, **kwargs
-            )
-            if num_classes is not None:
-                net.classifier = nn.Linear(net.classifier.in_features, num_classes)
-        elif architecture_name == "googlenet":
-            net = torchvision.models.googlenet(
-                weights=pretrained_weights, progress=True, **kwargs
-            )
-            if num_classes is not None:
-                net.fc = nn.Linear(net.fc.in_features, num_classes)
-        else:
-            net = cls.get_other_nets(architecture_name, num_classes, imagenet_pt, **kwargs)
-            assert (
-                False if net is False else True
-            ), f"Network name {architecture_name} not recognized"
+        return cls._build_timm_model(architecture_name, imagenet_pt, num_classes, **kwargs)
 
+    @classmethod
+    def _build_decoder(cls, architecture_name, imagenet_pt, num_classes):
+        """build a custom ResNet152 decoder model."""
+        norm_values = dict(mean=[0.491, 0.482, 0.447], std=[0.247, 0.243, 0.262])
+        resize_value = 224
+        use_residual = architecture_name == "resnet152_decoder_residual"
+        net = ResNet152decoders(
+            imagenet_pt=imagenet_pt,
+            num_outputs=num_classes,
+            use_residual_decoder=use_residual,
+        )
         return net, norm_values, resize_value
 
-    @staticmethod
-    def get_other_nets(architecture_name, num_classes, imagenet_pt, **kwargs):
-        pass
+    @classmethod
+    def _build_timm_model(cls, architecture_name, imagenet_pt, num_classes, **kwargs):
+        """build any timm-supported model with correct norm values and input size."""
+        timm_kwargs = dict(pretrained=imagenet_pt, **kwargs)
+        if num_classes is not None:
+            timm_kwargs["num_classes"] = num_classes
+
+        model = timm.create_model(architecture_name, **timm_kwargs)
+        data_config = timm.data.resolve_model_data_config(model)
+        norm_values = dict(mean=list(data_config["mean"]), std=list(data_config["std"]))
+        resize_value = data_config["input_size"][1]
+        return model, norm_values, resize_value
 
 
 from mindset.utils.device_utils import GLOBAL_DEVICE

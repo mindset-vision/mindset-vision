@@ -360,7 +360,7 @@ def modify_toml(
 
 
 def reorganize_ETH_80(base_dir):
-    base_dir = "assets/ETH_80"
+    base_dir = "mindset/assets/ETH_80"
 
     images_dir = os.path.join(base_dir, "images")
 

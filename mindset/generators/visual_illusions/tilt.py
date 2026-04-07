@@ -1,0 +1,80 @@
+"""tilt illusion dataset generator."""
+import csv
+import random
+import uuid
+from dataclasses import dataclass, field
+from pathlib import Path
+
+import numpy as np
+from tqdm import tqdm
+
+from mindset.generate_datasets.visual_illusions.tilt_illusion.generate_dataset import DrawTiltIllusion
+from mindset.generators._base import GeneratorConfig, generator, register
+
+
+@dataclass
+class TiltConfig(GeneratorConfig):
+    """config for tilt illusion dataset."""
+    num_samples_only_center: int = field(default=1000, metadata={"min": 1, "max": 50000, "step": 10, "label": "only center samples"})
+    num_samples_only_context: int = field(default=1000, metadata={"min": 1, "max": 50000, "step": 10, "label": "only context samples"})
+    num_samples_center_context: int = field(default=1000, metadata={"min": 1, "max": 50000, "step": 10, "label": "center+context samples"})
+    output_folder: str = field(default="data/visual_illusions/tilt", metadata={"label": "output folder"})
+
+
+def _get_random_values(canvas_size):
+    """return random theta, radius, center, freq for tilt stimuli."""
+    size_scale = np.random.uniform(0.1, 0.6)
+    radius = canvas_size[0] // 2 * size_scale
+    center = (
+        np.random.uniform(radius, canvas_size[0] - radius) // canvas_size[0],
+        np.random.uniform(radius, canvas_size[1] - radius) // canvas_size[1],
+    )
+    freq = random.randint(5, 20)
+    theta = np.random.uniform(-np.pi / 2, np.pi / 2)
+    return theta, radius, center, freq
+
+
+@register("tilt", "visual_illusions")
+@generator(TiltConfig)
+def generate_all(config: TiltConfig):
+    """generate tilt illusion dataset."""
+    output_folder = Path(config.output_folder)
+    for d in ["only_center", "only_context", "center_context"]:
+        (output_folder / d).mkdir(parents=True, exist_ok=True)
+
+    ds = DrawTiltIllusion(
+        background=config.background_color,
+        canvas_size=config.canvas_size,
+        antialiasing=config.antialiasing,
+    )
+
+    with open(output_folder / "annotation.csv", "w", newline="") as annfile:
+        writer = csv.writer(annfile)
+        writer.writerow(["Path", "Type", "BackgroundColor", "ThetaCenter", "Radius", "Frequency", "ThetaContext", "IterNum"])
+
+        for i in tqdm(range(config.num_samples_only_center)):
+            unique_hex = uuid.uuid4().hex[:8]
+            theta_center, radius, _, freq = _get_random_values(config.canvas_size)
+            path = Path("only_center") / f"{-theta_center:.3f}_0_{unique_hex}.png"
+            img = ds.generate_illusion(theta_center, radius, (0.5, 0.5), freq)
+            img.save(str(output_folder / path))
+            writer.writerow([path, "only_center", ds.background, theta_center, radius, freq, "", i])
+
+        for i in tqdm(range(config.num_samples_only_context)):
+            unique_hex = uuid.uuid4().hex[:8]
+            theta_context, radius, _, freq = _get_random_values(config.canvas_size)
+            path = Path("only_context") / f"{-theta_context:.3f}_0_{unique_hex}.png"
+            img = ds.generate_illusion(None, radius, (0.5, 0.5), freq, theta_context)
+            img.save(str(output_folder / path))
+            writer.writerow([path, "only_context", ds.background, 0, radius, freq, theta_context, i])
+
+        all_thetas = np.linspace(-np.pi / 2, np.pi / 2, config.num_samples_center_context)
+        for i, theta_context in enumerate(tqdm(all_thetas)):
+            _, radius, _, freq = _get_random_values(config.canvas_size)
+            img = ds.generate_illusion(0, radius, (0.5, 0.5), freq, theta_context)
+            unique_hex = uuid.uuid4().hex[:8]
+            path = Path("center_context") / f"0_{theta_context:.3f}_{unique_hex}.png"
+            img.save(output_folder / path)
+            writer.writerow([path, "center_context", ds.background, 0, radius, freq, theta_context, i])
+
+    return str(output_folder)

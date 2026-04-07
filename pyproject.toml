@@ -14,16 +14,18 @@ dependencies = [
     "matplotlib>=3.7.0",
     "natsort>=8.4.0",
     "numpy>=1.24.0",
-    "opencv_python>=4.9.0",
+    "opencv-contrib-python>=4.9.0",
     "pandas>=2.0.0",
     "perlin_noise>=1.12",
     "Pillow>=10.1.0",
     "scipy>=1.11.0",
     "seaborn>=0.12.0",
     "statsmodels>=0.14.0",
+    "beautifulsoup4>=4.12.0",
     "sty>=1.0.4",
     "toml>=0.10.2",
     "torch>=2.0.0",
+    "timm>=1.0.0",
     "torchvision>=0.15.0",
     "tqdm>=4.62.3",
     "pyyaml>=6.0",
@@ -39,6 +41,8 @@ mindset = "mindset.cli:main"
 [tool.setuptools.packages.find]
 include = ["mindset*"]
 
+[tool.setuptools.package-data]
+mindset = ["assets/**/*"]
+
 [tool.pytest.ini_options]
-testpaths = ["."]
-python_files = ["_test.py"]
+testpaths = ["tests"]

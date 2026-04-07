@@ -12,7 +12,7 @@ import cv2
 
 
 def get_image_facial_landmarks(image_path, facemark):
-    face_cascade = cv2.CascadeClassifier("assets/haarcascade_frontalface_default.xml")
+    face_cascade = cv2.CascadeClassifier("mindset/assets/haarcascade_frontalface_default.xml")
 
     ret = []
 

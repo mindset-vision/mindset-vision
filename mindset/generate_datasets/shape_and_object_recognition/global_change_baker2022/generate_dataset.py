@@ -76,7 +76,7 @@ def generate_all(
     loc = locals()
     args = {i: loc[i] for i in inspect.getfullargspec(generate_all)[0]}
     config = {f"{category_folder}/{name_dataset}": args}
-    image_input_folder = Path("assets/baker_2022")
+    image_input_folder = Path("mindset/assets/baker_2022")
     output_folder = Path(output_folder)
 
     if output_folder.exists() and behaviour_if_present == "skip":

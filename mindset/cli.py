@@ -6,10 +6,20 @@ from dataclasses import asdict, fields
 
 
 def _load_registry():
-    """import generators to populate the registry."""
-    import mindset.generators.visual_illusions.ebbinghaus  # noqa: F401
-    import mindset.generators.visual_illusions.muller_lyer  # noqa: F401
-    import mindset.generators.shape_recognition.linedrawings  # noqa: F401
+    """import all generators to populate the registry."""
+    from importlib import import_module
+    from pathlib import Path
+
+    generators_dir = Path(__file__).parent / "generators"
+    for category_dir in sorted(generators_dir.iterdir()):
+        if not category_dir.is_dir() or category_dir.name.startswith("_"):
+            continue
+        for gen_file in sorted(category_dir.glob("*.py")):
+            if gen_file.name.startswith("_"):
+                continue
+            module_path = f"mindset.generators.{category_dir.name}.{gen_file.stem}"
+            import_module(module_path)
+
     from mindset.generators import REGISTRY
     return REGISTRY
 

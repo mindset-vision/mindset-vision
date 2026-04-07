@@ -53,7 +53,7 @@ class DrawPatternedCanvas(DrawStimuli):
         font_size,
         spacing=0,
         rotation_angle=45,
-        font_path="assets/arial.ttf",
+        font_path="mindset/assets/arial.ttf",
     ):
         font = ImageFont.truetype(font_path, font_size)
         img = self.create_canvas(
