@@ -9,11 +9,11 @@ from pathlib import Path
 
 from tqdm import tqdm
 
-from mindset.drawing.thatcher_words import (
+from mindset.generators._base import GeneratorConfig, generator, register
+from mindset.generators.visual_illusions._helpers_thatcher_words import (
     CreateData,
     read_corpus,
 )
-from mindset.generators._base import GeneratorConfig, generator, register
 
 LETTERS_NOT_TO_ROTATE = ["O", "W", "M", "N"]
 

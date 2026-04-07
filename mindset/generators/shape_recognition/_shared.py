@@ -1,3 +1,4 @@
+"""shared drawing classes for linedrawings, global change, and silhouettes generators."""
 import cv2
 import numpy as np
 from PIL import Image, ImageOps

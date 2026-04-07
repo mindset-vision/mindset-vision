@@ -7,12 +7,12 @@ from pathlib import Path
 import numpy as np
 from tqdm import tqdm
 
-from mindset.drawing.grayscale_shapes import (
+from mindset.generators._base import GeneratorConfig, generator, register
+from mindset.generators.visual_illusions._shared import (
     ShapeConfigs,
     ColorPickerStimuli,
     add_arrow,
 )
-from mindset.generators._base import GeneratorConfig, generator, register
 from mindset.utils.misc import apply_antialiasing
 
 

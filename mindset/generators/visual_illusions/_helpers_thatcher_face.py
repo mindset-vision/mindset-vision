@@ -1,8 +1,8 @@
 """
-The code in this page is copied from the GPL 3.0 licensed GitHub repo:
+the code in this page is copied from the GPL 3.0 licensed GitHub repo:
 https://github.com/Erfaniaa/thatcher-effect-dataset-generator/tree/master
-The function get_image_facial_landmark has been rewritten to get rid of the dependency from the (heavy and error-prone) dlib. main() function has been removed.
-Notice that this requires the installation of opencv-contrib: pip install opencv-contrib-python --user
+the function get_image_facial_landmark has been rewritten to get rid of the dependency from the (heavy and error-prone) dlib. main() function has been removed.
+notice that this requires the installation of opencv-contrib: pip install opencv-contrib-python --user
 """
 
 import numpy as np
@@ -12,6 +12,7 @@ import cv2
 
 
 def get_image_facial_landmarks(image_path, facemark):
+    """detect facial landmarks from an image using opencv facemark."""
     face_cascade = cv2.CascadeClassifier("mindset/assets/haarcascade_frontalface_default.xml")
 
     ret = []
@@ -32,6 +33,7 @@ def get_image_facial_landmarks(image_path, facemark):
 
 
 def get_bounding_rectangle(points):
+    """compute bounding rectangle from a list of points."""
     top_left = [inf, inf]
     bottom_right = [-inf, -inf]
     for point in points:
@@ -43,6 +45,7 @@ def get_bounding_rectangle(points):
 
 
 def flip_subimage_vertically(image, x1, y1, x2, y2):
+    """flip a rectangular subimage vertically in-place."""
     mid_x = (x1 + x2) // 2
     for x in range(x1, mid_x):
         for y in range(y1, y2 + 1):
@@ -53,6 +56,7 @@ def flip_subimage_vertically(image, x1, y1, x2, y2):
 
 
 def flip_subimage_ellipse_vertically(image, x1, y1, x2, y2):
+    """flip an elliptical subimage region vertically in-place."""
     x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
     mid_x = (x1 + x2) / 2.0
     mid_y = (y1 + y2) / 2.0
@@ -70,6 +74,7 @@ def flip_subimage_ellipse_vertically(image, x1, y1, x2, y2):
 
 
 def gradient_subimage(image, x1, y1, x2, y2):
+    """apply a gradient fill to a rectangular subimage region."""
     final_distance = (x2 - x1) ** 2 + (y2 - y1) ** 2
     start_color = image[x1][y1].copy()
     final_color = image[x2][y2].copy()
@@ -82,6 +87,7 @@ def gradient_subimage(image, x1, y1, x2, y2):
 
 
 def blur_ellipse_border(image, x1, y1, x2, y2):
+    """blur the border region of an elliptical subimage."""
     blurred_image = cv2.GaussianBlur(image, (5, 5), 0)
     mid_x = (x1 + x2) / 2.0
     mid_y = (y1 + y2) / 2.0
@@ -98,6 +104,7 @@ def blur_ellipse_border(image, x1, y1, x2, y2):
 
 
 def blur_orthogonal_border(image, blurred_image, x1, y1, x2, y2, border_size):
+    """blur an orthogonal border strip of the subimage."""
     if x1 == x2:
         for x in range(x1 - border_size, x1 + border_size + 1):
             for y in range(y1, y2 + 1):
@@ -109,6 +116,7 @@ def blur_orthogonal_border(image, blurred_image, x1, y1, x2, y2, border_size):
 
 
 def blur_rectangle_border(image, x1, y1, x2, y2, border_size=2):
+    """blur all four borders of a rectangular subimage."""
     blurred_image = cv2.GaussianBlur(image, (5, 5), 0)
     blur_orthogonal_border(image, blurred_image, x1, y1, x2, y1, border_size)
     blur_orthogonal_border(image, blurred_image, x1, y2, x2, y2, border_size)
@@ -117,11 +125,13 @@ def blur_rectangle_border(image, x1, y1, x2, y2, border_size=2):
 
 
 def flip_subimage_vertically_with_border_softening(image, x1, y1, x2, y2):
+    """flip subimage vertically and soften rectangle border."""
     flip_subimage_vertically(image, x1, y1, x2, y2)
     blur_rectangle_border(image, x1, y1, x2, y2)
 
 
 def flip_subimage_ellipse_vertically_with_border_softening(image, x1, y1, x2, y2):
+    """flip elliptical subimage vertically and soften border."""
     flip_subimage_ellipse_vertically(image, x1, y1, x2, y2)
     blur_ellipse_border(image, x1, y1, x2, y2)
 
@@ -132,6 +142,7 @@ def apply_thatcher_effect_on_image(
     right_eye_rectangle,
     mouth_rectangle,
 ):
+    """apply the thatcher effect to eyes and mouth regions of a face image."""
     image = cv2.cvtColor(
         cv2.imread(
             input_image_path,

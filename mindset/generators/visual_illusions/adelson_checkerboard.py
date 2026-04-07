@@ -7,10 +7,10 @@ from pathlib import Path
 from PIL import Image
 from tqdm import tqdm
 
-from mindset.drawing.grayscale_shapes import add_arrow
+from mindset.generators._base import GeneratorConfig, generator, register
+from mindset.generators.visual_illusions._shared import add_arrow
 from mindset.utils.drawing_utils import resize_and_paste
 from mindset.utils.misc import apply_antialiasing
-from mindset.generators._base import GeneratorConfig, generator, register
 
 
 @dataclass

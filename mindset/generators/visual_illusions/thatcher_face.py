@@ -10,12 +10,12 @@ import PIL.Image as Image
 from torchvision import transforms
 from tqdm import tqdm
 
-from mindset.drawing.thatcher_face import (
+from mindset.generators._base import GeneratorConfig, generator, register
+from mindset.generators.visual_illusions._helpers_thatcher_face import (
     get_image_facial_landmarks,
     get_bounding_rectangle,
     apply_thatcher_effect_on_image,
 )
-from mindset.generators._base import GeneratorConfig, generator, register
 
 
 @dataclass

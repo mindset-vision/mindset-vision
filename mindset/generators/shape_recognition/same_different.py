@@ -7,8 +7,9 @@ from pathlib import Path
 import numpy as np
 from tqdm import tqdm
 
-from mindset.drawing.same_different import DrawSameDifferentStimuli
-from mindset.drawing.same_different_helpers import (
+from mindset.generators._base import GeneratorConfig, generator, register
+from mindset.generators.shape_recognition._same_different_drawing import (
+    DrawSameDifferentStimuli,
     is_overlapping,
     get_regular,
     get_irregular_polygon,
@@ -22,7 +23,6 @@ from mindset.drawing.same_different_helpers import (
     get_closed_squares,
     is_integer,
 )
-from mindset.generators._base import GeneratorConfig, generator, register
 
 
 @dataclass

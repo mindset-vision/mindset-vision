@@ -5,8 +5,8 @@ from pathlib import Path
 
 from tqdm import tqdm
 
-from mindset.drawing.linedrawings import DrawLinedrawingsGlobalChange as DrawLinedrawings
 from mindset.generators._base import GeneratorConfig, generator, register
+from mindset.generators.shape_recognition._shared import DrawLinedrawingsGlobalChange as DrawLinedrawings
 
 
 @dataclass
