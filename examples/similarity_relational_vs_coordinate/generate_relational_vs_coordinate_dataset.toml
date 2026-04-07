@@ -11,6 +11,6 @@ behaviour_if_present = "overwrite"
 # Specify the value in pixels to which the longest side of the line drawings will be resized (keeping the aspect ratio), before pasting the image into a canvas
 object_longest_side = 120
 # A folder containing the hummel-stankiewicz stimuli
-input_folder = "assets/hummel_stankiewicz_1996/pngs"
+input_folder = "mindset/assets/hummel_stankiewicz_1996/pngs"
 # The folder containing the data. It will be created if doesn't exist. The default will match the folder structure of the generation script
 output_folder = "examples/data/low_mid_level_vision/relational_vs_coordinate"
