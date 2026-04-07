@@ -182,7 +182,7 @@ class CreateData(DrawStimuli):
             self.get_w_h_letters(
                 self.word[i],
                 font=truetype(
-                    os.path.abspath(Path("assets", "words", "fonts") / self.name_font),
+                    str(Path("mindset", "assets", "words", "fonts") / self.name_font),
                     self.size_font + self.letters_size_font_shift[i],
                 ),
             )
@@ -193,7 +193,7 @@ class CreateData(DrawStimuli):
     def get_zoomed_font(self, zoom: int):
         """get font with size adjusted by zoom offset."""
         return truetype(
-            os.path.abspath(Path("assets", "words", "fonts") / self.name_font),
+            str(Path("mindset", "assets", "words", "fonts") / self.name_font),
             self.size_font + zoom,
         )
 

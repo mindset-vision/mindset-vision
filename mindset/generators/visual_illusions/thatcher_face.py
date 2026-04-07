@@ -11,7 +11,7 @@ from torchvision import transforms
 from tqdm import tqdm
 
 from mindset.generators._base import GeneratorConfig, generator, register
-from mindset.generators.visual_illusions._helpers_thatcher_face import (
+from mindset.generators.visual_illusions._thatcher_face_drawing import (
     get_image_facial_landmarks,
     get_bounding_rectangle,
     apply_thatcher_effect_on_image,

@@ -1,7 +1,6 @@
 """viewpoint invariance dataset generator."""
 import csv
 import glob
-import os
 import re
 import uuid
 from dataclasses import dataclass, field
@@ -26,8 +25,8 @@ class DrawETH(DrawStimuli):
 
     def create_ETH(self, img_path):
         """load an ETH-80 image, crop to object bounds, and paste on canvas."""
-        path_parts = img_path.split(os.sep)
-        desired_path = os.path.join(*path_parts[-3:]).rstrip(".png")
+        path_parts = Path(img_path).parts
+        desired_path = str(Path(*path_parts[-3:])).rstrip(".png")
         map_path = f"{self.map_path}/{desired_path}-map.png"
 
         map_pil = Image.open(map_path).convert("L")
@@ -95,7 +94,7 @@ def generate_all(config: ViewpointInvarianceConfig):
         for img_path in tqdm(all_images):
             class_num = Path(img_path).parts[2]
             object_id = int(Path(img_path).parts[3])
-            match = re.search(r"([a-zA-Z]+)\d+-0*(\d+)-0*(\d+).png$", os.path.basename(img_path))
+            match = re.search(r"([a-zA-Z]+)\d+-0*(\d+)-0*(\d+).png$", Path(img_path).name)
 
             class_name = match.group(1)
             inclination = int(match.group(2))
