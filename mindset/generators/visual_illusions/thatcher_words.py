@@ -9,7 +9,7 @@ from pathlib import Path
 
 from tqdm import tqdm
 
-from mindset.generate_datasets.visual_illusions.thatcher_illusion_words.utils import (
+from mindset.drawing.thatcher_words import (
     CreateData,
     read_corpus,
 )

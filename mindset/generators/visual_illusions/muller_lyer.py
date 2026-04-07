@@ -8,7 +8,7 @@ from pathlib import Path
 import numpy as np
 from tqdm import tqdm
 
-from mindset.generate_datasets.visual_illusions.muller_lyer_illusion.generate_dataset import DrawMullerLyer
+from mindset.drawing.muller_lyer import DrawMullerLyer
 from mindset.utils.misc import apply_antialiasing
 from mindset.generators._base import GeneratorConfig, generator, register
 

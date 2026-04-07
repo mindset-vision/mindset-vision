@@ -5,7 +5,7 @@ from pathlib import Path
 
 from tqdm import tqdm
 
-from mindset.generate_datasets.low_mid_level_vision.emergent_features.utils import DrawEmergentFeaturesdots
+from mindset.drawing.emergent_features import DrawEmergentFeaturesdots
 from mindset.generators._base import GeneratorConfig, generator, register
 
 

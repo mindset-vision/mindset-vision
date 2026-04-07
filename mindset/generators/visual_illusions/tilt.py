@@ -8,7 +8,7 @@ from pathlib import Path
 import numpy as np
 from tqdm import tqdm
 
-from mindset.generate_datasets.visual_illusions.tilt_illusion.generate_dataset import DrawTiltIllusion
+from mindset.drawing.tilt import DrawTiltIllusion
 from mindset.generators._base import GeneratorConfig, generator, register
 
 

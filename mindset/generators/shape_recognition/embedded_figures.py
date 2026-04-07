@@ -6,8 +6,7 @@ from pathlib import Path
 
 from tqdm import tqdm
 
-from mindset.generate_datasets.shape_and_object_recognition.embedded_figures.utils import DrawEmbeddedFigures
-from mindset.generate_datasets.shape_and_object_recognition.embedded_figures.generate_dataset import polys
+from mindset.drawing.embedded_figures import DrawEmbeddedFigures, polys
 from mindset.generators._base import GeneratorConfig, generator, register
 
 

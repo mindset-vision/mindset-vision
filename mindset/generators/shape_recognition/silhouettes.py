@@ -6,7 +6,7 @@ from pathlib import Path
 
 from tqdm import tqdm
 
-from mindset.generate_datasets.shape_and_object_recognition.silhouettes.generate_dataset import DrawLinedrawings
+from mindset.drawing.linedrawings import DrawLinedrawingsSilhouettes as DrawLinedrawings
 from mindset.generators._base import GeneratorConfig, generator, register
 
 

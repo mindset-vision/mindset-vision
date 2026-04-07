@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 from tqdm import tqdm
 
-from mindset.generate_datasets.visual_illusions.jastrow_illusion.generate_dataset import DrawJastrow, get_random_params
+from mindset.drawing.jastrow import DrawJastrow, get_random_params
 from mindset.generators._base import GeneratorConfig, generator, register
 
 

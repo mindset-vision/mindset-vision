@@ -1,16 +1,12 @@
 """2d transformations dataset generator."""
 import csv
-import importlib
 import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
 
 from tqdm import tqdm
 
-_mod = importlib.import_module(
-    "mindset.generate_datasets.shape_and_object_recognition.2d_transformations.generate_dataset"
-)
-DrawTransform = _mod.DrawTransform
+from mindset.drawing.transformations import DrawTransform
 from mindset.utils.misc import get_affine_rnd_fun
 from mindset.generators._base import GeneratorConfig, generator, register
 

@@ -7,8 +7,8 @@ from pathlib import Path
 import numpy as np
 from tqdm import tqdm
 
-from mindset.generate_datasets.shape_and_object_recognition.same_different_task.generate_dataset import (
-    DrawSameDifferentStimuli,
+from mindset.drawing.same_different import DrawSameDifferentStimuli
+from mindset.drawing.same_different_helpers import (
     is_overlapping,
     get_regular,
     get_irregular_polygon,

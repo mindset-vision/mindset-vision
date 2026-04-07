@@ -5,7 +5,7 @@ from pathlib import Path
 
 from tqdm import tqdm
 
-from mindset.generate_datasets.shape_and_object_recognition.dotted_linedrawings.generate_dataset import DrawDottedImage
+from mindset.drawing.dotted_linedrawings import DrawDottedImage
 from mindset.generators._base import GeneratorConfig, generator, register
 
 

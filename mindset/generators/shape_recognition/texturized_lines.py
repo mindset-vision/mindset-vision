@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 from tqdm import tqdm
 
-from mindset.generate_datasets.shape_and_object_recognition.texturized_linedrawings_lines.generate_dataset import DrawPatternedCanvas
+from mindset.drawing.texturized_lines import DrawPatternedCanvas
 from mindset.generators._base import GeneratorConfig, generator, register
 
 

@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 from tqdm import tqdm
 
-from mindset.generate_datasets.visual_illusions.grayscale_shapes.utils import (
+from mindset.drawing.grayscale_shapes import (
     ShapeConfigs,
     ColorPickerStimuli,
     add_arrow,

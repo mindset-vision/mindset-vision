@@ -5,7 +5,7 @@ from pathlib import Path
 
 from tqdm import tqdm
 
-from mindset.generate_datasets.shape_and_object_recognition.segmented_images.generate_dataset import DrawGriddedImages
+from mindset.drawing.gridded_images import DrawGriddedImages
 from mindset.generators._base import GeneratorConfig, generator, register
 
 

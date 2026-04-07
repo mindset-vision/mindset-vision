@@ -8,10 +8,7 @@ from pathlib import Path
 import numpy as np
 from tqdm import tqdm
 
-from mindset.generate_datasets.low_mid_level_vision.un_crowding.generate_dataset import (
-    DrawUncrowding,
-    all_test_shapes,
-)
+from mindset.drawing.uncrowding import DrawUncrowding, all_test_shapes
 from mindset.generators._base import GeneratorConfig, generator, register
 
 

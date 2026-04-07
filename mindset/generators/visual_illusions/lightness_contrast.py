@@ -8,7 +8,7 @@ import numpy as np
 from PIL import Image, ImageDraw
 from tqdm import tqdm
 
-from mindset.generate_datasets.visual_illusions.grayscale_shapes.utils import add_arrow
+from mindset.drawing.grayscale_shapes import add_arrow
 from mindset.utils.misc import apply_antialiasing
 from mindset.generators._base import GeneratorConfig, generator, register
 

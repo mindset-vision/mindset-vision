@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 from tqdm import tqdm
 
-from mindset.generate_datasets.low_mid_level_vision.weber_law.generate_dataset import DrawWeberLength
+from mindset.drawing.weber_law import DrawWeberLength
 from mindset.generators._base import GeneratorConfig, generator, register
 
 

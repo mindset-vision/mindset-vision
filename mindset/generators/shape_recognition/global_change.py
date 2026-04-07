@@ -5,7 +5,7 @@ from pathlib import Path
 
 from tqdm import tqdm
 
-from mindset.generate_datasets.shape_and_object_recognition.global_change.generate_dataset import DrawLinedrawings
+from mindset.drawing.linedrawings import DrawLinedrawingsGlobalChange as DrawLinedrawings
 from mindset.generators._base import GeneratorConfig, generator, register
 
 

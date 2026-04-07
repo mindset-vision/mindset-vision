@@ -79,11 +79,16 @@ class ReportGenerator:
     def _generate_and_sample(self, cfg, tmp_dir, name):
         """generate with capped params, then balanced-sample from annotation.csv."""
         output_dir = Path(tmp_dir) / name
-        gen_fn = importlib.import_module(cfg["module"]).generate_all
 
-        accepted = set(inspect.getfullargspec(gen_fn).args)
-        params = {**self.shared, **cap_sample_params(gen_fn), **cfg.get("overrides", {}), "output_folder": str(output_dir)}
-        gen_fn(**{k: v for k, v in params.items() if k in accepted})
+        from mindset.cli import _load_registry
+        from mindset.generators import get_generator
+        _load_registry()
+
+        info = get_generator(cfg["registry_name"])
+        gen_fn = info["func"]
+
+        params = {**self.shared, **cfg.get("overrides", {}), "output_folder": str(output_dir)}
+        gen_fn(**params)
 
         ann = output_dir / "annotation.csv"
         if ann.exists():

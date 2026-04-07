@@ -1,0 +1,11 @@
+canvas_size:
+- 224
+- 224
+background_color:
+- 0
+- 0
+- 0
+antialiasing: true
+output_folder: /tmp/example_config_only
+num_samples_scrambled: 20
+num_samples_illusory: 10

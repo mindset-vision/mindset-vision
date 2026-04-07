@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 from tqdm import tqdm
 
-from mindset.generate_datasets.visual_illusions.ponzo_illusion.generate_dataset import DrawPonzo
+from mindset.drawing.ponzo import DrawPonzo
 from mindset.generators._base import GeneratorConfig, generator, register
 
 

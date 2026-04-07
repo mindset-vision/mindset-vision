@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 from tqdm import tqdm
 
-from mindset.generate_datasets.visual_illusions.ebbinghaus_illusion.utils import DrawEbbinghaus
+from mindset.drawing.ebbinghaus import DrawEbbinghaus
 from mindset.generators._base import GeneratorConfig, generator, register
 
 

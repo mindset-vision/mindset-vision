@@ -9,7 +9,7 @@ from pathlib import Path
 import numpy as np
 from tqdm import tqdm
 
-from mindset.generate_datasets.shape_and_object_recognition.texturized_linedrawings_chars.generate_dataset import DrawPatternedCanvas
+from mindset.drawing.texturized_chars import DrawPatternedCanvas
 from mindset.generators._base import GeneratorConfig, generator, register
 
 characters = string.ascii_letters + string.digits + string.punctuation

@@ -5,10 +5,7 @@ from pathlib import Path
 
 from tqdm import tqdm
 
-from mindset.generate_datasets.shape_and_object_recognition.leuven_embedded_figures.generate_dataset import (
-    load_and_invert,
-    get_highest_number,
-)
+from mindset.drawing.leuven import load_and_invert, get_highest_number
 from mindset.generators._base import GeneratorConfig, generator, register
 
 

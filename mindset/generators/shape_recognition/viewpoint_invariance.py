@@ -9,7 +9,7 @@ from pathlib import Path
 
 from tqdm import tqdm
 
-from mindset.generate_datasets.shape_and_object_recognition.viewpoint_invariance.generate_dataset import DrawETH
+from mindset.drawing.viewpoint import DrawETH
 from mindset.generators._base import GeneratorConfig, generator, register
 from mindset.utils.misc import check_download_ETH_80_dataset
 
