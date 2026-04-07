@@ -18,12 +18,8 @@ from mindset.utils.device_utils import to_global_device
 from mindset.utils.similarity_judgment.misc import (
     save_figs,
 )
-from mindset.utils.misc import (
-    conditional_tqdm,
-    conver_tensor_to_plot,
-    get_affine_rnd_fun,
-    my_affine,
-)
+from mindset.drawing.affine import get_affine_rnd_fun, my_affine
+from mindset.utils.misc import conditional_tqdm, conver_tensor_to_plot
 from copy import deepcopy
 import csv
 

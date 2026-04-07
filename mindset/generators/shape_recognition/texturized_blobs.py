@@ -13,7 +13,7 @@ from torchvision.transforms import transforms
 from tqdm import tqdm
 
 from mindset.generators._base import GeneratorConfig, generator, register
-from mindset.utils.drawing_utils import DrawStimuli, get_mask_from_linedrawing
+from mindset.drawing.base import DrawStimuli, get_mask_from_linedrawing
 from mindset.utils.misc import apply_antialiasing
 from mindset.utils.shape_based_image_generation.modules.parent import ParentStimuli
 from mindset.utils.shape_based_image_generation.modules.shapes import Shapes

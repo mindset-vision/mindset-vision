@@ -7,7 +7,7 @@ import cv2
 import PIL.Image as Image
 from tqdm import tqdm
 
-from mindset.utils.drawing_utils import (
+from mindset.drawing.base import (
     DrawStimuli,
     paste_linedrawing_onto_canvas,
     resize_image_keep_aspect_ratio,

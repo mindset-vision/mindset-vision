@@ -9,7 +9,7 @@ from PIL import Image, ImageOps
 from tqdm import tqdm
 
 from mindset.generators._base import GeneratorConfig, generator, register
-from mindset.utils.drawing_utils import (
+from mindset.drawing.base import (
     DrawStimuli,
     paste_linedrawing_onto_canvas,
     resize_image_keep_aspect_ratio,

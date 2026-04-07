@@ -14,7 +14,7 @@ from torchvision.transforms import transforms
 from tqdm import tqdm
 
 from mindset.generators._base import GeneratorConfig, generator, register
-from mindset.utils.drawing_utils import (
+from mindset.drawing.base import (
     DrawStimuli,
     get_mask_from_linedrawing,
     resize_image_keep_aspect_ratio,

@@ -8,7 +8,7 @@ def test_package_imports():
     from mindset.utils.misc import DEFAULTS
     assert "canvas_size" in DEFAULTS
 
-    from mindset.utils.drawing_utils import DrawStimuli
+    from mindset.drawing.base import DrawStimuli
     assert DrawStimuli is not None
 
     from mindset.utils.dataset_utils import ImageDatasetAnnotations

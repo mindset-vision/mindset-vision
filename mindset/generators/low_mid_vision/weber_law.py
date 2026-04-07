@@ -9,7 +9,7 @@ from PIL import ImageDraw
 from tqdm import tqdm
 
 from mindset.generators._base import GeneratorConfig, generator, register
-from mindset.utils.drawing_utils import DrawStimuli
+from mindset.drawing.base import DrawStimuli
 
 
 class DrawWeberLength(DrawStimuli):

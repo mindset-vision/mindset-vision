@@ -9,7 +9,7 @@ from PIL import Image, ImageDraw
 from tqdm import tqdm
 
 from mindset.generators._base import GeneratorConfig, generator, register
-from mindset.generators.visual_illusions._shared import add_arrow
+from mindset.drawing.primitives import add_arrow
 from mindset.utils.misc import apply_antialiasing
 
 
