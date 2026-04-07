@@ -13,7 +13,7 @@ from mindset.generators._base import GeneratorConfig, generator, register
 class GlobalChangeConfig(GeneratorConfig):
     """config for global change dataset."""
     object_longest_side: int = field(default=120, metadata={"min": 50, "max": 500, "step": 10, "label": "object longest side (px)"})
-    image_input_folder: str = field(default="assets/baker_2018_linedrawings/cropped/", metadata={"label": "input folder with images"})
+    image_input_folder: str = field(default="mindset/assets/baker_2018_linedrawings/cropped/", metadata={"label": "input folder with images"})
     convert_to_silhouettes: int = field(default=0, metadata={"choices": [0, 1], "label": "convert to silhouettes"})
     antialiasing: bool = field(default=False, metadata={"label": "antialiasing"})
     output_folder: str = field(default="data/shape_and_object_recognition/global_change", metadata={"label": "output folder"})

@@ -32,7 +32,7 @@ DEFAULTS = BASE_DEFAULTS.copy()
 
 DEFAULTS.update(
     {
-        "ETH_80_folder": "assets/ETH_80",
+        "ETH_80_folder": "mindset/assets/ETH_80",
         "output_folder": f"data/{category_folder}/{name_dataset}",
         "object_longest_side": 200,
         "azimuth_lim": [0, 365],

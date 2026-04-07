@@ -12,7 +12,7 @@ from mindset.generators._base import GeneratorConfig, generator, register
 @dataclass
 class SegmentedImagesConfig(GeneratorConfig):
     """config for segmented images dataset."""
-    linedrawing_input_folder: str = field(default="assets/baker_2018_linedrawings/cropped", metadata={"label": "input folder with line drawings"})
+    linedrawing_input_folder: str = field(default="mindset/assets/baker_2018_linedrawings/cropped", metadata={"label": "input folder with line drawings"})
     object_longest_side: int = field(default=200, metadata={"min": 50, "max": 500, "step": 10, "label": "object longest side (px)"})
     grid_degree: int = field(default=45, metadata={"min": 0, "max": 360, "step": 5, "label": "grid rotation (degrees)"})
     grid_size: int = field(default=8, metadata={"min": 1, "max": 50, "step": 1, "label": "grid cell size (px)"})

@@ -64,7 +64,7 @@ class NapVsMp3dConfig(GeneratorConfig):
     """config for nap vs mp 3d geons dataset."""
     object_longest_side: int = field(default=200, metadata={"min": 10, "max": 1000, "step": 10, "label": "object longest side"})
     stroke_color: str = field(default="", metadata={"label": "stroke color (rgb as 255_255_255 or empty)"})
-    shape_folder: str = field(default="assets/amir_geons/cropped/NAPvsMP", metadata={"label": "shape folder"})
+    shape_folder: str = field(default="mindset/assets/amir_geons/cropped/NAPvsMP", metadata={"label": "shape folder"})
     output_folder: str = field(default="data/low_mid_level_vision/NAP_vs_MP_3D_geons", metadata={"label": "output folder"})
 
 

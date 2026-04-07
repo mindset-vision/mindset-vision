@@ -272,7 +272,7 @@ import json
 
 
 class ImageNetClasses:
-    def __init__(self, class_index_json_file="assets/imagenet_class_index.json"):
+    def __init__(self, class_index_json_file="mindset/assets/imagenet_class_index.json"):
         self.class_idx = json.load(open(class_index_json_file))
         self.idx2label = [self.class_idx[str(k)][1] for k in range(len(self.class_idx))]
         self.label2idx = {

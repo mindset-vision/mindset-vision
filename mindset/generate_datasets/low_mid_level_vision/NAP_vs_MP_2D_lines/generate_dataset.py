@@ -51,7 +51,7 @@ name_dataset = os.path.basename(os.path.dirname(__file__))
 DEFAULTS.update(
     {
         "object_longest_side": 200,
-        "input_folder": "assets/kubilius_2017/pngs",
+        "input_folder": "mindset/assets/kubilius_2017/pngs",
         "output_folder": f"data/{category_folder}/{name_dataset}",
         "antialiasing": False,
     }

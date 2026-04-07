@@ -75,7 +75,7 @@ name_dataset = os.path.basename(os.path.dirname(__file__))
 DEFAULTS.update(
     {
         "object_longest_side": 200,
-        "linedrawing_input_folder": "assets/baker_2018_linedrawings/cropped/",
+        "linedrawing_input_folder": "mindset/assets/baker_2018_linedrawings/cropped/",
         "dot_distance": 5,
         "dot_size": 1,
         "output_folder": f"data/{category_folder}/{name_dataset}",

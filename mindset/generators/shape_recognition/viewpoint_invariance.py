@@ -17,7 +17,7 @@ from mindset.utils.misc import check_download_ETH_80_dataset
 @dataclass
 class ViewpointInvarianceConfig(GeneratorConfig):
     """config for viewpoint invariance dataset."""
-    eth_80_folder: str = field(default="assets/ETH_80", metadata={"label": "ETH-80 dataset folder"})
+    eth_80_folder: str = field(default="mindset/assets/ETH_80", metadata={"label": "ETH-80 dataset folder"})
     object_longest_side: int = field(default=200, metadata={"min": 50, "max": 500, "step": 10, "label": "object longest side (px)"})
     azimuth_lim: list = field(default_factory=lambda: [0, 365], metadata={"label": "azimuth limits"})
     inclination_lim: list = field(default_factory=lambda: [30, 90], metadata={"label": "inclination limits"})

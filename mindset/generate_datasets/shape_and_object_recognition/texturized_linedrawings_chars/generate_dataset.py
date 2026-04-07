@@ -52,7 +52,7 @@ class DrawPatternedCanvas(DrawStimuli):
         font_size,
         spacing=0,
         rotation_angle=45,
-        font_path="assets/arial.ttf",
+        font_path="mindset/assets/arial.ttf",
         background=None,
     ):
         font = ImageFont.truetype(font_path, font_size)
@@ -139,7 +139,7 @@ name_dataset = os.path.basename(os.path.dirname(__file__))
 
 DEFAULTS.update(
     {
-        "linedrawing_input_folder": "assets/baker_2018_linedrawings/cropped/",
+        "linedrawing_input_folder": "mindset/assets/baker_2018_linedrawings/cropped/",
         "num_samples": 500,
         "object_longest_side": 200,
         "background_char": " ",

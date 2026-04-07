@@ -14,7 +14,7 @@ from mindset.generators._base import GeneratorConfig, generator, register
 @dataclass
 class TexturizedLinesConfig(GeneratorConfig):
     """config for texturized linedrawings (lines) dataset."""
-    linedrawing_input_folder: str = field(default="assets/baker_2018_linedrawings/cropped/", metadata={"label": "input folder with line drawings"})
+    linedrawing_input_folder: str = field(default="mindset/assets/baker_2018_linedrawings/cropped/", metadata={"label": "input folder with line drawings"})
     num_samples: int = field(default=500, metadata={"min": 1, "max": 10000, "step": 10, "label": "samples per line drawing"})
     object_longest_side: int = field(default=200, metadata={"min": 50, "max": 500, "step": 10, "label": "object longest side (px)"})
     density: float = field(default=1.8, metadata={"min": 0.1, "max": 10.0, "step": 0.1, "label": "pattern density"})

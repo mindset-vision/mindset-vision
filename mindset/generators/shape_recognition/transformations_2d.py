@@ -18,7 +18,7 @@ from mindset.generators._base import GeneratorConfig, generator, register
 @dataclass
 class Transformations2DConfig(GeneratorConfig):
     """config for 2d transformations dataset."""
-    input_folder: str = field(default="assets/baker_2018_linedrawings/cropped/", metadata={"label": "input folder with line drawings"})
+    input_folder: str = field(default="mindset/assets/baker_2018_linedrawings/cropped/", metadata={"label": "input folder with line drawings"})
     object_longest_side: int = field(default=200, metadata={"min": 50, "max": 500, "step": 10, "label": "object longest side (px)"})
     translation_x: list = field(default_factory=lambda: [-0.2, 0.2], metadata={"label": "translation X range"})
     translation_y: list = field(default_factory=lambda: [-0.2, 0.2], metadata={"label": "translation Y range"})

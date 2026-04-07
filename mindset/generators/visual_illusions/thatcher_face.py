@@ -21,7 +21,7 @@ from mindset.generators._base import GeneratorConfig, generator, register
 @dataclass
 class ThatcherFaceConfig(GeneratorConfig):
     """config for thatcher illusion face dataset."""
-    face_folder: str = field(default="assets/celebA_sample/normal", metadata={"label": "face folder"})
+    face_folder: str = field(default="mindset/assets/celebA_sample/normal", metadata={"label": "face folder"})
     output_folder: str = field(default="data/visual_illusions/thatcher_face", metadata={"label": "output folder"})
 
 
@@ -37,7 +37,7 @@ def generate_all(config: ThatcherFaceConfig):
         (output_folder / cond).mkdir(parents=True, exist_ok=True)
 
     facemark = cv2.face.createFacemarkLBF()
-    facemark.loadModel("assets/lbfmodel.yaml")
+    facemark.loadModel("mindset/assets/lbfmodel.yaml")
 
     with open(output_folder / "annotation.csv", "w", newline="") as annfile:
         writer = csv.writer(annfile)

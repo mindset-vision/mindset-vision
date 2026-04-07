@@ -13,7 +13,7 @@ from mindset.generators._base import GeneratorConfig, generator, register
 class LinedrawingsConfig(GeneratorConfig):
     """config for linedrawings dataset."""
     object_longest_side: int = field(default=200, metadata={"min": 50, "max": 500, "step": 10, "label": "object longest side (px)"})
-    linedrawing_input_folder: str = field(default="assets/baker_2018_linedrawings/cropped/", metadata={"label": "input folder with line drawings"})
+    linedrawing_input_folder: str = field(default="mindset/assets/baker_2018_linedrawings/cropped/", metadata={"label": "input folder with line drawings"})
     antialiasing: bool = field(default=False, metadata={"label": "antialiasing"})
     output_folder: str = field(default="data/shape_and_object_recognition/linedrawings", metadata={"label": "output folder"})
 

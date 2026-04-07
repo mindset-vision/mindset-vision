@@ -27,7 +27,7 @@ name_dataset = os.path.basename(os.path.dirname(__file__))
 
 DEFAULTS = {
     "canvas_size": [224, 224],
-    "face_folder": "assets/celebA_sample/normal",
+    "face_folder": "mindset/assets/celebA_sample/normal",
     "output_folder": f"data/{category_folder}/{name_dataset}",
     "behaviour_if_present": "overwrite",
 }
@@ -63,7 +63,7 @@ def generate_all(
         ]
     ]
     facemark = cv2.face.createFacemarkLBF()
-    facemark.loadModel("assets/lbfmodel.yaml")
+    facemark.loadModel("mindset/assets/lbfmodel.yaml")
     with open(output_folder / "annotation.csv", "w", newline="") as annfile:
         writer = csv.writer(annfile)
         writer.writerow(["Path", "Condition", "FaceId"])

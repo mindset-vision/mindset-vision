@@ -94,7 +94,7 @@ name_dataset = os.path.basename(os.path.dirname(__file__))
 
 DEFAULTS.update(
     {
-        "linedrawing_input_folder": "assets/baker_2018_linedrawings/cropped",
+        "linedrawing_input_folder": "mindset/assets/baker_2018_linedrawings/cropped",
         "object_longest_side": 200,
         "grid_degree": 45,
         "grid_size": 8,

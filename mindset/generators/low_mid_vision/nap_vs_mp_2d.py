@@ -37,7 +37,7 @@ class DrawLinedrawings(DrawStimuli):
 class NapVsMp2dConfig(GeneratorConfig):
     """config for nap vs mp 2d lines dataset."""
     object_longest_side: int = field(default=200, metadata={"min": 10, "max": 1000, "step": 10, "label": "object longest side"})
-    input_folder: str = field(default="assets/kubilius_2017/pngs", metadata={"label": "input folder"})
+    input_folder: str = field(default="mindset/assets/kubilius_2017/pngs", metadata={"label": "input folder"})
     output_folder: str = field(default="data/low_mid_level_vision/NAP_vs_MP_2D_lines", metadata={"label": "output folder"})
     antialiasing: bool = field(default=False, metadata={"label": "antialiasing"})
 

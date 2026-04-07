@@ -41,5 +41,8 @@ mindset = "mindset.cli:main"
 [tool.setuptools.packages.find]
 include = ["mindset*"]
 
+[tool.setuptools.package-data]
+mindset = ["assets/**/*"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]

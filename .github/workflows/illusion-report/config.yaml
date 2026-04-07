@@ -87,7 +87,7 @@ generators:
     label: "Global Change"
     module: mindset.generate_datasets.shape_and_object_recognition.global_change.generate_dataset
     overrides:
-      image_input_folder: "assets/baker_2018_linedrawings/cropped/"
+      image_input_folder: "mindset/assets/baker_2018_linedrawings/cropped/"
   transformations_2d:
     label: "2D Transformations"
     module: mindset.generate_datasets.shape_and_object_recognition.2d_transformations.generate_dataset

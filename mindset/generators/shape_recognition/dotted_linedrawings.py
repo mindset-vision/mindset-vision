@@ -13,7 +13,7 @@ from mindset.generators._base import GeneratorConfig, generator, register
 class DottedLinedrawingsConfig(GeneratorConfig):
     """config for dotted linedrawings dataset."""
     object_longest_side: int = field(default=200, metadata={"min": 50, "max": 500, "step": 10, "label": "object longest side (px)"})
-    linedrawing_input_folder: str = field(default="assets/baker_2018_linedrawings/cropped/", metadata={"label": "input folder with line drawings"})
+    linedrawing_input_folder: str = field(default="mindset/assets/baker_2018_linedrawings/cropped/", metadata={"label": "input folder with line drawings"})
     dot_distance: int = field(default=5, metadata={"min": 1, "max": 50, "step": 1, "label": "distance between dots"})
     dot_size: int = field(default=1, metadata={"min": 1, "max": 20, "step": 1, "label": "dot size"})
     antialiasing: bool = field(default=False, metadata={"label": "antialiasing"})

@@ -33,16 +33,16 @@ DEFAULTS["stroke_color"] = ""
 category_folder = os.path.basename(os.path.dirname(os.path.dirname(__file__)))
 name_dataset = os.path.basename(os.path.dirname(__file__))
 DEFAULTS["output_folder"] = f"data/{category_folder}/{name_dataset}_standard"
-DEFAULTS["shape_folder"] = "assets/amir_geons/cropped/NAPvsMP"
+DEFAULTS["shape_folder"] = "mindset/assets/amir_geons/cropped/NAPvsMP"
 DEFAULTS["object_longest_side"] = 200
 
 DEFAULTS_bis = DEFAULTS.copy()
 DEFAULTS_bis["output_folder"] = f"data/{category_folder}/{name_dataset}_no_shades"
-DEFAULTS_bis["shape_folder"] = "assets/amir_geons/cropped/NAPvsMP_no_shades"
+DEFAULTS_bis["shape_folder"] = "mindset/assets/amir_geons/cropped/NAPvsMP_no_shades"
 
 DEFAULTS_tris = DEFAULTS.copy()
 DEFAULTS_tris["output_folder"] = f"data/{category_folder}/{name_dataset}_silhouettes"
-DEFAULTS_tris["shape_folder"] = "assets/amir_geons/cropped/NAPvsMP_silhouettes"
+DEFAULTS_tris["shape_folder"] = "mindset/assets/amir_geons/cropped/NAPvsMP_silhouettes"
 
 DEFAULTS = [DEFAULTS, DEFAULTS_bis, DEFAULTS_tris]
 
