@@ -3,11 +3,44 @@ import csv
 from dataclasses import dataclass, field
 from pathlib import Path
 
+import cv2
+from PIL import Image, ImageOps
 from tqdm import tqdm
 
-from mindset.generate_datasets.shape_and_object_recognition.linedrawings.generate_dataset import DrawLinedrawings
+from mindset.drawing.base import (
+    DrawStimuli,
+    paste_linedrawing_onto_canvas,
+    resize_image_keep_aspect_ratio,
+)
 from mindset.generators._base import GeneratorConfig, generator, register
+from mindset.utils.misc import apply_antialiasing
 
+
+# ---------------------------------------------------------------------------
+# drawing class
+# ---------------------------------------------------------------------------
+
+class DrawLinedrawings(DrawStimuli):
+    """draws simple linedrawings (white stroke on canvas)."""
+
+    def __init__(self, obj_longest_side, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.obj_longest_side = obj_longest_side
+
+    def get_linedrawings(self, image_path):
+        """load and paste a linedrawing onto a canvas."""
+        img = cv2.imread(str(image_path), cv2.IMREAD_GRAYSCALE)
+        img = resize_image_keep_aspect_ratio(img, self.obj_longest_side)
+        img = ImageOps.invert(Image.fromarray(img).convert("L"))
+
+        canvas = paste_linedrawing_onto_canvas(img, self.create_canvas(), self.fill)
+
+        return apply_antialiasing(canvas) if self.antialiasing else canvas
+
+
+# ---------------------------------------------------------------------------
+# generator config and entry point
+# ---------------------------------------------------------------------------
 
 @dataclass
 class LinedrawingsConfig(GeneratorConfig):

@@ -4,11 +4,61 @@ import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
 
+import cv2
+import numpy as np
+from PIL import Image, ImageOps
 from tqdm import tqdm
 
-from mindset.generate_datasets.shape_and_object_recognition.silhouettes.generate_dataset import DrawLinedrawings
+from mindset.drawing.base import (
+    DrawStimuli,
+    paste_linedrawing_onto_canvas,
+    resize_image_keep_aspect_ratio,
+)
 from mindset.generators._base import GeneratorConfig, generator, register
+from mindset.utils.misc import apply_antialiasing
 
+
+# ---------------------------------------------------------------------------
+# drawing class
+# ---------------------------------------------------------------------------
+
+class DrawLinedrawings(DrawStimuli):
+    """draws silhouettes from linedrawings or silhouette inputs."""
+
+    def __init__(self, obj_longest_side, input_image_type, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.obj_longest_side = obj_longest_side
+        self.input_image_type = input_image_type
+
+    def get_linedrawings(self, image_path):
+        """load image and convert to silhouette on canvas."""
+        img = cv2.imread(str(image_path), cv2.IMREAD_GRAYSCALE)
+        img = resize_image_keep_aspect_ratio(img, self.obj_longest_side)
+        _, binary_img = cv2.threshold(img, 240, 255, cv2.THRESH_BINARY_INV)
+        if self.input_image_type == "linedrawings":
+            contours, _ = cv2.findContours(
+                binary_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE
+            )
+            mask = np.ones_like(img) * 255
+
+            cv2.drawContours(mask, contours, -1, (0), thickness=cv2.FILLED)
+
+            [
+                cv2.drawContours(mask, [c], -1, (0), thickness=cv2.FILLED)
+                for c in contours
+            ]
+        else:
+            mask = cv2.bitwise_not(binary_img)
+        mask = ImageOps.invert(Image.fromarray(mask).convert("L"))
+
+        canvas = paste_linedrawing_onto_canvas(mask, self.create_canvas(), self.fill)
+
+        return apply_antialiasing(canvas) if self.antialiasing else canvas
+
+
+# ---------------------------------------------------------------------------
+# generator config and entry point
+# ---------------------------------------------------------------------------
 
 @dataclass
 class SilhouettesConfig(GeneratorConfig):

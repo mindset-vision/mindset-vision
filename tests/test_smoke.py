@@ -8,7 +8,7 @@ def test_package_imports():
     from mindset.utils.misc import DEFAULTS
     assert "canvas_size" in DEFAULTS
 
-    from mindset.utils.drawing_utils import DrawStimuli
+    from mindset.drawing.base import DrawStimuli
     assert DrawStimuli is not None
 
     from mindset.utils.dataset_utils import ImageDatasetAnnotations
@@ -30,7 +30,7 @@ def test_generator_registry():
 
 
 def test_generate_ebbinghaus():
-    """smoke test: generate a small ebbinghaus dataset via new path."""
+    """smoke test: generate a small ebbinghaus dataset."""
     from mindset.generators.visual_illusions.ebbinghaus import generate_all
 
     out = Path("/tmp/mindset_ci_ebbinghaus")
@@ -46,25 +46,6 @@ def test_generate_ebbinghaus():
     assert Path(result).exists()
     assert (out / "annotation.csv").exists()
     assert len(list(out.rglob("*.png"))) >= 3
-    shutil.rmtree(out)
-
-
-def test_generate_legacy():
-    """smoke test: verify old import path still works."""
-    from mindset.generate_datasets.visual_illusions.ebbinghaus_illusion.generate_dataset import generate_all
-
-    out = Path("/tmp/mindset_ci_legacy")
-    if out.exists():
-        shutil.rmtree(out)
-
-    result = generate_all(
-        num_samples_scrambled=2,
-        num_samples_illusory=1,
-        output_folder=str(out),
-    )
-
-    assert Path(result).exists()
-    assert (out / "annotation.csv").exists()
     shutil.rmtree(out)
 
 

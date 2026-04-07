@@ -14,65 +14,65 @@ generators:
   # --- visual illusions ---
   ebbinghaus:
     label: "Ebbinghaus Illusion"
-    module: mindset.generate_datasets.visual_illusions.ebbinghaus_illusion.generate_dataset
+    registry_name: ebbinghaus
   muller_lyer:
     label: "Muller-Lyer Illusion"
-    module: mindset.generate_datasets.visual_illusions.muller_lyer_illusion.generate_dataset
+    registry_name: muller_lyer
   ponzo:
     label: "Ponzo Illusion"
-    module: mindset.generate_datasets.visual_illusions.ponzo_illusion.generate_dataset
+    registry_name: ponzo
   jastrow:
     label: "Jastrow Illusion"
-    module: mindset.generate_datasets.visual_illusions.jastrow_illusion.generate_dataset
+    registry_name: jastrow
   tilt:
     label: "Tilt Illusion"
-    module: mindset.generate_datasets.visual_illusions.tilt_illusion.generate_dataset
+    registry_name: tilt
   lightness_contrast:
     label: "Lightness Contrast Illusion"
-    module: mindset.generate_datasets.visual_illusions.lightness_contrast_illusion.generate_dataset
+    registry_name: lightness_contrast
   adelson_checkerboard:
     label: "Adelson Checkerboard Illusion"
-    module: mindset.generate_datasets.visual_illusions.adelson_checkerboard_illusion.generate_dataset
+    registry_name: adelson_checkerboard
   grayscale_shapes:
     label: "Grayscale Shapes"
-    module: mindset.generate_datasets.visual_illusions.grayscale_shapes.generate_dataset
+    registry_name: grayscale_shapes
   thatcher_face:
     label: "Thatcher Illusion (Face)"
-    module: mindset.generate_datasets.visual_illusions.thatcher_illusion_face.generate_dataset
+    registry_name: thatcher_face
   thatcher_words:
     label: "Thatcher Illusion (Words)"
-    module: mindset.generate_datasets.visual_illusions.thatcher_illusion_words.generate_dataset
+    registry_name: thatcher_words
     overrides:
       num_words: 4
 
   # --- low/mid-level vision ---
   amodal_completion:
     label: "Amodal Completion"
-    module: mindset.generate_datasets.low_mid_level_vision.amodal_completion.generate_dataset
+    registry_name: amodal_completion
   decomposition:
     label: "Decomposition"
-    module: mindset.generate_datasets.low_mid_level_vision.decomposition.generate_dataset
+    registry_name: decomposition
   depth_drawings:
     label: "Depth Drawings"
-    module: mindset.generate_datasets.low_mid_level_vision.depth_drawings.generate_dataset
+    registry_name: depth_drawings
   emergent_features:
     label: "Emergent Features"
-    module: mindset.generate_datasets.low_mid_level_vision.emergent_features.generate_dataset
+    registry_name: emergent_features
   nap_vs_mp_2d:
     label: "NAP vs MP (2D Lines)"
-    module: mindset.generate_datasets.low_mid_level_vision.NAP_vs_MP_2D_lines.generate_dataset
+    registry_name: nap_vs_mp_2d
   nap_vs_mp_3d:
     label: "NAP vs MP (3D Geons)"
-    module: mindset.generate_datasets.low_mid_level_vision.NAP_vs_MP_3D_geons.generate_dataset
+    registry_name: nap_vs_mp_3d
   relational_vs_coordinate:
     label: "Relational vs Coordinate"
-    module: mindset.generate_datasets.low_mid_level_vision.relational_vs_coordinate.generate_dataset
+    registry_name: relational_vs_coordinate
   uncrowding:
     label: "Un-crowding"
-    module: mindset.generate_datasets.low_mid_level_vision.un_crowding.generate_dataset
+    registry_name: uncrowding
   weber_law:
     label: "Weber Law"
-    module: mindset.generate_datasets.low_mid_level_vision.weber_law.generate_dataset
+    registry_name: weber_law
     overrides:
       num_samples_per_condition: 50
       max_line_length: 15
@@ -85,45 +85,45 @@ generators:
   # --- shape and object recognition ---
   global_change:
     label: "Global Change"
-    module: mindset.generate_datasets.shape_and_object_recognition.global_change.generate_dataset
+    registry_name: global_change
     overrides:
       image_input_folder: "mindset/assets/baker_2018_linedrawings/cropped/"
   transformations_2d:
     label: "2D Transformations"
-    module: mindset.generate_datasets.shape_and_object_recognition.2d_transformations.generate_dataset
+    registry_name: transformations_2d
   dotted_linedrawings:
     label: "Dotted Linedrawings"
-    module: mindset.generate_datasets.shape_and_object_recognition.dotted_linedrawings.generate_dataset
+    registry_name: dotted_linedrawings
   embedded_figures:
     label: "Embedded Figures"
-    module: mindset.generate_datasets.shape_and_object_recognition.embedded_figures.generate_dataset
+    registry_name: embedded_figures
   global_change_baker2022:
     label: "Global Change (Baker 2022)"
-    module: mindset.generate_datasets.shape_and_object_recognition.global_change_baker2022.generate_dataset
-  leuven_embedded_figures:
+    registry_name: global_change_baker2022
+  leuven_embedded:
     label: "Leuven Embedded Figures"
-    module: mindset.generate_datasets.shape_and_object_recognition.leuven_embedded_figures.generate_dataset
+    registry_name: leuven_embedded
   linedrawings:
     label: "Linedrawings"
-    module: mindset.generate_datasets.shape_and_object_recognition.linedrawings.generate_dataset
+    registry_name: linedrawings
   same_different:
     label: "Same/Different Task"
-    module: mindset.generate_datasets.shape_and_object_recognition.same_different_task.generate_dataset
+    registry_name: same_different
   segmented_images:
     label: "Segmented Images"
-    module: mindset.generate_datasets.shape_and_object_recognition.segmented_images.generate_dataset
+    registry_name: segmented_images
   silhouettes:
     label: "Silhouettes"
-    module: mindset.generate_datasets.shape_and_object_recognition.silhouettes.generate_dataset
+    registry_name: silhouettes
   texturized_blobs:
     label: "Texturized Blobs"
-    module: mindset.generate_datasets.shape_and_object_recognition.texturized_blobs.generate_dataset
-  texturized_linedrawings_chars:
+    registry_name: texturized_blobs
+  texturized_chars:
     label: "Texturized Linedrawings (Chars)"
-    module: mindset.generate_datasets.shape_and_object_recognition.texturized_linedrawings_chars.generate_dataset
-  texturized_linedrawings_lines:
+    registry_name: texturized_chars
+  texturized_lines:
     label: "Texturized Linedrawings (Lines)"
-    module: mindset.generate_datasets.shape_and_object_recognition.texturized_linedrawings_lines.generate_dataset
+    registry_name: texturized_lines
   viewpoint_invariance:
     label: "Viewpoint Invariance"
-    module: mindset.generate_datasets.shape_and_object_recognition.viewpoint_invariance.generate_dataset
+    registry_name: viewpoint_invariance

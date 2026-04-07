@@ -1,18 +1,37 @@
 """2d transformations dataset generator."""
 import csv
-import importlib
 import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
 
+import numpy as np
+from PIL import Image, ImageOps
+from torchvision.transforms import InterpolationMode
 from tqdm import tqdm
 
-_mod = importlib.import_module(
-    "mindset.generate_datasets.shape_and_object_recognition.2d_transformations.generate_dataset"
-)
-DrawTransform = _mod.DrawTransform
-from mindset.utils.misc import get_affine_rnd_fun
 from mindset.generators._base import GeneratorConfig, generator, register
+from mindset.drawing.base import DrawStimuli, resize_image_keep_aspect_ratio
+from mindset.drawing.affine import get_affine_rnd_fun, my_affine
+from mindset.utils.misc import apply_antialiasing
+
+
+class DrawTransform(DrawStimuli):
+    """applies affine transformations to linedrawing images."""
+
+    def __init__(self, obj_longest_side, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.obj_longest_side = obj_longest_side
+
+    def get_image_transformed(self, image_path, tr, rt, sc, sh):
+        """load, resize, paste on canvas, apply affine transform."""
+        img = Image.fromarray(
+            resize_image_keep_aspect_ratio(np.array(Image.open(image_path)), self.obj_longest_side)
+        )
+        canvas = self.create_canvas()
+        canvas.paste(img, (canvas.size[0] // 2 - img.size[0] // 2, canvas.size[1] // 2 - img.size[1] // 2))
+        canvas = my_affine(canvas, translate=tr, angle=rt, scale=sc, shear=sh, interpolation=InterpolationMode.NEAREST, fill=self.background)
+        canvas = ImageOps.invert(canvas.convert("L"))
+        return apply_antialiasing(canvas) if self.antialiasing else canvas
 
 
 @dataclass
