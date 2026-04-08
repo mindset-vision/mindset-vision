@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 from mindset.generators._base import GeneratorConfig, generator, register
 from mindset.drawing.base import DrawStimuli, resize_image_keep_aspect_ratio
-from mindset.utils.misc import apply_antialiasing, check_download_ETH_80_dataset
+from mindset.utils import apply_antialiasing, check_download_ETH_80_dataset
 
 
 class DrawETH(DrawStimuli):

@@ -8,9 +8,8 @@ import subprocess
 import PIL
 import numpy as np
 import sty
-import torch
 import cv2
-from PIL import Image, ImageFilter
+from PIL import ImageFilter
 import tqdm
 
 

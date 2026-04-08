@@ -14,7 +14,7 @@ from tqdm import tqdm
 
 from mindset.drawing.base import DrawStimuli
 from mindset.generators._base import GeneratorConfig, generator, register
-from mindset.utils.misc import apply_antialiasing
+from mindset.utils import apply_antialiasing
 
 
 # ---------------------------------------------------------------------------

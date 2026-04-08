@@ -1,8 +1,8 @@
 import math
-from mindset.utils.shape_based_image_generation.utils.shapes import chaikins_corner_cutting
+from mindset.drawing.shapes.utils.shapes import chaikins_corner_cutting
 from perlin_noise import PerlinNoise
 import random
-from mindset.utils.shape_based_image_generation.modules.core import ShapeCoreFunctions
+from mindset.drawing.shapes.core import ShapeCoreFunctions
 from PIL.Image import new
 from PIL.ImageDraw import Draw
 import numpy as np

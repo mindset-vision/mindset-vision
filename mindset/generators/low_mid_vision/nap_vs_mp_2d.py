@@ -12,7 +12,7 @@ from mindset.drawing.base import (
     paste_linedrawing_onto_canvas,
     resize_image_keep_aspect_ratio,
 )
-from mindset.utils.misc import apply_antialiasing
+from mindset.utils import apply_antialiasing
 from mindset.generators._base import GeneratorConfig, generator, register
 
 

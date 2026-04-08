@@ -11,7 +11,7 @@ from tqdm import tqdm
 
 from mindset.generators._base import GeneratorConfig, generator, register
 from mindset.drawing.base import DrawStimuli
-from mindset.utils.misc import apply_antialiasing
+from mindset.utils import apply_antialiasing
 
 
 polys = [

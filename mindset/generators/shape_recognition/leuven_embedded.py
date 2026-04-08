@@ -12,7 +12,7 @@ from PIL.ImageOps import invert
 from tqdm import tqdm
 
 from mindset.generators._base import GeneratorConfig, generator, register
-from mindset.utils.misc import apply_antialiasing
+from mindset.utils import apply_antialiasing
 
 
 def get_highest_number(folder_path):

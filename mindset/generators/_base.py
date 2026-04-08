@@ -7,7 +7,7 @@ from pathlib import Path
 
 import sty
 
-from mindset.utils.misc import delete_and_recreate_path
+from mindset.utils import delete_and_recreate_path
 from mindset.generators import REGISTRY
 
 

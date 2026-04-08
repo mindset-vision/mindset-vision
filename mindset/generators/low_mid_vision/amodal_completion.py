@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 from mindset.generators._base import GeneratorConfig, generator, register
 from mindset.drawing.base import DrawStimuli
-from mindset.utils.misc import apply_antialiasing, generate_random_color
+from mindset.utils import apply_antialiasing, generate_random_color
 
 
 def vector_length(s, theta):

@@ -1,11 +1,11 @@
 from PIL.Image import new
 from PIL.ImageDraw import Draw, ImageDraw
-from mindset.utils.shape_based_image_generation.utils.color import get_rgba_color
+from mindset.drawing.shapes.utils.color import get_rgba_color
 from PIL import Image
 import numpy as np
 import pprint
-from mindset.utils.shape_based_image_generation.utils.general import get_area_size
-from mindset.utils.shape_based_image_generation.utils.shapes import SizeMonitor
+from mindset.drawing.shapes.utils.general import get_area_size
+from mindset.drawing.shapes.utils.shapes import SizeMonitor
 from matplotlib import colors
 import math
 import time

@@ -18,7 +18,7 @@ from mindset.drawing.base import (
     resize_image_keep_aspect_ratio,
 )
 from mindset.drawing.affine import get_affine_rnd_fun, my_affine
-from mindset.utils.misc import apply_antialiasing
+from mindset.utils import apply_antialiasing
 
 
 class DrawPatternedCanvas(DrawStimuli):
