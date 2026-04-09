@@ -9,7 +9,7 @@ from pathlib import Path
 
 import numpy as np
 from PIL import Image
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 from mindset.drawing.base import DrawStimuli
 from mindset.drawing.geometry import circle_perimeter, line, polygon, polygon_perimeter

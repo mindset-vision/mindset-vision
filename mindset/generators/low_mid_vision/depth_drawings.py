@@ -6,7 +6,7 @@ from pathlib import Path
 
 import cv2
 import PIL.Image as Image
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 from mindset.drawing.base import (
     DrawStimuli,

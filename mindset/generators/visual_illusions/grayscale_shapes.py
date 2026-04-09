@@ -11,7 +11,7 @@ import numpy as np
 from PIL import Image
 from PIL.Image import new
 from PIL.ImageDraw import Draw
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 from mindset.drawing.primitives import add_arrow
 from mindset.generators._base import GeneratorConfig, generator, register

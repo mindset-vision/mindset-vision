@@ -15,7 +15,7 @@ from PIL.Image import new
 from PIL.ImageDraw import Draw
 from PIL.ImageFont import truetype
 from scipy import ndimage
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 from mindset.drawing.base import DrawStimuli
 from mindset.generators._base import GeneratorConfig, generator, register

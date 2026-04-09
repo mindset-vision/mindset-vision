@@ -8,7 +8,7 @@ from pathlib import Path
 
 import numpy as np
 from PIL import Image, ImageDraw
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 from mindset.drawing.base import DrawStimuli
 from mindset.generators._base import GeneratorConfig, generator, register

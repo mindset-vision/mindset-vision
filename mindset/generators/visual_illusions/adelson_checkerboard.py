@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from PIL import Image
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 from mindset.drawing.base import resize_and_paste
 from mindset.drawing.primitives import add_arrow

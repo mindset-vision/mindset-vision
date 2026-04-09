@@ -11,7 +11,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 from torchvision.transforms import transforms
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 from mindset.drawing.base import DrawStimuli, get_mask_from_linedrawing
 from mindset.drawing.shapes.parent import ParentStimuli

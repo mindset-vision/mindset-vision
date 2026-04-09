@@ -8,7 +8,7 @@ from itertools import product
 from pathlib import Path
 
 import numpy as np
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 from mindset.drawing.base import DrawStimuli
 from mindset.drawing.shapes.parent import ParentStimuli
