@@ -1,4 +1,5 @@
 """shared drawing primitives for visual illusion generators."""
+
 from PIL import ImageDraw
 
 

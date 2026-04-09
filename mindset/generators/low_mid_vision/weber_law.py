@@ -1,4 +1,5 @@
 """weber law dataset generator."""
+
 import csv
 import uuid
 from dataclasses import dataclass, field
@@ -28,15 +29,41 @@ class DrawWeberLength(DrawStimuli):
 @dataclass
 class WeberLawConfig(GeneratorConfig):
     """config for weber law dataset."""
-    num_samples_per_condition: int = field(default=50, metadata={"min": 1, "max": 5000, "step": 1, "label": "samples per condition"})
-    max_line_length: int = field(default=50, metadata={"min": 5, "max": 200, "step": 1, "label": "max line length (px)"})
-    min_line_length: int = field(default=5, metadata={"min": 1, "max": 200, "step": 1, "label": "min line length (px)"})
-    interval_line_length: int = field(default=1, metadata={"min": 1, "max": 50, "step": 1, "label": "line length interval"})
-    min_grayscale: int = field(default=50, metadata={"min": 0, "max": 255, "step": 1, "label": "min grayscale"})
-    max_grayscale: int = field(default=255, metadata={"min": 0, "max": 255, "step": 1, "label": "max grayscale"})
-    interval_grayscale: int = field(default=20, metadata={"min": 1, "max": 100, "step": 1, "label": "grayscale interval"})
-    width: int = field(default=2, metadata={"min": 1, "max": 20, "step": 1, "label": "line width (px)"})
-    output_folder: str = field(default="data/low_mid_level_vision/weber_law", metadata={"label": "output folder"})
+
+    num_samples_per_condition: int = field(
+        default=50,
+        metadata={"min": 1, "max": 5000, "step": 1, "label": "samples per condition"},
+    )
+    max_line_length: int = field(
+        default=50,
+        metadata={"min": 5, "max": 200, "step": 1, "label": "max line length (px)"},
+    )
+    min_line_length: int = field(
+        default=5,
+        metadata={"min": 1, "max": 200, "step": 1, "label": "min line length (px)"},
+    )
+    interval_line_length: int = field(
+        default=1,
+        metadata={"min": 1, "max": 50, "step": 1, "label": "line length interval"},
+    )
+    min_grayscale: int = field(
+        default=50, metadata={"min": 0, "max": 255, "step": 1, "label": "min grayscale"}
+    )
+    max_grayscale: int = field(
+        default=255,
+        metadata={"min": 0, "max": 255, "step": 1, "label": "max grayscale"},
+    )
+    interval_grayscale: int = field(
+        default=20,
+        metadata={"min": 1, "max": 100, "step": 1, "label": "grayscale interval"},
+    )
+    width: int = field(
+        default=2, metadata={"min": 1, "max": 20, "step": 1, "label": "line width (px)"}
+    )
+    output_folder: str = field(
+        default="data/low_mid_level_vision/weber_law",
+        metadata={"label": "output folder"},
+    )
 
 
 @register("weber_law", "low_mid_vision")
@@ -52,12 +79,18 @@ def generate_all(config: WeberLawConfig):
         antialiasing=config.antialiasing,
     )
 
-    lengths_conditions = range(config.min_line_length, config.max_line_length, config.interval_line_length)
-    grayscale_conditions = range(config.min_grayscale, config.max_grayscale, config.interval_grayscale)
+    lengths_conditions = range(
+        config.min_line_length, config.max_line_length, config.interval_line_length
+    )
+    grayscale_conditions = range(
+        config.min_grayscale, config.max_grayscale, config.interval_grayscale
+    )
 
     with open(output_folder / "annotation.csv", "w", newline="") as annfile:
         writer = csv.writer(annfile)
-        writer.writerow(["Path", "BackgroundColor", "Length", "Width", "Luminance", "IterNum"])
+        writer.writerow(
+            ["Path", "BackgroundColor", "Length", "Width", "Luminance", "IterNum"]
+        )
 
         for ln in tqdm(lengths_conditions):
             for gr in grayscale_conditions:

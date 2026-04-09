@@ -29,6 +29,7 @@ dependencies = [
     "torchvision>=0.15.0",
     "tqdm>=4.62.3",
     "pyyaml>=6.0",
+    "black>=26.3.1",
 ]
 
 [project.optional-dependencies]

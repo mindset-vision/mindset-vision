@@ -1,4 +1,5 @@
 """thatcher illusion face dataset generator."""
+
 import csv
 import pathlib
 from dataclasses import dataclass, field
@@ -17,11 +18,14 @@ from mindset.generators._base import GeneratorConfig, generator, register
 # drawing helpers (from GPL 3.0 thatcher-effect-dataset-generator)
 # ---------------------------------------------------------------------------
 
+
 def get_image_facial_landmarks(image_path, facemark):
     """detect facial landmarks from an image using opencv facemark."""
     import matplotlib.pyplot as plt
 
-    face_cascade = cv2.CascadeClassifier("mindset/assets/haarcascade_frontalface_default.xml")
+    face_cascade = cv2.CascadeClassifier(
+        "mindset/assets/haarcascade_frontalface_default.xml"
+    )
 
     ret = []
 
@@ -164,11 +168,18 @@ def apply_thatcher_effect_on_image(
 # generator
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class ThatcherFaceConfig(GeneratorConfig):
     """config for thatcher illusion face dataset."""
-    face_folder: str = field(default="mindset/assets/celebA_sample/normal", metadata={"label": "face folder"})
-    output_folder: str = field(default="data/visual_illusions/thatcher_face", metadata={"label": "output folder"})
+
+    face_folder: str = field(
+        default="mindset/assets/celebA_sample/normal", metadata={"label": "face folder"}
+    )
+    output_folder: str = field(
+        default="data/visual_illusions/thatcher_face",
+        metadata={"label": "output folder"},
+    )
 
 
 @register("thatcher_face", "visual_illusions")
@@ -178,7 +189,12 @@ def generate_all(config: ThatcherFaceConfig):
     output_folder = Path(config.output_folder)
     face_folder = Path(config.face_folder)
 
-    conditions = ["straight", "inverted", "thatcherized_straight", "thatcherized_inverted"]
+    conditions = [
+        "straight",
+        "inverted",
+        "thatcherized_straight",
+        "thatcherized_inverted",
+    ]
     for cond in conditions:
         (output_folder / cond).mkdir(parents=True, exist_ok=True)
 
@@ -213,12 +229,24 @@ def generate_all(config: ThatcherFaceConfig):
             transforms.CenterCrop((config.canvas_size[1], config.canvas_size[0]))(
                 Image.fromarray(cv_image)
             ).save(output_folder / "thatcherized_straight" / f"{idx}.png")
-            writer.writerow([pathlib.Path("thatcherized_straight") / f"{image_name}.png", "thatcherized_straight", idx])
+            writer.writerow(
+                [
+                    pathlib.Path("thatcherized_straight") / f"{image_name}.png",
+                    "thatcherized_straight",
+                    idx,
+                ]
+            )
 
             transforms.CenterCrop((config.canvas_size[1], config.canvas_size[0]))(
                 Image.fromarray(cv2.flip(cv_image, 0))
             ).save(output_folder / "thatcherized_inverted" / f"{idx}.png")
-            writer.writerow([pathlib.Path("thatcherized_inverted") / f"{image_name}.png", "thatcherized_inverted", idx])
+            writer.writerow(
+                [
+                    pathlib.Path("thatcherized_inverted") / f"{image_name}.png",
+                    "thatcherized_inverted",
+                    idx,
+                ]
+            )
 
             transforms.CenterCrop((config.canvas_size[1], config.canvas_size[0]))(
                 Image.open(image_path)
@@ -228,6 +256,8 @@ def generate_all(config: ThatcherFaceConfig):
             transforms.CenterCrop((config.canvas_size[1], config.canvas_size[0]))(
                 Image.open(image_path).rotate(180).transpose(Image.FLIP_LEFT_RIGHT)
             ).save(output_folder / "inverted" / f"{image_name}.png")
-            writer.writerow([pathlib.Path("inverted") / f"{image_name}.png", "inverted", idx])
+            writer.writerow(
+                [pathlib.Path("inverted") / f"{image_name}.png", "inverted", idx]
+            )
 
     return str(output_folder)

@@ -1,9 +1,9 @@
 """mindset CLI entry point."""
+
 import argparse
 import sys
 import yaml
 from dataclasses import asdict, fields
-
 
 
 def _load_registry():
@@ -22,6 +22,7 @@ def _load_registry():
             import_module(module_path)
 
     from mindset.generators import REGISTRY
+
     return REGISTRY
 
 
@@ -39,7 +40,9 @@ def main():
     gen.add_argument("--canvas-size", type=int, nargs=2, help="canvas width height")
     gen.add_argument("--output", "-o", help="output folder")
     gen.add_argument("--config", help="path to yaml config file")
-    gen.add_argument("--save-config", action="store_true", help="dump default config to yaml")
+    gen.add_argument(
+        "--save-config", action="store_true", help="dump default config to yaml"
+    )
 
     sub.add_parser("list", help="list available generators")
 
@@ -58,6 +61,7 @@ def main():
     match args.command:
         case "list":
             from mindset.generators import list_generators
+
             for category, names in list_generators().items():
                 print(f"\n  {category}:")
                 for name in names:
@@ -71,6 +75,7 @@ def main():
                     info["func"]()
             else:
                 from mindset.generators import get_generator
+
                 info = get_generator(args.dataset)
                 config_cls = info["config_cls"]
 
@@ -78,7 +83,9 @@ def main():
                     defaults = asdict(config_cls())
                     out_path = f"{args.dataset}.yaml"
                     with open(out_path, "w") as fh:
-                        yaml.dump(defaults, fh, default_flow_style=False, sort_keys=False)
+                        yaml.dump(
+                            defaults, fh, default_flow_style=False, sort_keys=False
+                        )
                     print(f"config saved to {out_path}")
                     return
 

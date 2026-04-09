@@ -1,4 +1,5 @@
 """tilt illusion dataset generator."""
+
 import csv
 import random
 import uuid
@@ -65,10 +66,27 @@ class DrawTiltIllusion(DrawStimuli):
 @dataclass
 class TiltConfig(GeneratorConfig):
     """config for tilt illusion dataset."""
-    num_samples_only_center: int = field(default=1000, metadata={"min": 1, "max": 50000, "step": 10, "label": "only center samples"})
-    num_samples_only_context: int = field(default=1000, metadata={"min": 1, "max": 50000, "step": 10, "label": "only context samples"})
-    num_samples_center_context: int = field(default=1000, metadata={"min": 1, "max": 50000, "step": 10, "label": "center+context samples"})
-    output_folder: str = field(default="data/visual_illusions/tilt", metadata={"label": "output folder"})
+
+    num_samples_only_center: int = field(
+        default=1000,
+        metadata={"min": 1, "max": 50000, "step": 10, "label": "only center samples"},
+    )
+    num_samples_only_context: int = field(
+        default=1000,
+        metadata={"min": 1, "max": 50000, "step": 10, "label": "only context samples"},
+    )
+    num_samples_center_context: int = field(
+        default=1000,
+        metadata={
+            "min": 1,
+            "max": 50000,
+            "step": 10,
+            "label": "center+context samples",
+        },
+    )
+    output_folder: str = field(
+        default="data/visual_illusions/tilt", metadata={"label": "output folder"}
+    )
 
 
 def _get_random_values(canvas_size):
@@ -100,7 +118,18 @@ def generate_all(config: TiltConfig):
 
     with open(output_folder / "annotation.csv", "w", newline="") as annfile:
         writer = csv.writer(annfile)
-        writer.writerow(["Path", "Type", "BackgroundColor", "ThetaCenter", "Radius", "Frequency", "ThetaContext", "IterNum"])
+        writer.writerow(
+            [
+                "Path",
+                "Type",
+                "BackgroundColor",
+                "ThetaCenter",
+                "Radius",
+                "Frequency",
+                "ThetaContext",
+                "IterNum",
+            ]
+        )
 
         for i in tqdm(range(config.num_samples_only_center)):
             unique_hex = uuid.uuid4().hex[:8]
@@ -108,7 +137,9 @@ def generate_all(config: TiltConfig):
             path = Path("only_center") / f"{-theta_center:.3f}_0_{unique_hex}.png"
             img = ds.generate_illusion(theta_center, radius, (0.5, 0.5), freq)
             img.save(str(output_folder / path))
-            writer.writerow([path, "only_center", ds.background, theta_center, radius, freq, "", i])
+            writer.writerow(
+                [path, "only_center", ds.background, theta_center, radius, freq, "", i]
+            )
 
         for i in tqdm(range(config.num_samples_only_context)):
             unique_hex = uuid.uuid4().hex[:8]
@@ -116,15 +147,30 @@ def generate_all(config: TiltConfig):
             path = Path("only_context") / f"{-theta_context:.3f}_0_{unique_hex}.png"
             img = ds.generate_illusion(None, radius, (0.5, 0.5), freq, theta_context)
             img.save(str(output_folder / path))
-            writer.writerow([path, "only_context", ds.background, 0, radius, freq, theta_context, i])
+            writer.writerow(
+                [path, "only_context", ds.background, 0, radius, freq, theta_context, i]
+            )
 
-        all_thetas = np.linspace(-np.pi / 2, np.pi / 2, config.num_samples_center_context)
+        all_thetas = np.linspace(
+            -np.pi / 2, np.pi / 2, config.num_samples_center_context
+        )
         for i, theta_context in enumerate(tqdm(all_thetas)):
             _, radius, _, freq = _get_random_values(config.canvas_size)
             img = ds.generate_illusion(0, radius, (0.5, 0.5), freq, theta_context)
             unique_hex = uuid.uuid4().hex[:8]
             path = Path("center_context") / f"0_{theta_context:.3f}_{unique_hex}.png"
             img.save(output_folder / path)
-            writer.writerow([path, "center_context", ds.background, 0, radius, freq, theta_context, i])
+            writer.writerow(
+                [
+                    path,
+                    "center_context",
+                    ds.background,
+                    0,
+                    radius,
+                    freq,
+                    theta_context,
+                    i,
+                ]
+            )
 
     return str(output_folder)

@@ -1,4 +1,5 @@
 """base infrastructure for dataset generators: config dataclass, decorator, and registration."""
+
 import dataclasses
 import functools
 import json
@@ -14,15 +15,25 @@ from mindset.utils import delete_and_recreate_path
 @dataclass
 class GeneratorConfig:
     """base config shared by all generators."""
-    canvas_size: list = field(default_factory=lambda: [224, 224], metadata={"min": 32, "max": 1024, "step": 16, "label": "canvas size"})
-    background_color: list = field(default_factory=lambda: [0, 0, 0], metadata={"label": "background color (RGB)"})
+
+    canvas_size: list = field(
+        default_factory=lambda: [224, 224],
+        metadata={"min": 32, "max": 1024, "step": 16, "label": "canvas size"},
+    )
+    background_color: list = field(
+        default_factory=lambda: [0, 0, 0], metadata={"label": "background color (RGB)"}
+    )
     antialiasing: bool = field(default=True, metadata={"label": "antialiasing"})
-    behaviour_if_present: str = field(default="overwrite", metadata={"choices": ["overwrite", "skip"], "label": "if folder exists"})
+    behaviour_if_present: str = field(
+        default="overwrite",
+        metadata={"choices": ["overwrite", "skip"], "label": "if folder exists"},
+    )
     output_folder: str = field(default="", metadata={"label": "output folder"})
 
 
 def generator(config_cls):
     """decorator that handles all generator boilerplate."""
+
     def decorator(func):
         @functools.wraps(func)
         def wrapper(**kwargs):
@@ -42,11 +53,13 @@ def generator(config_cls):
 
         wrapper.config_cls = config_cls
         return wrapper
+
     return decorator
 
 
 def register(name, category):
     """register a generator in the global registry."""
+
     def decorator(func):
         REGISTRY[name] = {
             "func": func,
@@ -54,16 +67,22 @@ def register(name, category):
             "config_cls": func.config_cls,
         }
         return func
+
     return decorator
 
 
 def config_to_argparser(config_cls, description=""):
     """build argparse.ArgumentParser from a config dataclass."""
     import argparse
+
     parser = argparse.ArgumentParser(description=description)
     for fld in fields(config_cls):
         name = f"--{fld.name}"
-        default = fld.default if fld.default is not dataclasses.MISSING else fld.default_factory()
+        default = (
+            fld.default
+            if fld.default is not dataclasses.MISSING
+            else fld.default_factory()
+        )
         meta = fld.metadata
 
         match fld.type:

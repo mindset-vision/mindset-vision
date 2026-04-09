@@ -1,4 +1,5 @@
 """segmented images dataset generator."""
+
 import csv
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -8,8 +9,11 @@ import numpy as np
 from PIL import Image, ImageOps
 from tqdm import tqdm
 
-from mindset.drawing.base import (DrawStimuli, paste_linedrawing_onto_canvas,
-                                  resize_image_keep_aspect_ratio)
+from mindset.drawing.base import (
+    DrawStimuli,
+    paste_linedrawing_onto_canvas,
+    resize_image_keep_aspect_ratio,
+)
 from mindset.generators._base import GeneratorConfig, generator, register
 from mindset.utils import apply_antialiasing
 
@@ -74,13 +78,37 @@ class DrawGriddedImages(DrawStimuli):
 @dataclass
 class SegmentedImagesConfig(GeneratorConfig):
     """config for segmented images dataset."""
-    linedrawing_input_folder: str = field(default="mindset/assets/baker_2018_linedrawings/cropped", metadata={"label": "input folder with line drawings"})
-    object_longest_side: int = field(default=200, metadata={"min": 50, "max": 500, "step": 10, "label": "object longest side (px)"})
-    grid_degree: int = field(default=45, metadata={"min": 0, "max": 360, "step": 5, "label": "grid rotation (degrees)"})
-    grid_size: int = field(default=8, metadata={"min": 1, "max": 50, "step": 1, "label": "grid cell size (px)"})
-    grid_thickness: int = field(default=4, metadata={"min": 1, "max": 20, "step": 1, "label": "grid thickness (px)"})
+
+    linedrawing_input_folder: str = field(
+        default="mindset/assets/baker_2018_linedrawings/cropped",
+        metadata={"label": "input folder with line drawings"},
+    )
+    object_longest_side: int = field(
+        default=200,
+        metadata={
+            "min": 50,
+            "max": 500,
+            "step": 10,
+            "label": "object longest side (px)",
+        },
+    )
+    grid_degree: int = field(
+        default=45,
+        metadata={"min": 0, "max": 360, "step": 5, "label": "grid rotation (degrees)"},
+    )
+    grid_size: int = field(
+        default=8,
+        metadata={"min": 1, "max": 50, "step": 1, "label": "grid cell size (px)"},
+    )
+    grid_thickness: int = field(
+        default=4,
+        metadata={"min": 1, "max": 20, "step": 1, "label": "grid thickness (px)"},
+    )
     antialiasing: bool = field(default=False, metadata={"label": "antialiasing"})
-    output_folder: str = field(default="data/shape_and_object_recognition/segmented_images", metadata={"label": "output folder"})
+    output_folder: str = field(
+        default="data/shape_and_object_recognition/segmented_images",
+        metadata={"label": "output folder"},
+    )
 
 
 @register("segmented_images", "shape_recognition")
@@ -103,11 +131,23 @@ def generate_all(config: SegmentedImagesConfig):
         width=1,
     )
 
-    image_files = sorted(linedrawing_input_folder.rglob("*.jpg")) + sorted(linedrawing_input_folder.rglob("*.png"))
+    image_files = sorted(linedrawing_input_folder.rglob("*.jpg")) + sorted(
+        linedrawing_input_folder.rglob("*.png")
+    )
 
     with open(output_folder / "annotation.csv", "w", newline="") as annfile:
         writer = csv.writer(annfile)
-        writer.writerow(["Path", "ClassName", "IsComplement", "BackgroundColor", "GridShift", "GridThickness", "GridDegree"])
+        writer.writerow(
+            [
+                "Path",
+                "ClassName",
+                "IsComplement",
+                "BackgroundColor",
+                "GridShift",
+                "GridThickness",
+                "GridDegree",
+            ]
+        )
         grid_shift = 0
         for complement in tqdm([True, False]):
             for img_path in image_files:
@@ -121,8 +161,22 @@ def generate_all(config: SegmentedImagesConfig):
                     rotation_degrees=config.grid_degree,
                     complement=complement,
                 )
-                path = Path("del" + ("_complement" if complement else "")) / class_name / f"{image_name}.png"
+                path = (
+                    Path("del" + ("_complement" if complement else ""))
+                    / class_name
+                    / f"{image_name}.png"
+                )
                 img.save(str(output_folder / path))
-                writer.writerow([path, class_name, complement, ds.background, grid_shift, config.grid_thickness, config.grid_degree])
+                writer.writerow(
+                    [
+                        path,
+                        class_name,
+                        complement,
+                        ds.background,
+                        grid_shift,
+                        config.grid_thickness,
+                        config.grid_degree,
+                    ]
+                )
 
     return str(output_folder)

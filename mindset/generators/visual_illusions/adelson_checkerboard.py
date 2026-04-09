@@ -1,4 +1,5 @@
 """adelson checkerboard illusion dataset generator."""
+
 import csv
 import uuid
 from dataclasses import dataclass, field
@@ -16,10 +17,20 @@ from mindset.utils import apply_antialiasing
 @dataclass
 class AdelsonCheckerboardConfig(GeneratorConfig):
     """config for adelson checkerboard illusion dataset."""
+
     antialiasing: bool = field(default=False, metadata={"label": "antialiasing"})
-    steps_arrow: int = field(default=5, metadata={"min": 1, "max": 100, "step": 1, "label": "arrow step size"})
-    grayscale_background: int = field(default=0, metadata={"min": 0, "max": 255, "step": 1, "label": "grayscale background"})
-    output_folder: str = field(default="data/visual_illusions/adelson_checkerboard", metadata={"label": "output folder"})
+    steps_arrow: int = field(
+        default=5,
+        metadata={"min": 1, "max": 100, "step": 1, "label": "arrow step size"},
+    )
+    grayscale_background: int = field(
+        default=0,
+        metadata={"min": 0, "max": 255, "step": 1, "label": "grayscale background"},
+    )
+    output_folder: str = field(
+        default="data/visual_illusions/adelson_checkerboard",
+        metadata={"label": "output folder"},
+    )
 
 
 @register("adelson_checkerboard", "visual_illusions")
@@ -45,7 +56,9 @@ def generate_all(config: AdelsonCheckerboardConfig):
 
     with open(output_folder / "annotation.csv", "w", newline="") as annfile:
         writer = csv.writer(annfile)
-        writer.writerow(["Path", "Target Pixel Color", "Target Pixel Location", "BackgroundColor"])
+        writer.writerow(
+            ["Path", "Target Pixel Color", "Target Pixel Location", "BackgroundColor"]
+        )
 
         for coordinate in tqdm(coordinates, colour="green"):
             pixel_color = img.getpixel(coordinate)
@@ -54,6 +67,8 @@ def generate_all(config: AdelsonCheckerboardConfig):
             image_path = Path("all_images") / f"{uuid.uuid4().hex[:8]}.png"
             img_copy = apply_antialiasing(img_copy) if config.antialiasing else img_copy
             img_copy.save(output_folder / image_path)
-            writer.writerow([str(image_path), pixel_color, coordinate, config.grayscale_background])
+            writer.writerow(
+                [str(image_path), pixel_color, coordinate, config.grayscale_background]
+            )
 
     return str(output_folder)

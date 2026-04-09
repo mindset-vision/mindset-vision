@@ -1,4 +1,5 @@
 """shared non-drawing utilities."""
+
 import os
 import pathlib
 import random
@@ -44,8 +45,26 @@ def convert_normalized_tensor_to_plottable_array(tensor, mean, std, text):
     font_scale = np.ceil(canvas_size[1]) / 150
     font = cv2.QT_FONT_NORMAL
     umat = cv2.UMat(image * 255)
-    umat = cv2.putText(img=cv2.UMat(umat), text=text, org=(0, int(canvas_size[1] - 3)), fontFace=font, fontScale=font_scale, color=[0, 0, 0], lineType=cv2.LINE_AA, thickness=6)
-    umat = cv2.putText(img=cv2.UMat(umat), text=text, org=(0, int(canvas_size[1] - 3)), fontFace=font, fontScale=font_scale, color=[255, 255, 255], lineType=cv2.LINE_AA, thickness=1)
+    umat = cv2.putText(
+        img=cv2.UMat(umat),
+        text=text,
+        org=(0, int(canvas_size[1] - 3)),
+        fontFace=font,
+        fontScale=font_scale,
+        color=[0, 0, 0],
+        lineType=cv2.LINE_AA,
+        thickness=6,
+    )
+    umat = cv2.putText(
+        img=cv2.UMat(umat),
+        text=text,
+        org=(0, int(canvas_size[1] - 3)),
+        fontFace=font,
+        fontScale=font_scale,
+        color=[255, 255, 255],
+        lineType=cv2.LINE_AA,
+        thickness=1,
+    )
     image = cv2.UMat.get(umat)
     return np.array(image, np.uint8)
 
@@ -77,13 +96,27 @@ def update_dict(dictA, dictB, replace=True):
     for key in dictB:
         if dictB[key] is None:
             continue
-        if key in dictA and isinstance(dictA[key], dict) and isinstance(dictB[key], dict):
+        if (
+            key in dictA
+            and isinstance(dictA[key], dict)
+            and isinstance(dictB[key], dict)
+        ):
             update_dict(dictA[key], dictB[key], replace)
         elif replace or key not in dictA:
             old_value = dictA.get(key, "none")
             dictA[key] = dictB[key]
             if old_value != dictB[key]:
-                print(sty.fg.blue + f"updated {key}: " + sty.rs.fg + sty.fg.red + f"{old_value} => " + sty.rs.fg + sty.fg.green + f"{dictB[key]}" + sty.rs.fg)
+                print(
+                    sty.fg.blue
+                    + f"updated {key}: "
+                    + sty.rs.fg
+                    + sty.fg.red
+                    + f"{old_value} => "
+                    + sty.rs.fg
+                    + sty.fg.green
+                    + f"{dictB[key]}"
+                    + sty.rs.fg
+                )
     return dictA
 
 

@@ -1,4 +1,5 @@
 """global change baker2022 dataset generator."""
+
 import csv
 import uuid
 from dataclasses import dataclass, field
@@ -8,8 +9,11 @@ import cv2
 from PIL import Image, ImageOps
 from tqdm import tqdm
 
-from mindset.drawing.base import (DrawStimuli, paste_linedrawing_onto_canvas,
-                                  resize_image_keep_aspect_ratio)
+from mindset.drawing.base import (
+    DrawStimuli,
+    paste_linedrawing_onto_canvas,
+    resize_image_keep_aspect_ratio,
+)
 from mindset.generators._base import GeneratorConfig, generator, register
 from mindset.utils import apply_antialiasing
 
@@ -38,9 +42,21 @@ class DrawBakerStimuli(DrawStimuli):
 @dataclass
 class GlobalChangeBaker2022Config(GeneratorConfig):
     """config for global change baker2022 dataset."""
-    object_longest_side: int = field(default=200, metadata={"min": 50, "max": 500, "step": 10, "label": "object longest side (px)"})
+
+    object_longest_side: int = field(
+        default=200,
+        metadata={
+            "min": 50,
+            "max": 500,
+            "step": 10,
+            "label": "object longest side (px)",
+        },
+    )
     antialiasing: bool = field(default=False, metadata={"label": "antialiasing"})
-    output_folder: str = field(default="data/shape_and_object_recognition/global_change_baker2022", metadata={"label": "output folder"})
+    output_folder: str = field(
+        default="data/shape_and_object_recognition/global_change_baker2022",
+        metadata={"label": "output folder"},
+    )
 
 
 @register("global_change_baker2022", "shape_recognition")
@@ -61,7 +77,9 @@ def generate_all(config: GlobalChangeBaker2022Config):
         obj_longest_side=config.object_longest_side,
     )
 
-    image_files = sorted(image_input_folder.rglob("*.jpg")) + sorted(image_input_folder.rglob("*.png"))
+    image_files = sorted(image_input_folder.rglob("*.jpg")) + sorted(
+        image_input_folder.rglob("*.png")
+    )
 
     with open(output_folder / "annotation.csv", "w", newline="") as annfile:
         writer = csv.writer(annfile)

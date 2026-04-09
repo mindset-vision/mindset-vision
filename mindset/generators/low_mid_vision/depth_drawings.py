@@ -1,4 +1,5 @@
 """depth drawings dataset generator."""
+
 import csv
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -7,8 +8,11 @@ import cv2
 import PIL.Image as Image
 from tqdm import tqdm
 
-from mindset.drawing.base import (DrawStimuli, paste_linedrawing_onto_canvas,
-                                  resize_image_keep_aspect_ratio)
+from mindset.drawing.base import (
+    DrawStimuli,
+    paste_linedrawing_onto_canvas,
+    resize_image_keep_aspect_ratio,
+)
 from mindset.generators._base import GeneratorConfig, generator, register
 from mindset.utils import apply_antialiasing
 
@@ -33,9 +37,19 @@ class DrawLinedrawings(DrawStimuli):
 @dataclass
 class DepthDrawingsConfig(GeneratorConfig):
     """config for depth drawings dataset."""
-    object_longest_side: int = field(default=200, metadata={"min": 10, "max": 1000, "step": 10, "label": "object longest side"})
-    input_folder: str = field(default="mindset/assets/enns_rensink_1991/pngs", metadata={"label": "input folder"})
-    output_folder: str = field(default="data/low_mid_level_vision/depth_drawings", metadata={"label": "output folder"})
+
+    object_longest_side: int = field(
+        default=200,
+        metadata={"min": 10, "max": 1000, "step": 10, "label": "object longest side"},
+    )
+    input_folder: str = field(
+        default="mindset/assets/enns_rensink_1991/pngs",
+        metadata={"label": "input folder"},
+    )
+    output_folder: str = field(
+        default="data/low_mid_level_vision/depth_drawings",
+        metadata={"label": "output folder"},
+    )
     antialiasing: bool = field(default=False, metadata={"label": "antialiasing"})
 
 

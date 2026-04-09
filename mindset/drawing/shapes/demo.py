@@ -10,7 +10,6 @@ Additional operations can be added by extending the ShapeCoreFunctions or Shapes
 from mindset.drawing.shapes.parent import ParentStimuli
 from mindset.drawing.shapes.shapes import Shapes
 
-
 # The `ShapeCoreFunctions` class in the provided code defines a set of methods for working with shapes on a canvas. It is capable of performing various operations like:
 
 # 1. Cutting the shape along a line defined by a reference point and an angle (`cut` method)

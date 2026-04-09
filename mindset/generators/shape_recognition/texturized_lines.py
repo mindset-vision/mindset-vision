@@ -1,4 +1,5 @@
 """texturized linedrawings (lines) dataset generator."""
+
 import csv
 import math
 import random
@@ -12,8 +13,11 @@ from torchvision.transforms import InterpolationMode, transforms
 from tqdm import tqdm
 
 from mindset.drawing.affine import get_affine_rnd_fun, my_affine
-from mindset.drawing.base import (DrawStimuli, get_mask_from_linedrawing,
-                                  resize_image_keep_aspect_ratio)
+from mindset.drawing.base import (
+    DrawStimuli,
+    get_mask_from_linedrawing,
+    resize_image_keep_aspect_ratio,
+)
 from mindset.generators._base import GeneratorConfig, generator, register
 from mindset.utils import apply_antialiasing
 
@@ -134,14 +138,44 @@ class DrawPatternedCanvas(DrawStimuli):
 @dataclass
 class TexturizedLinesConfig(GeneratorConfig):
     """config for texturized linedrawings (lines) dataset."""
-    linedrawing_input_folder: str = field(default="mindset/assets/baker_2018_linedrawings/cropped/", metadata={"label": "input folder with line drawings"})
-    num_samples: int = field(default=500, metadata={"min": 1, "max": 10000, "step": 10, "label": "samples per line drawing"})
-    object_longest_side: int = field(default=200, metadata={"min": 50, "max": 500, "step": 10, "label": "object longest side (px)"})
-    density: float = field(default=1.8, metadata={"min": 0.1, "max": 10.0, "step": 0.1, "label": "pattern density"})
-    texturize_foreground: bool = field(default=True, metadata={"label": "texturize foreground"})
-    texturize_background: bool = field(default=False, metadata={"label": "texturize background"})
+
+    linedrawing_input_folder: str = field(
+        default="mindset/assets/baker_2018_linedrawings/cropped/",
+        metadata={"label": "input folder with line drawings"},
+    )
+    num_samples: int = field(
+        default=500,
+        metadata={
+            "min": 1,
+            "max": 10000,
+            "step": 10,
+            "label": "samples per line drawing",
+        },
+    )
+    object_longest_side: int = field(
+        default=200,
+        metadata={
+            "min": 50,
+            "max": 500,
+            "step": 10,
+            "label": "object longest side (px)",
+        },
+    )
+    density: float = field(
+        default=1.8,
+        metadata={"min": 0.1, "max": 10.0, "step": 0.1, "label": "pattern density"},
+    )
+    texturize_foreground: bool = field(
+        default=True, metadata={"label": "texturize foreground"}
+    )
+    texturize_background: bool = field(
+        default=False, metadata={"label": "texturize background"}
+    )
     antialiasing: bool = field(default=False, metadata={"label": "antialiasing"})
-    output_folder: str = field(default="data/shape_and_object_recognition/texturized_linedrawings_lines", metadata={"label": "output folder"})
+    output_folder: str = field(
+        default="data/shape_and_object_recognition/texturized_linedrawings_lines",
+        metadata={"label": "output folder"},
+    )
 
 
 @register("texturized_lines", "shape_recognition")
@@ -175,7 +209,9 @@ def generate_all(config: TexturizedLinesConfig):
 
     with open(output_folder / "annotation.csv", "w", newline="") as annfile:
         writer = csv.writer(annfile)
-        writer.writerow(["Path", "Class", "BackgroundColor", "SlopeLine", "LineLength", "IterNum"])
+        writer.writerow(
+            ["Path", "Class", "BackgroundColor", "SlopeLine", "LineLength", "IterNum"]
+        )
 
         for img_path in tqdm(image_files):
             class_name = img_path.parent.stem
@@ -186,6 +222,8 @@ def generate_all(config: TexturizedLinesConfig):
                 img = ds.draw_pattern(img_path, slope_line, line_length)
                 path = Path(class_name) / f"{image_name}_{n}.png"
                 img.save(output_folder / path)
-                writer.writerow([path, class_name, ds.background, slope_line, line_length, n])
+                writer.writerow(
+                    [path, class_name, ds.background, slope_line, line_length, n]
+                )
 
     return str(output_folder)

@@ -1,4 +1,5 @@
 """ponzo illusion dataset generator."""
+
 import csv
 import math
 import random
@@ -141,9 +142,7 @@ class DrawPonzo(DrawStimuli):
         img = self.create_canvas()
 
         d = ImageDraw.Draw(img)
-        for i in range(
-            self.num_rail_lines + 2
-        ):
+        for i in range(self.num_rail_lines + 2):
             start_point, end_point = self.get_random_start_end_ponts()
             d.line([start_point, end_point], fill="white", width=2)
 
@@ -192,11 +191,25 @@ class DrawPonzo(DrawStimuli):
 @dataclass
 class PonzoConfig(GeneratorConfig):
     """config for ponzo illusion dataset."""
-    num_samples_scrambled: int = field(default=5000, metadata={"min": 1, "max": 50000, "step": 10, "label": "scrambled samples"})
-    num_samples_illusory: int = field(default=500, metadata={"min": 1, "max": 5000, "step": 10, "label": "illusory samples"})
-    num_rail_lines: int = field(default=5, metadata={"min": 0, "max": 20, "step": 1, "label": "number of rail lines"})
-    rnd_target_lines: bool = field(default=False, metadata={"label": "random target lines"})
-    output_folder: str = field(default="data/visual_illusions/ponzo", metadata={"label": "output folder"})
+
+    num_samples_scrambled: int = field(
+        default=5000,
+        metadata={"min": 1, "max": 50000, "step": 10, "label": "scrambled samples"},
+    )
+    num_samples_illusory: int = field(
+        default=500,
+        metadata={"min": 1, "max": 5000, "step": 10, "label": "illusory samples"},
+    )
+    num_rail_lines: int = field(
+        default=5,
+        metadata={"min": 0, "max": 20, "step": 1, "label": "number of rail lines"},
+    )
+    rnd_target_lines: bool = field(
+        default=False, metadata={"label": "random target lines"}
+    )
+    output_folder: str = field(
+        default="data/visual_illusions/ponzo", metadata={"label": "output folder"}
+    )
 
 
 @register("ponzo", "visual_illusions")
@@ -216,7 +229,18 @@ def generate_all(config: PonzoConfig):
 
     with open(output_folder / "annotation.csv", "w", newline="") as annfile:
         writer = csv.writer(annfile)
-        writer.writerow(["Path", "Type", "BackgroundColor", "RedLength", "BlueLength", "UpperLineColor", "NumRailLines", "IterNum"])
+        writer.writerow(
+            [
+                "Path",
+                "Type",
+                "BackgroundColor",
+                "RedLength",
+                "BlueLength",
+                "UpperLineColor",
+                "NumRailLines",
+                "IterNum",
+            ]
+        )
 
         for i in tqdm(range(config.num_samples_scrambled)):
             img, red_l, blue_l, _ = ds.generate_rnd_lines_images(
@@ -226,7 +250,18 @@ def generate_all(config: PonzoConfig):
             unique_hex = uuid.uuid4().hex[:8]
             path = Path("scrambled_lines") / f"{unique_hex}.png"
             img.save(output_folder / path)
-            writer.writerow([path, "scrambled_lines", ds.background, red_l, blue_l, "", config.num_rail_lines, i])
+            writer.writerow(
+                [
+                    path,
+                    "scrambled_lines",
+                    ds.background,
+                    red_l,
+                    blue_l,
+                    "",
+                    config.num_rail_lines,
+                    i,
+                ]
+            )
 
         for i in tqdm(range(config.num_samples_illusory)):
             for c in ["ponzo_same_length", "ponzo_diff_length"]:
@@ -236,6 +271,17 @@ def generate_all(config: PonzoConfig):
                 unique_hex = uuid.uuid4().hex[:8]
                 path = Path(c) / f"{upper_line_color}_{unique_hex}.png"
                 img.save(output_folder / path)
-                writer.writerow([path, c, ds.background, red_l, blue_l, upper_line_color, config.num_rail_lines, i])
+                writer.writerow(
+                    [
+                        path,
+                        c,
+                        ds.background,
+                        red_l,
+                        blue_l,
+                        upper_line_color,
+                        config.num_rail_lines,
+                        i,
+                    ]
+                )
 
     return str(output_folder)

@@ -1,4 +1,5 @@
 """lightness contrast illusion dataset generator."""
+
 import csv
 import uuid
 from dataclasses import dataclass, field
@@ -16,11 +17,24 @@ from mindset.utils import apply_antialiasing
 @dataclass
 class LightnessContrastConfig(GeneratorConfig):
     """config for lightness contrast illusion dataset."""
+
     antialiasing: bool = field(default=False, metadata={"label": "antialiasing"})
-    steps_arrow: int = field(default=30, metadata={"min": 1, "max": 100, "step": 1, "label": "arrow step size"})
-    square_color: int = field(default=200, metadata={"min": 0, "max": 255, "step": 1, "label": "square grayscale color"})
-    steps_bg_color: int = field(default=20, metadata={"min": 1, "max": 128, "step": 1, "label": "background color step"})
-    output_folder: str = field(default="data/visual_illusions/lightness_contrast", metadata={"label": "output folder"})
+    steps_arrow: int = field(
+        default=30,
+        metadata={"min": 1, "max": 100, "step": 1, "label": "arrow step size"},
+    )
+    square_color: int = field(
+        default=200,
+        metadata={"min": 0, "max": 255, "step": 1, "label": "square grayscale color"},
+    )
+    steps_bg_color: int = field(
+        default=20,
+        metadata={"min": 1, "max": 128, "step": 1, "label": "background color step"},
+    )
+    output_folder: str = field(
+        default="data/visual_illusions/lightness_contrast",
+        metadata={"label": "output folder"},
+    )
 
 
 @register("lightness_contrast", "visual_illusions")
@@ -39,7 +53,15 @@ def generate_all(config: LightnessContrastConfig):
 
     with open(output_folder / "annotation.csv", "w", newline="") as annfile:
         writer = csv.writer(annfile)
-        writer.writerow(["Path", "Target Pixel Color", "Target Pixel Location", "Background Color", "Rectangle Color"])
+        writer.writerow(
+            [
+                "Path",
+                "Target Pixel Color",
+                "Target Pixel Location",
+                "Background Color",
+                "Rectangle Color",
+            ]
+        )
 
         for coordinate in tqdm(coordinates, colour="green"):
             grayscale_background_all = np.arange(0, 255, config.steps_bg_color)
@@ -49,8 +71,12 @@ def generate_all(config: LightnessContrastConfig):
                 width, height = image.size
                 size_rect = 80
                 draw.rectangle(
-                    (width // 2 - size_rect // 2, height // 2 - size_rect // 2,
-                     width // 2 + size_rect // 2, height // 2 + size_rect // 2),
+                    (
+                        width // 2 - size_rect // 2,
+                        height // 2 - size_rect // 2,
+                        width // 2 + size_rect // 2,
+                        height // 2 + size_rect // 2,
+                    ),
                     fill=(config.square_color,) * 3,
                 )
                 image = add_arrow(image, coordinate)
@@ -59,6 +85,14 @@ def generate_all(config: LightnessContrastConfig):
                 image = image.convert("L")
                 pixel_color = image.getpixel(coordinate)
                 image.save(output_folder / image_path)
-                writer.writerow([str(image_path), pixel_color, coordinate, background_c, config.square_color])
+                writer.writerow(
+                    [
+                        str(image_path),
+                        pixel_color,
+                        coordinate,
+                        background_c,
+                        config.square_color,
+                    ]
+                )
 
     return str(output_folder)
