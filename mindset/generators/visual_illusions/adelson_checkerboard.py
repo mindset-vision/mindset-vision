@@ -41,7 +41,7 @@ def generate_all(config: AdelsonCheckerboardConfig):
     (output_folder / "all_images").mkdir(parents=True, exist_ok=True)
 
     canvas_size = config.canvas_size
-    img_path = Path("assets") / "adelson_checkerboard" / "nochars_nobg.png"
+    img_path = Path("mindset/assets") / "adelson_checkerboard" / "nochars_nobg.png"
     original_image = Image.open(img_path)
     img = Image.new("RGBA", canvas_size, (*(config.grayscale_background,) * 3, 0))
     resize_and_paste(original_image, img)

@@ -115,8 +115,8 @@ def generate_all(config: ViewpointInvarianceConfig):
         )
 
         for img_path in tqdm(all_images):
-            class_num = Path(img_path).parts[2]
-            object_id = int(Path(img_path).parts[3])
+            class_num = Path(img_path).parts[-3]
+            object_id = int(Path(img_path).parts[-2])
             match = re.search(
                 r"([a-zA-Z]+)\d+-0*(\d+)-0*(\d+).png$", Path(img_path).name
             )

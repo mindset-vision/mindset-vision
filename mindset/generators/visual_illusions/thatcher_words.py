@@ -285,7 +285,7 @@ class ThatcherWordsConfig(GeneratorConfig):
 def generate_all(config: ThatcherWordsConfig):
     """generate thatcher illusion words dataset."""
     output_folder = Path(config.output_folder)
-    word_folder = Path("assets", "words")
+    word_folder = Path("mindset", "assets", "words")
     font_folder = word_folder / "fonts"
 
     conditions = [
