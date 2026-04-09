@@ -8,7 +8,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image, ImageOps
 from torchvision.transforms import InterpolationMode
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 from mindset.drawing.affine import get_affine_rnd_fun, my_affine
 from mindset.drawing.base import DrawStimuli, resize_image_keep_aspect_ratio

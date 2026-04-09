@@ -10,7 +10,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image, UnidentifiedImageError
 from PIL.ImageOps import invert
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 from mindset.generators._base import GeneratorConfig, generator, register
 from mindset.utils import apply_antialiasing

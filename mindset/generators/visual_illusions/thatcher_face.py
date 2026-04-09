@@ -10,7 +10,7 @@ import cv2
 import numpy as np
 import PIL.Image as Image
 from torchvision import transforms
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 from mindset.generators._base import GeneratorConfig, generator, register
 

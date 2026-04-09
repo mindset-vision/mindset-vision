@@ -10,7 +10,7 @@ import cv2
 import numpy as np
 from PIL import ImageDraw
 from torchvision.transforms import InterpolationMode, transforms
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 from mindset.drawing.affine import get_affine_rnd_fun, my_affine
 from mindset.drawing.base import (

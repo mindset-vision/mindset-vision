@@ -7,7 +7,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 from PIL import Image, ImageOps
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 from mindset.drawing.base import DrawStimuli, resize_image_keep_aspect_ratio
 from mindset.generators._base import GeneratorConfig, generator, register
