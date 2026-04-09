@@ -8,13 +8,9 @@ import numpy as np
 from PIL import Image, ImageOps
 from tqdm import tqdm
 
-from mindset.drawing.base import (
-    DrawStimuli,
-    resize_image_keep_aspect_ratio,
-)
+from mindset.drawing.base import DrawStimuli, resize_image_keep_aspect_ratio
 from mindset.generators._base import GeneratorConfig, generator, register
 from mindset.utils import apply_antialiasing
-
 
 # ---------------------------------------------------------------------------
 # drawing class

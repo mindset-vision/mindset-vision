@@ -7,13 +7,10 @@ import cv2
 import PIL.Image as Image
 from tqdm import tqdm
 
-from mindset.drawing.base import (
-    DrawStimuli,
-    paste_linedrawing_onto_canvas,
-    resize_image_keep_aspect_ratio,
-)
-from mindset.utils import apply_antialiasing
+from mindset.drawing.base import (DrawStimuli, paste_linedrawing_onto_canvas,
+                                  resize_image_keep_aspect_ratio)
 from mindset.generators._base import GeneratorConfig, generator, register
+from mindset.utils import apply_antialiasing
 
 
 class DrawLinedrawings(DrawStimuli):

@@ -7,9 +7,9 @@ from pathlib import Path
 from PIL import Image
 from tqdm import tqdm
 
-from mindset.generators._base import GeneratorConfig, generator, register
-from mindset.drawing.primitives import add_arrow
 from mindset.drawing.base import resize_and_paste
+from mindset.drawing.primitives import add_arrow
+from mindset.generators._base import GeneratorConfig, generator, register
 from mindset.utils import apply_antialiasing
 
 

@@ -7,17 +7,14 @@ from pathlib import Path
 
 import cv2
 import numpy as np
-from PIL import Image, ImageDraw
+from PIL import ImageDraw
 from torchvision.transforms import InterpolationMode, transforms
 from tqdm import tqdm
 
-from mindset.generators._base import GeneratorConfig, generator, register
-from mindset.drawing.base import (
-    DrawStimuli,
-    get_mask_from_linedrawing,
-    resize_image_keep_aspect_ratio,
-)
 from mindset.drawing.affine import get_affine_rnd_fun, my_affine
+from mindset.drawing.base import (DrawStimuli, get_mask_from_linedrawing,
+                                  resize_image_keep_aspect_ratio)
+from mindset.generators._base import GeneratorConfig, generator, register
 from mindset.utils import apply_antialiasing
 
 

@@ -5,13 +5,12 @@ import random
 import shutil
 import subprocess
 
-import PIL
-import numpy as np
-import sty
 import cv2
-from PIL import ImageFilter
+import numpy as np
+import PIL
+import sty
 import tqdm
-
+from PIL import ImageFilter
 
 DEFAULTS = {
     "canvas_size": [224, 224],

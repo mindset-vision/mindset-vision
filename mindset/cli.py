@@ -5,6 +5,7 @@ import yaml
 from dataclasses import asdict, fields
 
 
+
 def _load_registry():
     """import all generators to populate the registry."""
     from importlib import import_module

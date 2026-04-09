@@ -16,7 +16,6 @@ from mindset.drawing.base import DrawStimuli
 from mindset.generators._base import GeneratorConfig, generator, register
 from mindset.utils import apply_antialiasing
 
-
 # ---------------------------------------------------------------------------
 # geometry helpers
 # ---------------------------------------------------------------------------

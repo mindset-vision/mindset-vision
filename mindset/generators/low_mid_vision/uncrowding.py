@@ -7,14 +7,14 @@ from datetime import datetime
 from pathlib import Path
 
 import numpy as np
-from PIL import Image, ImageDraw
+from PIL import Image
 from tqdm import tqdm
 
 from mindset.drawing.base import DrawStimuli
-from mindset.drawing.geometry import circle_perimeter, polygon, polygon_perimeter, line
+from mindset.drawing.geometry import (circle_perimeter, line, polygon,
+                                      polygon_perimeter)
 from mindset.generators._base import GeneratorConfig, generator, register
 from mindset.utils import apply_antialiasing
-
 
 # ---------------------------------------------------------------------------
 # shape pattern generators

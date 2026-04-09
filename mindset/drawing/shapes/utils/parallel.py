@@ -1,5 +1,6 @@
-from tqdm import tqdm
 import multiprocessing as mp
+
+from tqdm import tqdm
 
 
 def parallel(make_one, n: int, progress_bar: bool = True):

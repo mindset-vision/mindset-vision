@@ -1,7 +1,8 @@
 import decimal
+from typing import Tuple, Union
+
 import numpy as np
 from PIL import Image
-from typing import Union, Tuple
 
 
 def float_to_str(f):

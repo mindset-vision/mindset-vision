@@ -1,13 +1,14 @@
 import math
-from mindset.drawing.shapes.utils.shapes import chaikins_corner_cutting
-from perlin_noise import PerlinNoise
 import random
-from mindset.drawing.shapes.core import ShapeCoreFunctions
-from PIL.Image import new
-from PIL.ImageDraw import Draw
+
 import numpy as np
 from PIL import Image
-from pathlib import Path
+from PIL.Image import new
+from PIL.ImageDraw import Draw
+from perlin_noise import PerlinNoise
+
+from mindset.drawing.shapes.core import ShapeCoreFunctions
+from mindset.drawing.shapes.utils.shapes import chaikins_corner_cutting
 
 
 class Shapes(ShapeCoreFunctions):
@@ -194,7 +195,3 @@ class Shapes(ShapeCoreFunctions):
         self.draw.polygon(vertices, fill=self.color)
         random.setstate(current_seed)
         return self
-
-
-if __name__ == "__main__":
-    pass

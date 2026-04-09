@@ -1,14 +1,14 @@
 """base infrastructure for dataset generators: config dataclass, decorator, and registration."""
 import dataclasses
-import json
 import functools
-from dataclasses import dataclass, field, fields, asdict
+import json
+from dataclasses import asdict, dataclass, field, fields
 from pathlib import Path
 
 import sty
 
-from mindset.utils import delete_and_recreate_path
 from mindset.generators import REGISTRY
+from mindset.utils import delete_and_recreate_path
 
 
 @dataclass

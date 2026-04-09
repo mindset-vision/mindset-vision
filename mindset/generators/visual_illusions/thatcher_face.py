@@ -13,7 +13,6 @@ from tqdm import tqdm
 
 from mindset.generators._base import GeneratorConfig, generator, register
 
-
 # ---------------------------------------------------------------------------
 # drawing helpers (from GPL 3.0 thatcher-effect-dataset-generator)
 # ---------------------------------------------------------------------------

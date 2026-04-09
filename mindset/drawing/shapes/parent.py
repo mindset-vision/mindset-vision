@@ -2,6 +2,7 @@ import numpy as np
 from PIL import Image
 from PIL.Image import new
 from PIL.ImageDraw import Draw
+
 from mindset.drawing.shapes.utils.general import get_area_size
 
 

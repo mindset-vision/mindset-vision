@@ -10,8 +10,8 @@ import numpy as np
 from PIL import Image, ImageDraw
 from tqdm import tqdm
 
-from mindset.generators._base import GeneratorConfig, generator, register
 from mindset.drawing.base import DrawStimuli
+from mindset.generators._base import GeneratorConfig, generator, register
 from mindset.utils import apply_antialiasing
 
 

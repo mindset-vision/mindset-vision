@@ -13,12 +13,9 @@ from PIL import Image, ImageDraw, ImageFont
 from torchvision.transforms import transforms
 from tqdm import tqdm
 
+from mindset.drawing.base import (DrawStimuli, get_mask_from_linedrawing,
+                                  resize_image_keep_aspect_ratio)
 from mindset.generators._base import GeneratorConfig, generator, register
-from mindset.drawing.base import (
-    DrawStimuli,
-    get_mask_from_linedrawing,
-    resize_image_keep_aspect_ratio,
-)
 from mindset.utils import apply_antialiasing
 
 characters = string.ascii_letters + string.digits + string.punctuation

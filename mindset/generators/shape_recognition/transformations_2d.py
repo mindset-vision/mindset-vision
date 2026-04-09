@@ -9,9 +9,9 @@ from PIL import Image, ImageOps
 from torchvision.transforms import InterpolationMode
 from tqdm import tqdm
 
-from mindset.generators._base import GeneratorConfig, generator, register
-from mindset.drawing.base import DrawStimuli, resize_image_keep_aspect_ratio
 from mindset.drawing.affine import get_affine_rnd_fun, my_affine
+from mindset.drawing.base import DrawStimuli, resize_image_keep_aspect_ratio
+from mindset.generators._base import GeneratorConfig, generator, register
 from mindset.utils import apply_antialiasing
 
 

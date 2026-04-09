@@ -10,8 +10,8 @@ import numpy as np
 from PIL import Image
 from tqdm import tqdm
 
-from mindset.generators._base import GeneratorConfig, generator, register
 from mindset.drawing.base import DrawStimuli, resize_image_keep_aspect_ratio
+from mindset.generators._base import GeneratorConfig, generator, register
 from mindset.utils import apply_antialiasing, check_download_ETH_80_dataset
 
 

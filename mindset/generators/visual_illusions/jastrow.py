@@ -9,10 +9,10 @@ from pathlib import Path
 import numpy as np
 from tqdm import tqdm
 
-from mindset.generators._base import GeneratorConfig, generator, register
 from mindset.drawing.base import DrawStimuli
 from mindset.drawing.shapes.parent import ParentStimuli
 from mindset.drawing.shapes.shapes import Shapes
+from mindset.generators._base import GeneratorConfig, generator, register
 
 
 def get_random_params():

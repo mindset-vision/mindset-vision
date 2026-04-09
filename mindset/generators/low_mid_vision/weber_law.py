@@ -4,12 +4,11 @@ import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
 
-import numpy as np
 from PIL import ImageDraw
 from tqdm import tqdm
 
-from mindset.generators._base import GeneratorConfig, generator, register
 from mindset.drawing.base import DrawStimuli
+from mindset.generators._base import GeneratorConfig, generator, register
 
 
 class DrawWeberLength(DrawStimuli):
