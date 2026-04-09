@@ -1,4 +1,5 @@
 """grayscale shapes dataset generator."""
+
 import csv
 import math
 import uuid
@@ -14,12 +15,12 @@ from tqdm import tqdm
 
 from mindset.drawing.primitives import add_arrow
 from mindset.generators._base import GeneratorConfig, generator, register
-from mindset.utils.misc import apply_antialiasing
-
+from mindset.utils import apply_antialiasing
 
 # ---------------------------------------------------------------------------
 # shape configs
 # ---------------------------------------------------------------------------
+
 
 class ShapeConfigs:
     """contains the configs for the shapes."""
@@ -244,6 +245,7 @@ class ShapeConfigs:
 # ---------------------------------------------------------------------------
 # color picker stimuli
 # ---------------------------------------------------------------------------
+
 
 class ColorPickerStimuli:
     """generates colour picker task stimuli on a grayscale canvas."""
@@ -476,13 +478,23 @@ class ColorPickerStimuli:
 # generator config and entry point
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class GrayscaleShapesConfig(GeneratorConfig):
     """config for grayscale shapes dataset."""
-    num_samples: int = field(default=5000, metadata={"min": 1, "max": 50000, "step": 10, "label": "number of samples"})
-    arrow_size: float = field(default=1, metadata={"min": 0.1, "max": 10, "step": 0.1, "label": "arrow size"})
+
+    num_samples: int = field(
+        default=5000,
+        metadata={"min": 1, "max": 50000, "step": 10, "label": "number of samples"},
+    )
+    arrow_size: float = field(
+        default=1, metadata={"min": 0.1, "max": 10, "step": 0.1, "label": "arrow size"}
+    )
     antialiasing: bool = field(default=False, metadata={"label": "antialiasing"})
-    output_folder: str = field(default="data/visual_illusions/grayscale_shapes", metadata={"label": "output folder"})
+    output_folder: str = field(
+        default="data/visual_illusions/grayscale_shapes",
+        metadata={"label": "output folder"},
+    )
 
 
 @register("grayscale_shapes", "visual_illusions")
@@ -509,7 +521,10 @@ def generate_all(config: GrayscaleShapesConfig):
 
             propose_coordinates = img._propose_arrow_coord()
             counter = 0
-            while img._count_colors_withing_circle(propose_coordinates) > 1 and counter < 100:
+            while (
+                img._count_colors_withing_circle(propose_coordinates) > 1
+                and counter < 100
+            ):
                 propose_coordinates = img._propose_arrow_coord()
                 counter += 1
 
@@ -517,7 +532,9 @@ def generate_all(config: GrayscaleShapesConfig):
                 continue
 
             pixel_color = img._get_pixel_color(propose_coordinates)
-            coord = tuple(map(lambda x: int(x * img.canvas.size[0]), propose_coordinates))
+            coord = tuple(
+                map(lambda x: int(x * img.canvas.size[0]), propose_coordinates)
+            )
             img.canvas = add_arrow(img.canvas, coord, arrow_size=config.arrow_size)
             img.canvas = apply_antialiasing(img) if config.antialiasing else img.canvas
             image_name = str(uuid.uuid4().hex[:8]) + ".png"

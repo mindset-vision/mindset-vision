@@ -1,4 +1,5 @@
 """dotted linedrawings dataset generator."""
+
 import csv
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -8,13 +9,13 @@ import numpy as np
 from PIL import Image, ImageOps
 from tqdm import tqdm
 
-from mindset.generators._base import GeneratorConfig, generator, register
 from mindset.drawing.base import (
     DrawStimuli,
     paste_linedrawing_onto_canvas,
     resize_image_keep_aspect_ratio,
 )
-from mindset.utils.misc import apply_antialiasing
+from mindset.generators._base import GeneratorConfig, generator, register
+from mindset.utils import apply_antialiasing
 
 
 class DrawDottedImage(DrawStimuli):
@@ -64,12 +65,32 @@ class DrawDottedImage(DrawStimuli):
 @dataclass
 class DottedLinedrawingsConfig(GeneratorConfig):
     """config for dotted linedrawings dataset."""
-    object_longest_side: int = field(default=200, metadata={"min": 50, "max": 500, "step": 10, "label": "object longest side (px)"})
-    linedrawing_input_folder: str = field(default="mindset/assets/baker_2018_linedrawings/cropped/", metadata={"label": "input folder with line drawings"})
-    dot_distance: int = field(default=5, metadata={"min": 1, "max": 50, "step": 1, "label": "distance between dots"})
-    dot_size: int = field(default=1, metadata={"min": 1, "max": 20, "step": 1, "label": "dot size"})
+
+    object_longest_side: int = field(
+        default=200,
+        metadata={
+            "min": 50,
+            "max": 500,
+            "step": 10,
+            "label": "object longest side (px)",
+        },
+    )
+    linedrawing_input_folder: str = field(
+        default="mindset/assets/baker_2018_linedrawings/cropped/",
+        metadata={"label": "input folder with line drawings"},
+    )
+    dot_distance: int = field(
+        default=5,
+        metadata={"min": 1, "max": 50, "step": 1, "label": "distance between dots"},
+    )
+    dot_size: int = field(
+        default=1, metadata={"min": 1, "max": 20, "step": 1, "label": "dot size"}
+    )
     antialiasing: bool = field(default=False, metadata={"label": "antialiasing"})
-    output_folder: str = field(default="data/shape_and_object_recognition/dotted_linedrawings", metadata={"label": "output folder"})
+    output_folder: str = field(
+        default="data/shape_and_object_recognition/dotted_linedrawings",
+        metadata={"label": "output folder"},
+    )
 
 
 @register("dotted_linedrawings", "shape_recognition")
@@ -90,18 +111,33 @@ def generate_all(config: DottedLinedrawingsConfig):
         obj_longest_side=config.object_longest_side,
     )
 
-    image_files = sorted(linedrawing_input_folder.rglob("*.jpg")) + sorted(linedrawing_input_folder.rglob("*.png"))
+    image_files = sorted(linedrawing_input_folder.rglob("*.jpg")) + sorted(
+        linedrawing_input_folder.rglob("*.png")
+    )
 
     with open(output_folder / "annotation.csv", "w", newline="") as annfile:
         writer = csv.writer(annfile)
-        writer.writerow(["Path", "Class", "BackgroundColor", "DotDistance", "DotSize", "IterNum"])
+        writer.writerow(
+            ["Path", "Class", "BackgroundColor", "DotDistance", "DotSize", "IterNum"]
+        )
 
         for n, img_path in enumerate(tqdm(image_files)):
             class_name = img_path.parent.stem
             name_sample = img_path.stem
-            img = ds.dotted_image(img_path, dot_distance=config.dot_distance, dot_size=config.dot_size)
+            img = ds.dotted_image(
+                img_path, dot_distance=config.dot_distance, dot_size=config.dot_size
+            )
             path = Path(class_name) / f"{name_sample}.png"
             img.save(output_folder / path)
-            writer.writerow([path, class_name, ds.background, config.dot_distance, config.dot_size, n])
+            writer.writerow(
+                [
+                    path,
+                    class_name,
+                    ds.background,
+                    config.dot_distance,
+                    config.dot_size,
+                    n,
+                ]
+            )
 
     return str(output_folder)

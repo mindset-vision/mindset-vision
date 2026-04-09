@@ -1,4 +1,5 @@
 """linedrawings dataset generator."""
+
 import csv
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -13,12 +14,12 @@ from mindset.drawing.base import (
     resize_image_keep_aspect_ratio,
 )
 from mindset.generators._base import GeneratorConfig, generator, register
-from mindset.utils.misc import apply_antialiasing
-
+from mindset.utils import apply_antialiasing
 
 # ---------------------------------------------------------------------------
 # drawing class
 # ---------------------------------------------------------------------------
+
 
 class DrawLinedrawings(DrawStimuli):
     """draws simple linedrawings (white stroke on canvas)."""
@@ -42,13 +43,29 @@ class DrawLinedrawings(DrawStimuli):
 # generator config and entry point
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class LinedrawingsConfig(GeneratorConfig):
     """config for linedrawings dataset."""
-    object_longest_side: int = field(default=200, metadata={"min": 50, "max": 500, "step": 10, "label": "object longest side (px)"})
-    linedrawing_input_folder: str = field(default="mindset/assets/baker_2018_linedrawings/cropped/", metadata={"label": "input folder with line drawings"})
+
+    object_longest_side: int = field(
+        default=200,
+        metadata={
+            "min": 50,
+            "max": 500,
+            "step": 10,
+            "label": "object longest side (px)",
+        },
+    )
+    linedrawing_input_folder: str = field(
+        default="mindset/assets/baker_2018_linedrawings/cropped/",
+        metadata={"label": "input folder with line drawings"},
+    )
     antialiasing: bool = field(default=False, metadata={"label": "antialiasing"})
-    output_folder: str = field(default="data/shape_and_object_recognition/linedrawings", metadata={"label": "output folder"})
+    output_folder: str = field(
+        default="data/shape_and_object_recognition/linedrawings",
+        metadata={"label": "output folder"},
+    )
 
 
 @register("linedrawings", "shape_recognition")
@@ -68,7 +85,9 @@ def generate_all(config: LinedrawingsConfig):
         obj_longest_side=config.object_longest_side,
     )
 
-    all_images = sorted(linedrawing_input_folder.rglob("*.jpg")) + sorted(linedrawing_input_folder.rglob("*.png"))
+    all_images = sorted(linedrawing_input_folder.rglob("*.jpg")) + sorted(
+        linedrawing_input_folder.rglob("*.png")
+    )
 
     with open(output_folder / "annotation.csv", "w", newline="") as annfile:
         writer = csv.writer(annfile)

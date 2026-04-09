@@ -1,4 +1,5 @@
 """relational vs coordinate dataset generator."""
+
 import csv
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -12,8 +13,8 @@ from mindset.drawing.base import (
     paste_linedrawing_onto_canvas,
     resize_image_keep_aspect_ratio,
 )
-from mindset.utils.misc import apply_antialiasing
 from mindset.generators._base import GeneratorConfig, generator, register
+from mindset.utils import apply_antialiasing
 
 
 class DrawLinedrawings(DrawStimuli):
@@ -36,9 +37,19 @@ class DrawLinedrawings(DrawStimuli):
 @dataclass
 class RelationalVsCoordinateConfig(GeneratorConfig):
     """config for relational vs coordinate dataset."""
-    object_longest_side: int = field(default=200, metadata={"min": 10, "max": 1000, "step": 10, "label": "object longest side"})
-    input_folder: str = field(default="mindset/assets/hummel_stankiewicz_1996/pngs", metadata={"label": "input folder"})
-    output_folder: str = field(default="data/low_mid_level_vision/relational_vs_coordinate", metadata={"label": "output folder"})
+
+    object_longest_side: int = field(
+        default=200,
+        metadata={"min": 10, "max": 1000, "step": 10, "label": "object longest side"},
+    )
+    input_folder: str = field(
+        default="mindset/assets/hummel_stankiewicz_1996/pngs",
+        metadata={"label": "input folder"},
+    )
+    output_folder: str = field(
+        default="data/low_mid_level_vision/relational_vs_coordinate",
+        metadata={"label": "output folder"},
+    )
     antialiasing: bool = field(default=False, metadata={"label": "antialiasing"})
 
 

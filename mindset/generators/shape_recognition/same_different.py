@@ -1,4 +1,5 @@
 """same different task dataset generator."""
+
 import copy
 import csv
 import math
@@ -14,12 +15,12 @@ from tqdm import tqdm
 
 from mindset.drawing.base import DrawStimuli
 from mindset.generators._base import GeneratorConfig, generator, register
-from mindset.utils.misc import apply_antialiasing
-
+from mindset.utils import apply_antialiasing
 
 # ---------------------------------------------------------------------------
 # geometry helpers
 # ---------------------------------------------------------------------------
+
 
 def svrt_1_points(
     canvas_size,
@@ -63,15 +64,24 @@ def svrt_1_points(
 
     if category == 0 and regular:
         points_a, _ = regular_polygon(
-            sides=sides_1, radius=radius_1, rotation=rotation_1, translation=translation_a,
+            sides=sides_1,
+            radius=radius_1,
+            rotation=rotation_1,
+            translation=translation_a,
         )
         points_b, _ = regular_polygon(
-            sides=sides_2, radius=radius_2, rotation=rotation_2, translation=translation_b,
+            sides=sides_2,
+            radius=radius_2,
+            rotation=rotation_2,
+            translation=translation_b,
         )
 
     elif category == 1 and regular:
         points_a, original_a = regular_polygon(
-            sides=sides_1, radius=radius_1, rotation=rotation_1, translation=translation_a,
+            sides=sides_1,
+            radius=radius_1,
+            rotation=rotation_1,
+            translation=translation_a,
         )
         points_b = [
             [sum(pair) for pair in zip(point, translation_b)] for point in original_a
@@ -79,18 +89,27 @@ def svrt_1_points(
 
     elif category == 0 and not regular:
         points_a, _ = irregular_polygon_from_regular(
-            sides=sides_1, radius=radius_1, rotation=rotation_1,
-            translation=translation_a, max_dev=max_dev_1,
+            sides=sides_1,
+            radius=radius_1,
+            rotation=rotation_1,
+            translation=translation_a,
+            max_dev=max_dev_1,
         )
         points_b, _ = irregular_polygon_from_regular(
-            sides=sides_2, radius=radius_2, rotation=rotation_2,
-            translation=translation_b, max_dev=max_dev_2,
+            sides=sides_2,
+            radius=radius_2,
+            rotation=rotation_2,
+            translation=translation_b,
+            max_dev=max_dev_2,
         )
 
     elif category == 1 and not regular:
         points_a, original_a = irregular_polygon_from_regular(
-            sides=sides_1, radius=radius_1, rotation=rotation_1,
-            translation=translation_a, max_dev=max_dev_1,
+            sides=sides_1,
+            radius=radius_1,
+            rotation=rotation_1,
+            translation=translation_a,
+            max_dev=max_dev_1,
         )
         points_b = [
             [sum(pair) for pair in zip(point, translation_b)] for point in original_a
@@ -201,6 +220,7 @@ def irregular_polygon_from_regular(
 # drawing class
 # ---------------------------------------------------------------------------
 
+
 class DrawSameDifferentStimuli(DrawStimuli):
     """draws same-different task stimuli with various shape types."""
 
@@ -247,7 +267,11 @@ class DrawSameDifferentStimuli(DrawStimuli):
                 img, [poly_new_a], isClosed=closed, color=color_a, thickness=thickness
             )
             cv2.polylines(
-                img, [poly_new_b], isClosed=closed, color=color_b, thickness=thickness,
+                img,
+                [poly_new_b],
+                isClosed=closed,
+                color=color_b,
+                thickness=thickness,
             )
         else:
             cv2.fillPoly(img, [poly_new_a], color=color_a)
@@ -282,7 +306,11 @@ class DrawSameDifferentStimuli(DrawStimuli):
             img, points_line_1[0], points_line_1[1], self.fill, thickness=line_thickness
         )
         cv2.line(
-            img, points_line_2[0], points_line_2[1], self.fill, thickness=line_thickness,
+            img,
+            points_line_2[0],
+            points_line_2[1],
+            self.fill,
+            thickness=line_thickness,
         )
 
         img = Image.fromarray(img)
@@ -357,12 +385,22 @@ class DrawSameDifferentStimuli(DrawStimuli):
 
         size = size1
         points_a = [
-            [0, size], [0, 0], [size, 0], [size, size],
-            [size, 2 * size], [2 * size, 2 * size], [2 * size, size],
+            [0, size],
+            [0, 0],
+            [size, 0],
+            [size, size],
+            [size, 2 * size],
+            [2 * size, 2 * size],
+            [2 * size, size],
         ]
         points_b = [
-            [0, size], [0, 2 * size], [size, 2 * size], [size, size],
-            [size, 0], [2 * size, 0], [2 * size, size],
+            [0, size],
+            [0, 2 * size],
+            [size, 2 * size],
+            [size, size],
+            [size, 0],
+            [2 * size, 0],
+            [2 * size, size],
         ]
         if category == 1:
             points_b = points_a
@@ -392,7 +430,11 @@ class DrawSameDifferentStimuli(DrawStimuli):
             img, [poly_new_a], isClosed=is_closed, color=self.fill, thickness=line_width
         )
         cv2.polylines(
-            img, [poly_new_b], isClosed=is_closed, color=self.fill, thickness=line_width,
+            img,
+            [poly_new_b],
+            isClosed=is_closed,
+            color=self.fill,
+            thickness=line_width,
         )
 
         img = Image.fromarray(img)
@@ -402,6 +444,7 @@ class DrawSameDifferentStimuli(DrawStimuli):
 # ---------------------------------------------------------------------------
 # overlap detection and dataset factory lambdas
 # ---------------------------------------------------------------------------
+
 
 def is_overlapping(img: np.array, background_color: tuple, threshold: int = 2):
     """detect whether two shapes overlap in an image."""
@@ -430,7 +473,12 @@ get_regular = lambda ds, label, **kwargs: ds.svrt_1_img(
 )
 
 get_open = lambda ds, label, **kwargs: ds.svrt_1_img(
-    category=label, regular=False, sides=None, thickness=1, closed=False, **kwargs,
+    category=label,
+    regular=False,
+    sides=None,
+    thickness=1,
+    closed=False,
+    **kwargs,
 )
 
 get_wider_line = lambda ds, label, **kwargs: ds.svrt_1_img(
@@ -448,7 +496,12 @@ def get_rnd_color(ds, label, **kwargs):
 
 
 get_filled = lambda ds, label, **kwargs: ds.svrt_1_img(
-    category=label, regular=False, sides=None, thickness=1, filled=True, **kwargs,
+    category=label,
+    regular=False,
+    sides=None,
+    thickness=1,
+    filled=True,
+    **kwargs,
 )
 
 get_straight_lines = lambda ds, label, **kwargs: ds.make_straight_lines_sd_diffrot(
@@ -481,13 +534,30 @@ def is_integer(n):
 # generator config and entry point
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class SameDifferentConfig(GeneratorConfig):
     """config for same different task dataset."""
-    num_samples: int = field(default=5000, metadata={"min": 1, "max": 50000, "step": 10, "label": "samples per type per condition"})
-    size_shapes: str = field(default="20", metadata={"label": "shape size (int, rnd1, or rnd2)"})
-    type_dataset: str = field(default="all", metadata={"label": "dataset type (all or specific name)"})
-    output_folder: str = field(default="data/shape_and_object_recognition/same_different_task", metadata={"label": "output folder"})
+
+    num_samples: int = field(
+        default=5000,
+        metadata={
+            "min": 1,
+            "max": 50000,
+            "step": 10,
+            "label": "samples per type per condition",
+        },
+    )
+    size_shapes: str = field(
+        default="20", metadata={"label": "shape size (int, rnd1, or rnd2)"}
+    )
+    type_dataset: str = field(
+        default="all", metadata={"label": "dataset type (all or specific name)"}
+    )
+    output_folder: str = field(
+        default="data/shape_and_object_recognition/same_different_task",
+        metadata={"label": "output folder"},
+    )
 
 
 @register("same_different", "shape_recognition")
@@ -509,7 +579,11 @@ def generate_all(config: SameDifferentConfig):
         "closed_squares": get_closed_squares,
     }
 
-    datasets = all_datasets if config.type_dataset == "all" else {config.type_dataset: all_datasets[config.type_dataset]}
+    datasets = (
+        all_datasets
+        if config.type_dataset == "all"
+        else {config.type_dataset: all_datasets[config.type_dataset]}
+    )
 
     ds = DrawSameDifferentStimuli(
         background=config.background_color,
@@ -524,7 +598,17 @@ def generate_all(config: SameDifferentConfig):
 
     with open(output_folder / "annotation.csv", "w", newline="") as annfile:
         writer = csv.writer(annfile)
-        writer.writerow(["Path", "BackgroundColor", "TypeDataset", "SizeShape1", "SizeShape2", "SameDiff", "SampleNum"])
+        writer.writerow(
+            [
+                "Path",
+                "BackgroundColor",
+                "TypeDataset",
+                "SizeShape1",
+                "SizeShape2",
+                "SameDiff",
+                "SampleNum",
+            ]
+        )
 
         for ds_name, dataset_fun in tqdm(datasets.items()):
             use_size2 = ds_name not in ["open_squares", "closed_squares", "rectangles"]
@@ -532,12 +616,18 @@ def generate_all(config: SameDifferentConfig):
                 for label in labels:
                     while True:
                         if is_integer(config.size_shapes):
-                            size1, size2 = int(config.size_shapes), int(config.size_shapes)
+                            size1, size2 = int(config.size_shapes), int(
+                                config.size_shapes
+                            )
                         elif config.size_shapes == "rnd1":
-                            size1 = np.random.randint(ds.canvas_size[0] // 15, ds.canvas_size[0] // 4)
+                            size1 = np.random.randint(
+                                ds.canvas_size[0] // 15, ds.canvas_size[0] // 4
+                            )
                             size2 = size1
                         else:
-                            size1, size2 = np.random.randint(ds.canvas_size[0] // 15, ds.canvas_size[0] // 4, 2)
+                            size1, size2 = np.random.randint(
+                                ds.canvas_size[0] // 15, ds.canvas_size[0] // 4, 2
+                            )
 
                         args = dict(label=1 if label == "same" else 0, size1=size1)
                         if use_size2:
@@ -550,6 +640,16 @@ def generate_all(config: SameDifferentConfig):
                     unique_hex = uuid.uuid4().hex[:8]
                     img_path = Path(ds_name) / label / f"{unique_hex}.png"
                     img.save(output_folder / img_path)
-                    writer.writerow([img_path, config.background_color, ds_name, size1, size2 if use_size2 else None, label, n])
+                    writer.writerow(
+                        [
+                            img_path,
+                            config.background_color,
+                            ds_name,
+                            size1,
+                            size2 if use_size2 else None,
+                            label,
+                            n,
+                        ]
+                    )
 
     return str(output_folder)

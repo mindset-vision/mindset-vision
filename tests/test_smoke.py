@@ -5,14 +5,11 @@ from pathlib import Path
 
 def test_package_imports():
     """verify core modules import correctly."""
-    from mindset.utils.misc import DEFAULTS
+    from mindset.utils import DEFAULTS
     assert "canvas_size" in DEFAULTS
 
     from mindset.drawing.base import DrawStimuli
     assert DrawStimuli is not None
-
-    from mindset.utils.dataset_utils import ImageDatasetAnnotations
-    assert ImageDatasetAnnotations is not None
 
 
 def test_generator_registry():

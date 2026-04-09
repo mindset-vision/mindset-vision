@@ -1,4 +1,5 @@
 """emergent features dataset generator."""
+
 import csv
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -8,17 +9,18 @@ import numpy as np
 from PIL import ImageDraw
 from tqdm import tqdm
 
-from mindset.generators._base import GeneratorConfig, generator, register
 from mindset.drawing.base import DrawStimuli
-from mindset.utils.misc import apply_antialiasing
-
+from mindset.generators._base import GeneratorConfig, generator, register
+from mindset.utils import apply_antialiasing
 
 # ---------------------------------------------------------------------------
 # drawing classes
 # ---------------------------------------------------------------------------
 
+
 class ConstrainedError(Exception):
     """raised when constraint-based point generation fails."""
+
     pass
 
 
@@ -107,14 +109,20 @@ class DrawEmergentFeaturesdots(DrawStimuli):
             if not one_point:
                 x0 = np.random.randint(
                     0 + r + self.borders_width + self.min_dist_borders,
-                    self.canvas_size[0] - r - self.borders_width - self.min_dist_borders,
+                    self.canvas_size[0]
+                    - r
+                    - self.borders_width
+                    - self.min_dist_borders,
                 )
                 y0 = np.random.randint(
                     0 + r + self.borders_width + self.min_dist_borders,
-                    self.canvas_size[1] - r - self.borders_width - self.min_dist_borders,
+                    self.canvas_size[1]
+                    - r
+                    - self.borders_width
+                    - self.min_dist_borders,
                 )
             else:
-                (((x0, y0),), _) = one_point
+                ((x0, y0),), _ = one_point
 
             x1 = np.random.randint(
                 0 + r + self.min_dist_borders + self.borders_width,
@@ -319,11 +327,19 @@ class DrawEmergentFeaturesdots(DrawStimuli):
 # generator config and entry point
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class EmergentFeaturesConfig(GeneratorConfig):
     """config for emergent features dataset."""
-    num_samples: int = field(default=1000, metadata={"min": 1, "max": 50000, "step": 10, "label": "number of samples"})
-    output_folder: str = field(default="data/low_mid_level_vision/emergent_features", metadata={"label": "output folder"})
+
+    num_samples: int = field(
+        default=1000,
+        metadata={"min": 1, "max": 50000, "step": 10, "label": "number of samples"},
+    )
+    output_folder: str = field(
+        default="data/low_mid_level_vision/emergent_features",
+        metadata={"label": "output folder"},
+    )
 
 
 @register("emergent_features", "low_mid_vision")

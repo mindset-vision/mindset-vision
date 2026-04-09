@@ -1,4 +1,5 @@
 """embedded figures dataset generator."""
+
 import csv
 import random
 import uuid
@@ -9,10 +10,9 @@ import numpy as np
 from PIL import ImageDraw
 from tqdm import tqdm
 
-from mindset.generators._base import GeneratorConfig, generator, register
 from mindset.drawing.base import DrawStimuli
-from mindset.utils.misc import apply_antialiasing
-
+from mindset.generators._base import GeneratorConfig, generator, register
+from mindset.utils import apply_antialiasing
 
 polys = [
     [
@@ -196,9 +196,19 @@ class DrawEmbeddedFigures(DrawStimuli):
 @dataclass
 class EmbeddedFiguresConfig(GeneratorConfig):
     """config for embedded figures dataset."""
-    num_samples: int = field(default=100, metadata={"min": 1, "max": 10000, "step": 1, "label": "samples per polygon"})
-    shape_size: float = field(default=45, metadata={"min": 10, "max": 200, "step": 5, "label": "shape size (px)"})
-    output_folder: str = field(default="data/shape_and_object_recognition/embedded_figures", metadata={"label": "output folder"})
+
+    num_samples: int = field(
+        default=100,
+        metadata={"min": 1, "max": 10000, "step": 1, "label": "samples per polygon"},
+    )
+    shape_size: float = field(
+        default=45,
+        metadata={"min": 10, "max": 200, "step": 5, "label": "shape size (px)"},
+    )
+    output_folder: str = field(
+        default="data/shape_and_object_recognition/embedded_figures",
+        metadata={"label": "output folder"},
+    )
 
 
 @register("embedded_figures", "shape_recognition")
@@ -230,9 +240,19 @@ def generate_all(config: EmbeddedFiguresConfig):
 
                 for i in tqdm(range(n_samples)):
                     if cond == "polygon":
-                        img = ds.draw_shape(shape_points, extend_lines=False, num_shift_lines=0, num_rnd_lines=0)
+                        img = ds.draw_shape(
+                            shape_points,
+                            extend_lines=False,
+                            num_shift_lines=0,
+                            num_rnd_lines=0,
+                        )
                     else:
-                        img = ds.draw_shape(shape_points, extend_lines=True, num_shift_lines=10, num_rnd_lines=10)
+                        img = ds.draw_shape(
+                            shape_points,
+                            extend_lines=True,
+                            num_shift_lines=10,
+                            num_rnd_lines=10,
+                        )
 
                     unique_hex = uuid.uuid4().hex[:8]
                     img_path = Path(cond) / shape_name / f"{unique_hex}.png"

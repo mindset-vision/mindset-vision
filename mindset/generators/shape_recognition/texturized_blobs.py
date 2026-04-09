@@ -1,4 +1,5 @@
 """texturized blobs dataset generator."""
+
 import csv
 import math
 import random
@@ -12,11 +13,11 @@ from PIL import Image, ImageDraw, ImageFont
 from torchvision.transforms import transforms
 from tqdm import tqdm
 
-from mindset.generators._base import GeneratorConfig, generator, register
 from mindset.drawing.base import DrawStimuli, get_mask_from_linedrawing
-from mindset.utils.misc import apply_antialiasing
-from mindset.utils.shape_based_image_generation.modules.parent import ParentStimuli
-from mindset.utils.shape_based_image_generation.modules.shapes import Shapes
+from mindset.drawing.shapes.parent import ParentStimuli
+from mindset.drawing.shapes.shapes import Shapes
+from mindset.generators._base import GeneratorConfig, generator, register
+from mindset.utils import apply_antialiasing
 
 characters = string.ascii_letters + string.digits + string.punctuation
 
@@ -144,14 +145,38 @@ class DrawPatternedCanvas(DrawStimuli):
 @dataclass
 class TexturizedBlobsConfig(GeneratorConfig):
     """config for texturized blobs dataset."""
-    num_samples_per_blob: int = field(default=5, metadata={"min": 1, "max": 1000, "step": 1, "label": "samples per blob"})
-    num_blobs: int = field(default=10, metadata={"min": 1, "max": 1000, "step": 1, "label": "number of blobs"})
-    object_longest_side: int = field(default=200, metadata={"min": 50, "max": 500, "step": 10, "label": "object longest side (px)"})
-    background_char: str = field(default=" ", metadata={"label": "background character"})
-    foreground_char: str = field(default="random", metadata={"label": "foreground character"})
-    font_size: list = field(default_factory=lambda: [15, 20], metadata={"label": "font size range"})
+
+    num_samples_per_blob: int = field(
+        default=5,
+        metadata={"min": 1, "max": 1000, "step": 1, "label": "samples per blob"},
+    )
+    num_blobs: int = field(
+        default=10,
+        metadata={"min": 1, "max": 1000, "step": 1, "label": "number of blobs"},
+    )
+    object_longest_side: int = field(
+        default=200,
+        metadata={
+            "min": 50,
+            "max": 500,
+            "step": 10,
+            "label": "object longest side (px)",
+        },
+    )
+    background_char: str = field(
+        default=" ", metadata={"label": "background character"}
+    )
+    foreground_char: str = field(
+        default="random", metadata={"label": "foreground character"}
+    )
+    font_size: list = field(
+        default_factory=lambda: [15, 20], metadata={"label": "font size range"}
+    )
     antialiasing: bool = field(default=False, metadata={"label": "antialiasing"})
-    output_folder: str = field(default="data/shape_and_object_recognition/texturized_blobs", metadata={"label": "output folder"})
+    output_folder: str = field(
+        default="data/shape_and_object_recognition/texturized_blobs",
+        metadata={"label": "output folder"},
+    )
 
 
 @register("texturized_blobs", "shape_recognition")
@@ -173,11 +198,19 @@ def generate_all(config: TexturizedBlobsConfig):
 
     with open(output_folder / "annotation.csv", "w", newline="") as annfile:
         writer = csv.writer(annfile)
-        writer.writerow([
-            "Path", "BlobID", "IsTexturized", "BackgroundColor",
-            "BackgroundChar", "ForegroundChar", "FontSize",
-            "RotationAngle", "IterNum",
-        ])
+        writer.writerow(
+            [
+                "Path",
+                "BlobID",
+                "IsTexturized",
+                "BackgroundColor",
+                "BackgroundChar",
+                "ForegroundChar",
+                "FontSize",
+                "RotationAngle",
+                "IterNum",
+            ]
+        )
 
         for blob_id in tqdm(range(config.num_blobs)):
             img = ds.draw_blob(blob_id)
@@ -185,7 +218,9 @@ def generate_all(config: TexturizedBlobsConfig):
             img.save(str(output_folder / path))
             writer.writerow([path, blob_id, False, ds.background, "", "", "", "", 0])
 
-            (output_folder / "texturized_blobs" / str(blob_id)).mkdir(exist_ok=True, parents=True)
+            (output_folder / "texturized_blobs" / str(blob_id)).mkdir(
+                exist_ok=True, parents=True
+            )
 
             for n in tqdm(range(config.num_samples_per_blob), leave=False):
                 rotation_angle = random.randint(-60, 60)
@@ -194,8 +229,16 @@ def generate_all(config: TexturizedBlobsConfig):
                     if isinstance(config.font_size, list)
                     else config.font_size
                 )
-                background_c = random.choice(characters) if config.background_char == "random" else config.background_char
-                foreground_c = random.choice(characters) if config.foreground_char == "random" else config.foreground_char
+                background_c = (
+                    random.choice(characters)
+                    if config.background_char == "random"
+                    else config.background_char
+                )
+                foreground_c = (
+                    random.choice(characters)
+                    if config.foreground_char == "random"
+                    else config.foreground_char
+                )
 
                 img = ds.draw_pattern(
                     blob_id=blob_id,
@@ -208,9 +251,18 @@ def generate_all(config: TexturizedBlobsConfig):
                 hex_id = uuid.uuid4().hex[:8]
                 path = Path("texturized_blobs") / str(blob_id) / f"{hex_id}.png"
                 img.save(output_folder / path)
-                writer.writerow([
-                    path, blob_id, True, ds.background,
-                    background_c, foreground_c, font_s, rotation_angle, n,
-                ])
+                writer.writerow(
+                    [
+                        path,
+                        blob_id,
+                        True,
+                        ds.background,
+                        background_c,
+                        foreground_c,
+                        font_s,
+                        rotation_angle,
+                        n,
+                    ]
+                )
 
     return str(output_folder)

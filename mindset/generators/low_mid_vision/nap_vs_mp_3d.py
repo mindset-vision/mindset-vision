@@ -1,4 +1,5 @@
 """nap vs mp 3d geons dataset generator."""
+
 import colorsys
 import csv
 from dataclasses import dataclass, field
@@ -14,8 +15,8 @@ from mindset.drawing.base import (
     paste_linedrawing_onto_canvas,
     resize_image_keep_aspect_ratio,
 )
-from mindset.utils.misc import apply_antialiasing
 from mindset.generators._base import GeneratorConfig, generator, register
+from mindset.utils import apply_antialiasing
 
 
 class DrawShape(DrawStimuli):
@@ -62,10 +63,22 @@ class DrawShape(DrawStimuli):
 @dataclass
 class NapVsMp3dConfig(GeneratorConfig):
     """config for nap vs mp 3d geons dataset."""
-    object_longest_side: int = field(default=200, metadata={"min": 10, "max": 1000, "step": 10, "label": "object longest side"})
-    stroke_color: str = field(default="", metadata={"label": "stroke color (rgb as 255_255_255 or empty)"})
-    shape_folder: str = field(default="mindset/assets/amir_geons/cropped/NAPvsMP", metadata={"label": "shape folder"})
-    output_folder: str = field(default="data/low_mid_level_vision/NAP_vs_MP_3D_geons", metadata={"label": "output folder"})
+
+    object_longest_side: int = field(
+        default=200,
+        metadata={"min": 10, "max": 1000, "step": 10, "label": "object longest side"},
+    )
+    stroke_color: str = field(
+        default="", metadata={"label": "stroke color (rgb as 255_255_255 or empty)"}
+    )
+    shape_folder: str = field(
+        default="mindset/assets/amir_geons/cropped/NAPvsMP",
+        metadata={"label": "shape folder"},
+    )
+    output_folder: str = field(
+        default="data/low_mid_level_vision/NAP_vs_MP_3D_geons",
+        metadata={"label": "output folder"},
+    )
 
 
 @register("nap_vs_mp_3d", "low_mid_vision")

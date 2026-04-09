@@ -1,15 +1,13 @@
-from PIL.Image import new
-from PIL.ImageDraw import Draw, ImageDraw
-from mindset.utils.shape_based_image_generation.utils.color import get_rgba_color
-from PIL import Image
-import numpy as np
-import pprint
-from mindset.utils.shape_based_image_generation.utils.general import get_area_size
-from mindset.utils.shape_based_image_generation.utils.shapes import SizeMonitor
-from matplotlib import colors
 import math
-import time
+import pprint
+
+import numpy as np
+from matplotlib import colors
+from PIL import Image
+from PIL.Image import new
 from PIL.ImageDraw import Draw
+
+from mindset.drawing.shapes.utils.color import get_rgba_color
 
 
 def check_area(canvas):

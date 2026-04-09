@@ -1,7 +1,7 @@
-import PIL
 import cv2
 import numpy as np
-from PIL import Image, ImageDraw, ImageChops, ImageOps
+import PIL
+from PIL import Image, ImageChops, ImageDraw
 
 
 class DrawStimuli:

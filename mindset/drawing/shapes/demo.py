@@ -7,9 +7,8 @@ that can be performed on shapes, such as cutting, rotating, moving, and changing
 Additional operations can be added by extending the ShapeCoreFunctions or Shapes classes.
 """
 
-from mindset.utils.shape_based_image_generation.modules.parent import ParentStimuli
-from mindset.utils.shape_based_image_generation.modules.shapes import Shapes
-from mindset.utils.shape_based_image_generation.utils.parallel import parallel
+from mindset.drawing.shapes.parent import ParentStimuli
+from mindset.drawing.shapes.shapes import Shapes
 
 # The `ShapeCoreFunctions` class in the provided code defines a set of methods for working with shapes on a canvas. It is capable of performing various operations like:
 
