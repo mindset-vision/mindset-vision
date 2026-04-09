@@ -42,6 +42,9 @@ todo.md
 *.egg-info/
 mindset-report-site/
 uv.lock
+.preview/
+.temp/
+/*.yaml
 
 # macOS specific
 Icon*

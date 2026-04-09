@@ -26,6 +26,37 @@ def _load_registry():
     return REGISTRY
 
 
+def _num(s):
+    """parse a numeric string to int or float."""
+    f = float(s)
+    return int(f) if f == int(f) and "e" not in s.lower() else f
+
+
+def _parse_generator_args(config_cls, remaining):
+    """parse generator-specific CLI flags from leftover args."""
+    skip = {"output_folder", "behaviour_if_present", "canvas_size", "background_color", "antialiasing"}
+    gen_parser = argparse.ArgumentParser(add_help=False)
+    for fld in fields(config_cls):
+        if fld.name in skip:
+            continue
+        flag = f"--{fld.name.replace('_', '-')}"
+        match fld.type:
+            case t if t == bool:
+                gen_parser.add_argument(flag, action=argparse.BooleanOptionalAction, default=None)
+            case t if t == list:
+                gen_parser.add_argument(flag, nargs="+", type=_num, default=None)
+            case t if t == int:
+                gen_parser.add_argument(flag, type=int, default=None)
+            case t if t == float:
+                gen_parser.add_argument(flag, type=float, default=None)
+            case _:
+                gen_parser.add_argument(flag, type=str, default=None)
+    gen_args, unknown = gen_parser.parse_known_args(remaining)
+    if unknown:
+        print(f"warning: unrecognized arguments: {' '.join(unknown)}")
+    return {k: v for k, v in vars(gen_args).items() if v is not None}
+
+
 def main():
     """main CLI entry point for mindset-vision."""
     parser = argparse.ArgumentParser(
@@ -36,7 +67,7 @@ def main():
 
     gen = sub.add_parser("generate", help="generate a dataset")
     gen.add_argument("dataset", help="dataset name or 'all'")
-    gen.add_argument("--samples", type=int, help="override default sample count")
+    gen.add_argument("--samples", type=int, help="override all sample-count fields")
     gen.add_argument("--canvas-size", type=int, nargs=2, help="canvas width height")
     gen.add_argument("--output", "-o", help="output folder")
     gen.add_argument("--config", help="path to yaml config file")
@@ -50,11 +81,14 @@ def main():
     ev.add_argument("pipeline", choices=["decoder", "similarity", "classify"])
     ev.add_argument("--config", help="path to config file")
 
-    args = parser.parse_args()
+    args, remaining = parser.parse_known_args()
 
     if args.command is None:
         parser.print_help()
         sys.exit(0)
+
+    if args.command != "generate" and remaining:
+        parser.error(f"unrecognized arguments: {' '.join(remaining)}")
 
     registry = _load_registry()
 
@@ -93,13 +127,15 @@ def main():
                 if args.config:
                     with open(args.config) as fh:
                         kwargs = yaml.safe_load(fh)
+                if remaining:
+                    kwargs.update(_parse_generator_args(config_cls, remaining))
                 if args.output:
                     kwargs["output_folder"] = args.output
                 if args.canvas_size:
                     kwargs["canvas_size"] = args.canvas_size
                 if args.samples:
                     for fld in fields(config_cls):
-                        if "samples" in fld.name:
+                        if "samples" in fld.name and fld.name not in kwargs:
                             kwargs[fld.name] = args.samples
 
                 info["func"](**kwargs)
