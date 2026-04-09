@@ -2,7 +2,7 @@
 *.pdf
 *.pt
 *.bat
-*.svg 
+*.svg
 *.pyc
 .DS_Store
 *.pyc
@@ -41,6 +41,7 @@ temp/*
 todo.md
 *.egg-info/
 mindset-report-site/
+uv.lock
 
 # macOS specific
 Icon*
