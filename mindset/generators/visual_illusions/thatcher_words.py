@@ -194,7 +194,7 @@ class CreateData(DrawStimuli):
             self.get_w_h_letters(
                 self.word[i],
                 font=truetype(
-                    str(Path("mindset", "assets", "words", "fonts") / self.name_font),
+                    str(Path("mindset", "assets", "thatcher_words", "fonts") / self.name_font),
                     self.size_font + self.letters_size_font_shift[i],
                 ),
             )
@@ -205,7 +205,7 @@ class CreateData(DrawStimuli):
     def get_zoomed_font(self, zoom: int):
         """get font with size adjusted by zoom offset."""
         return truetype(
-            str(Path("mindset", "assets", "words", "fonts") / self.name_font),
+            str(Path("mindset", "assets", "thatcher_words", "fonts") / self.name_font),
             self.size_font + zoom,
         )
 
@@ -285,7 +285,7 @@ class ThatcherWordsConfig(GeneratorConfig):
 def generate_all(config: ThatcherWordsConfig):
     """generate thatcher illusion words dataset."""
     output_folder = Path(config.output_folder)
-    word_folder = Path("mindset", "assets", "words")
+    word_folder = Path("mindset", "assets", "thatcher_words")
     font_folder = word_folder / "fonts"
 
     conditions = [

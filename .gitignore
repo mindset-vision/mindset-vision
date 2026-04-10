@@ -11,7 +11,7 @@ experiments/*
 init
 
 
-assets/ETH_80
+assets/viewpoint_invariance
 # specific directories
 **/__pycache__/
 **/.neptune/

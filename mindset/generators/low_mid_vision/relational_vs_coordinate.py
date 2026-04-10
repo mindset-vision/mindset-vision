@@ -43,7 +43,7 @@ class RelationalVsCoordinateConfig(GeneratorConfig):
         metadata={"min": 10, "max": 1000, "step": 10, "label": "object longest side"},
     )
     input_folder: str = field(
-        default="mindset/assets/hummel_stankiewicz_1996/pngs",
+        default="mindset/assets/relational_vs_coordinate/pngs",
         metadata={"label": "input folder"},
     )
     output_folder: str = field(

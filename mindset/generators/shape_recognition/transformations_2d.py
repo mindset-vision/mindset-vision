@@ -56,7 +56,7 @@ class Transformations2DConfig(GeneratorConfig):
     """config for 2d transformations dataset."""
 
     input_folder: str = field(
-        default="mindset/assets/baker_2018_linedrawings/cropped/",
+        default="mindset/assets/linedrawings/cropped/",
         metadata={"label": "input folder with line drawings"},
     )
     object_longest_side: int = field(

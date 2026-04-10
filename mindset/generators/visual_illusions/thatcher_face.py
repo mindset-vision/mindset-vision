@@ -174,7 +174,7 @@ class ThatcherFaceConfig(GeneratorConfig):
     """config for thatcher illusion face dataset."""
 
     face_folder: str = field(
-        default="mindset/assets/celebA_sample/normal", metadata={"label": "face folder"}
+        default="mindset/assets/thatcher_face/normal", metadata={"label": "face folder"}
     )
     output_folder: str = field(
         default="data/visual_illusions/thatcher_face",

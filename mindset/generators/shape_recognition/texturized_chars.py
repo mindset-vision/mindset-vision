@@ -126,7 +126,7 @@ class TexturizedCharsConfig(GeneratorConfig):
     """config for texturized linedrawings (chars) dataset."""
 
     linedrawing_input_folder: str = field(
-        default="mindset/assets/baker_2018_linedrawings/cropped/",
+        default="mindset/assets/linedrawings/cropped/",
         metadata={"label": "input folder with line drawings"},
     )
     num_samples: int = field(

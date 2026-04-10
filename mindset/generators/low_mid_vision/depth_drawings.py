@@ -43,7 +43,7 @@ class DepthDrawingsConfig(GeneratorConfig):
         metadata={"min": 10, "max": 1000, "step": 10, "label": "object longest side"},
     )
     input_folder: str = field(
-        default="mindset/assets/enns_rensink_1991/pngs",
+        default="mindset/assets/depth_drawings/pngs",
         metadata={"label": "input folder"},
     )
     output_folder: str = field(

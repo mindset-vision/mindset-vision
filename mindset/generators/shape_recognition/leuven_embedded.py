@@ -83,7 +83,7 @@ class LeuvenEmbeddedConfig(GeneratorConfig):
 def generate_all(config: LeuvenEmbeddedConfig):
     """generate leuven embedded figures dataset with shapes and context stimuli."""
     output_folder = Path(config.output_folder)
-    left_ds = Path("mindset/assets") / "leuven_embedded_figures_test"
+    left_ds = Path("mindset/assets") / "leuven_embedded"
 
     figs_to_take = range(0, 16 * 4, 4)
     all_shapes_path = [
