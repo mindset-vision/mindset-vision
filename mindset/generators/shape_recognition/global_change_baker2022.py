@@ -64,7 +64,7 @@ class GlobalChangeBaker2022Config(GeneratorConfig):
 def generate_all(config: GlobalChangeBaker2022Config):
     """generate global change baker2022 dataset from baker 2022 silhouettes."""
     output_folder = Path(config.output_folder)
-    image_input_folder = Path("mindset/assets/baker_2022")
+    image_input_folder = Path("mindset/assets/global_change")
 
     all_categories = [p.stem for p in image_input_folder.glob("*")]
     for cat in all_categories:

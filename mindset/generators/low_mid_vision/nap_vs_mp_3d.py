@@ -72,7 +72,7 @@ class NapVsMp3dConfig(GeneratorConfig):
         default="", metadata={"label": "stroke color (rgb as 255_255_255 or empty)"}
     )
     shape_folder: str = field(
-        default="mindset/assets/amir_geons/cropped/NAPvsMP",
+        default="mindset/assets/nap_vs_mp_3d/cropped/NAPvsMP",
         metadata={"label": "shape folder"},
     )
     output_folder: str = field(

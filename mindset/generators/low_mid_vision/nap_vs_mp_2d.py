@@ -43,7 +43,7 @@ class NapVsMp2dConfig(GeneratorConfig):
         metadata={"min": 10, "max": 1000, "step": 10, "label": "object longest side"},
     )
     input_folder: str = field(
-        default="mindset/assets/kubilius_2017/pngs", metadata={"label": "input folder"}
+        default="mindset/assets/nap_vs_mp_2d/pngs", metadata={"label": "input folder"}
     )
     output_folder: str = field(
         default="data/low_mid_level_vision/NAP_vs_MP_2D_lines",

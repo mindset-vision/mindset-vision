@@ -226,7 +226,7 @@ def generate_all(config: TexturizedBlobsConfig):
                 rotation_angle = random.randint(-60, 60)
                 font_s = (
                     random.randint(config.font_size[0], config.font_size[1])
-                    if isinstance(config.font_size, list)
+                    if isinstance(config.font_size, (list, tuple))
                     else config.font_size
                 )
                 background_c = (

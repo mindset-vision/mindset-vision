@@ -76,7 +76,7 @@ class SilhouettesConfig(GeneratorConfig):
         },
     )
     image_input_folder: str = field(
-        default="mindset/assets/baker_2018_linedrawings/cropped/",
+        default="mindset/assets/linedrawings/cropped/",
         metadata={"label": "input folder with images"},
     )
     input_image_type: str = field(

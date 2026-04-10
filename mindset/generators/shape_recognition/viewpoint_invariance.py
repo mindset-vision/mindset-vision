@@ -65,7 +65,7 @@ class ViewpointInvarianceConfig(GeneratorConfig):
     """config for viewpoint invariance dataset."""
 
     eth_80_folder: str = field(
-        default="mindset/assets/ETH_80", metadata={"label": "ETH-80 dataset folder"}
+        default="mindset/assets/viewpoint_invariance", metadata={"label": "ETH-80 dataset folder"}
     )
     object_longest_side: int = field(
         default=200,

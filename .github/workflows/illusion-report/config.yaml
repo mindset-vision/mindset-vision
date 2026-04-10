@@ -87,7 +87,7 @@ generators:
     label: "Global Change"
     registry_name: global_change
     overrides:
-      image_input_folder: "mindset/assets/baker_2018_linedrawings/cropped/"
+      image_input_folder: "mindset/assets/linedrawings/cropped/"
   transformations_2d:
     label: "2D Transformations"
     registry_name: transformations_2d
