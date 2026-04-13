@@ -87,7 +87,8 @@ class ReportGenerator:
         info = get_generator(cfg["registry_name"])
         gen_fn = info["func"]
 
-        params = {**self.shared, **cfg.get("overrides", {}), "output_folder": str(output_dir)}
+        capped = cap_sample_params(gen_fn, SAMPLE_CAP)
+        params = {**self.shared, **cfg.get("overrides", {}), **capped, "output_folder": str(output_dir)}
         gen_fn(**params)
 
         ann = output_dir / "annotation.csv"
