@@ -176,18 +176,25 @@ def generate_all(config: AmodalCompletionConfig):
             side_square = np.ceil(radius_circle * 1.8).astype(int)
             diagonal_square = side_square * np.sqrt(2)
 
-            base_center_dist = (radius_circle + diagonal_square / 2)  # minimum distance between centers so that there is no overalap
+            # minimum distance between centers so that there is no overalap
+            base_center_dist = (radius_circle + diagonal_square / 2)
 
             while True:
                 # determine circle position
-                base_center_circle = np.random.uniform(0 + radius_circle, 224 - radius_circle, size=2).round().astype(int)
+                base_center_circle = np.random.uniform(
+                    0 + radius_circle, canvas_size[0] - radius_circle, size=2
+                ).round().astype(int)
 
                 # trace position of the non occluding square along a random direction
                 theta = np.random.uniform(0, np.pi * 2)
                 center_square_dir = np.array([np.sin(theta), np.cos(theta)])
 
-                factor = np.random.uniform(1.05, 1.2) * base_center_dist # scale the distance between centers by a random value
-                base_center_square = np.ceil(base_center_circle + factor * center_square_dir).astype(int)
+                # scale the distance between centers by a random value
+
+                factor = np.random.uniform(1.05, 1.2) * base_center_dist
+                base_center_square = np.ceil(
+                    base_center_circle + factor * center_square_dir
+                ).astype(int)
 
                 # if the non-occluding square is in the canvas, accept the image
                 if check_square_fully_in_canvas(base_center_square):
