@@ -52,7 +52,14 @@ class DrawDecomposition(DrawStimuli):
 
         shape_1.rotate(30)
         shape_2.rotate(30)
-        shape_2.move_next_to(shape_1, "LEFT")
+        shape_2.move_next_to(shape_1, "LEFT")  # type: ignore
+
+        # Re-center shapes so we avoid clipping further down the generator pipeline.
+        center_bbox_shape1 = shape_1.get_bbox_center() / np.asarray(shape_1.canvas.size)
+        center_bbox_shape2 = shape_2.get_bbox_center() / np.asarray(shape_2.canvas.size)
+        displacement = 0.5 - (center_bbox_shape2 + (center_bbox_shape1 - center_bbox_shape2) / 2)
+        shape_1.move_to(center_bbox_shape1 + displacement)  # type: ignore
+        shape_2.move_to(center_bbox_shape2 + displacement)  # type: ignore
 
         if split_type == "no_split":
             shape_1.register()
@@ -77,7 +84,7 @@ class DrawDecomposition(DrawStimuli):
 
         parent.binary_filter()
         parent.convert_color_to_color((255, 255, 255), self.shape_color)
-        parent.move_to(image_position).rotate(image_rotation)
+        parent.rotate(image_rotation)
         self.create_canvas()
         parent.add_background(self.background)
         parent.shrink() if self.antialiasing else None
@@ -89,7 +96,7 @@ class DecompositionConfig(GeneratorConfig):
     """config for decomposition dataset."""
 
     moving_distance: int = field(
-        default=60,
+        default=50,
         metadata={"min": 1, "max": 200, "step": 1, "label": "moving distance"},
     )
     shape_color: list = field(
@@ -150,21 +157,23 @@ def generate_all(config: DecompositionConfig):
         writer = csv.writer(annfile)
         writer.writerow(
             [
-                "Path",
-                "BackgroundColor",
+                "SampleID",
                 "ShapeType",
-                "SplitType",
+                "NoSplitPath",
+                "NaturalPath",
+                "UnnaturalPath",
                 "LeftShape",
                 "RightShape",
                 "CutRotation",
-                "PairShapeId",
-                "IterNum",
+                "BackgroundColor",
             ]
         )
 
+        sample_id = 0
         for name_comb, combs in tqdm(shapes_types.items()):
-            for idx, c in enumerate(tqdm(combs, leave=False)):
+            for c in tqdm(combs, leave=False):
                 cut_rotation = random.uniform(0, 360)
+                paths = {}
                 for split_type in split_types:
                     img = ds.generate_canvas(
                         c["shape_1_name"],
@@ -173,19 +182,24 @@ def generate_all(config: DecompositionConfig):
                         cut_rotation=cut_rotation,
                     )
                     unique_hex = uuid.uuid4().hex[:8]
-                    path = Path(name_comb) / split_type / f"{unique_hex}.png"
+                    path = Path(name_comb) / split_type / \
+                        f"{c['shape_1_name']}_{c['shape_2_name']}_{unique_hex}.png"
                     img.save(output_folder / path)
-                    writer.writerow(
-                        [
-                            path,
-                            ds.background,
-                            name_comb,
-                            split_type,
-                            c["shape_1_name"],
-                            c["shape_2_name"],
-                            cut_rotation,
-                            idx,
-                        ]
-                    )
+                    paths[split_type] = path
+
+                writer.writerow(
+                    [
+                        sample_id,
+                        name_comb,
+                        paths["no_split"],
+                        paths["natural"],
+                        paths["unnatural"],
+                        c["shape_1_name"],
+                        c["shape_2_name"],
+                        cut_rotation,
+                        ds.background,
+                    ]
+                )
+                sample_id += 1
 
     return str(output_folder)
