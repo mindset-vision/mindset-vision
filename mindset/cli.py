@@ -52,7 +52,14 @@ def _parse_generator_args(config_cls, remaining):
         match fld.type:
             case t if t == bool:
                 gen_parser.add_argument(*flags, action=argparse.BooleanOptionalAction, default=None)
-            case t if t == list:
+            case t if (
+                t == list
+                or get_origin(t) is list
+                or (
+                    get_origin(t) is not None
+                    and any(get_origin(a) is list or a is list for a in get_args(t))
+                )
+            ):
                 gen_parser.add_argument(*flags, nargs="+", type=_parse_val, default=None)
             case t if t == int:
                 gen_parser.add_argument(*flags, type=int, default=None)
@@ -64,7 +71,7 @@ def _parse_generator_args(config_cls, remaining):
                     *flags, type=type_args[0], nargs=len(type_args), default=None
                 )
             case _:
-                gen_parser.add_argument(*flags, type=str, default=None)
+                gen_parser.add_argument(*flags, type=_parse_val, default=None)
 
     gen_args, unknown = gen_parser.parse_known_args(remaining)
     if unknown:

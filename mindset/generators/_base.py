@@ -36,8 +36,13 @@ def generator(config_cls):
 
     def decorator(func):
         @functools.wraps(func)
-        def wrapper(**kwargs):
-            config = config_cls(**{k: v for k, v in kwargs.items() if v is not None})
+        def wrapper(*args, **kwargs):
+            if args and isinstance(args[0], config_cls):
+                config = args[0]
+                if kwargs:
+                    config = dataclasses.replace(config, **{k: v for k, v in kwargs.items() if v is not None})
+            else:
+                config = config_cls(**{k: v for k, v in kwargs.items() if v is not None})
             output_folder = Path(config.output_folder)
 
             if output_folder.exists() and config.behaviour_if_present == "skip":
