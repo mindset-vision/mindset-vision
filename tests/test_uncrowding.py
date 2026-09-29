@@ -286,9 +286,10 @@ def test_uncrowding_distributions_generator(tmp_path):
             assert row["VernierInOut"] in ("inside", "outside")
             assert row["Dimension"] == "rotation"
             assert row["BaseShape"] in ("square", "star")
-            assert row["ConfigIndex"] in ("0", "1")
-            assert float(row["Loc"]) in (0.0, 45.0)
-            assert float(row["Scale"]) in (0.0, 5.0)
+            assert float(row["LocA"]) in (0.0, 45.0)
+            assert float(row["ScaleA"]) in (0.0, 5.0)
+            assert float(row["LocB"]) in (0.0, 45.0) if row['LocB'] != 'none' else True
+            assert float(row["ScaleB"]) in (0.0, 5.0) if row['ScaleB'] != 'none' else True
             img_file = output_dir / row["Path"]
             assert img_file.exists()
 
@@ -298,8 +299,8 @@ def test_uncrowding_distributions_scale_generator(tmp_path):
     output_dir = tmp_path / "distributions_test_scale"
     config = UncrowdingDistributionsConfig(
         dimension="scale",
-        loc=[1.0, 0.6],
-        scale=[0.0, 0.05],
+        loc=[0.5, 0.6],
+        scale=[0.5, 0.05],
         base_shapes=["hexagon"],
         row_counts=[1, 3],
         col_counts=[1, 3],
@@ -319,8 +320,10 @@ def test_uncrowding_distributions_scale_generator(tmp_path):
         assert len(reader) > 0
         for row in reader:
             assert row["Dimension"] == "scale"
-            assert float(row["Loc"]) in (1.0, 0.6)
-            assert float(row["Scale"]) in (0.0, 0.05)
+            assert float(row["LocA"]) in (0.5, 0.6)
+            assert float(row["ScaleA"]) in (0.5, 0.05)
+            assert float(row["LocB"]) in (0.5, 0.6) if row['LocB'] != 'none' else True
+            assert float(row["ScaleB"]) in (0.5, 0.05) if row['ScaleB'] != 'none' else True
             img_file = output_dir / row["Path"]
             assert img_file.exists()
 
@@ -337,11 +340,6 @@ def test_uncrowding_distributions_validation():
     # Mismatched loc and scale lengths
     with pytest.raises(ValueError, match="loc and scale lists must have equal length"):
         UncrowdingDistributionsConfig(loc=[0.0, 45.0], scale=[0.0])
-
-    # Singleton normalization
-    cfg_single = UncrowdingDistributionsConfig(loc=45, scale=5)
-    assert cfg_single.loc == [45.0]
-    assert cfg_single.scale == [5.0]
 
     # Multiple values
     cfg_multi = UncrowdingDistributionsConfig(loc=[15.0, 30.0], scale=[1.0, 2.0])
@@ -467,8 +465,8 @@ def test_uncrowding_distributions_central_flanker_fixed(monkeypatch, tmp_path):
     # Test scale
     config_scale = UncrowdingDistributionsConfig(
         dimension="scale",
-        loc=[0.5],
-        scale=[0.0],
+        loc=[0.5, 0.5],
+        scale=[0.0, 0.0],
         base_shapes=["square"],
         row_counts=[1, 3],
         col_counts=[1, 3],
@@ -487,5 +485,4 @@ def test_uncrowding_distributions_central_flanker_fixed(monkeypatch, tmp_path):
         assert scales[r_c][c_c] == 1.0, f"Central flanker scaled in {r}x{c} grid: {scales[r_c][c_c]}"
         if (r, c) == (3, 3):
             surround_scales = [scales[i][j] for i in range(r) for j in range(c) if (i, j) != (r_c, c_c)]
-            assert any(sc == 0.5 for sc in surround_scales)
-
+            assert any((sc == 0.5 if sc != 'none' else True) for sc in surround_scales )

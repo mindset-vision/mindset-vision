@@ -13,16 +13,16 @@ def test_package_imports():
 
 
 def test_generator_registry():
-    """verify all 33 generators register via auto-discovery."""
+    """verify all 37 generators register via auto-discovery."""
     from mindset.cli import _load_registry
     from mindset.generators import list_generators
 
     registry = _load_registry()
-    assert len(registry) == 36
+    assert len(registry) == 37
 
     cats = list_generators()
     assert len(cats["visual_illusions"]) == 10
-    assert len(cats["low_mid_vision"]) == 9
+    assert len(cats["low_mid_vision"]) == 10
     assert len(cats["shape_recognition"]) == 17
 
 

@@ -646,12 +646,12 @@ class UncrowdingDistributionsConfig(_BaseUncrowdingConfig):
         default="rotation",
         metadata={"choices": ["rotation", "scale"], "label": "feature dimension (rotation or scale)"},
     )
-    loc: list[float] | float = field(
-        default_factory=lambda: [0.0, 45.0, 90.0],
+    loc: list[float] = field(
+        default_factory=lambda: [0.0, 0.0],
         metadata={"label": "distribution locations (e.g. angle in deg or scale factor)"},
     )
-    scale: list[float] | float = field(
-        default_factory=lambda: [0.0, 0.0, 10.0],
+    scale: list[float] = field(
+        default_factory=lambda: [10.0, 10.0],
         metadata={"label": "distribution scales (e.g. spread / std)"},
     )
     base_shapes: list[str] = field(
@@ -672,15 +672,8 @@ class UncrowdingDistributionsConfig(_BaseUncrowdingConfig):
         if self.dimension not in ("rotation", "scale"):
             raise ValueError(f"dimension must be 'rotation' or 'scale', got '{self.dimension}'")
 
-        if isinstance(self.loc, (int, float, str)):
-            self.loc = [float(self.loc)]
-        else:
-            self.loc = [float(x) for x in self.loc]
-
-        if isinstance(self.scale, (int, float, str)):
-            self.scale = [float(self.scale)]
-        else:
-            self.scale = [float(x) for x in self.scale]
+        self.loc = [float(x) for x in self.loc]
+        self.scale = [float(x) for x in self.scale]
 
         if len(self.loc) != len(self.scale):
             raise ValueError(
@@ -705,7 +698,7 @@ def generate_distributions(config: UncrowdingDistributionsConfig):
 
             for shape in base_shapes:
                 if arr == "uniform":
-                    for (loc_a, scale_a) in zip(config.loc, config.scale):  # type: ignore
+                    for (loc_a, scale_a) in zip(config.loc, config.scale):
                         conditions.append(
                             {
                                 "num_rows": r,
@@ -721,8 +714,8 @@ def generate_distributions(config: UncrowdingDistributionsConfig):
                             }
                         )
                 else:
-                    dist_comb = combinations(zip(config.loc, config.scale), 2)  # type: ignore
-                    for (loc_a, scale_a), (loc_b, scale_b) in dist_comb:  # type: ignore
+                    dist_comb = combinations(zip(config.loc, config.scale), 2)
+                    for (loc_a, scale_a), (loc_b, scale_b) in dist_comb:
                         conditions.append(
                             {
                                 "num_rows": r,
@@ -753,7 +746,6 @@ def generate_distributions(config: UncrowdingDistributionsConfig):
                 "GridArrangement",
                 "BaseShape",
                 "Dimension",
-                "ConfigIndex",
                 "GridPattern",
                 "LocA",
                 "ScaleA",
@@ -780,8 +772,11 @@ def generate_distributions(config: UncrowdingDistributionsConfig):
                         r, c = cond["num_rows"], cond["num_cols"]
                         shape = cond["base_shape"]
                         arr = cond["arrangement"]
+
                         loc_a = cond["loc_a"]
-                        scale_b = cond["scale_a"]
+                        scale_a = cond["scale_a"]
+                        loc_b = cond["loc_b"]
+                        scale_b = cond["scale_b"]
 
                         cell_shapes = [[shape] * c for _ in range(r)]
                         cell_rotations = [[0.0] * c for _ in range(r)]
