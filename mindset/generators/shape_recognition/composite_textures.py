@@ -7,7 +7,9 @@ from PIL import Image
 from tqdm.auto import tqdm
 
 from mindset.generators._base import GeneratorConfig, generator, register
-from mindset.generators.shape_recognition.manipulated_textures import  DrawManipulatedTexture
+from mindset.generators.shape_recognition.manipulated_textures import (
+    DrawManipulatedTexture,
+)
 from mindset.utils import to_list
 
 
@@ -147,7 +149,7 @@ class CompositeTexturesConfig(GeneratorConfig):
     )
     antialiasing: bool = field(default=False, metadata={"label": "antialiasing"})
     output_folder: str = field(
-        default="data/shape_and_object_recognition/composite_textures",
+        default="data/shape_recognition/composite_textures",
         metadata={"label": "output folder"},
     )
 

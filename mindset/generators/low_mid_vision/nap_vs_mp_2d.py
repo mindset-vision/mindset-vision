@@ -43,8 +43,8 @@ class NapVsMp2dConfig(GeneratorConfig):
         default=200,
         metadata={"min": 10, "max": 1000, "step": 10, "label": "object longest side"},
     )
-    input_folder: str = field(
-        default="mindset/assets/nap_vs_mp_2d/pngs", metadata={"label": "input folder"}
+    input_folder: str | None = field(
+        default=None, metadata={"label": "input folder"}
     )
     output_folder: str = field(
         default="data/low_mid_vision/nap_vs_mp_2d",
@@ -58,7 +58,12 @@ class NapVsMp2dConfig(GeneratorConfig):
 def generate_all(config: NapVsMp2dConfig):
     """generate nap vs mp 2d lines dataset."""
     output_folder = Path(config.output_folder)
-    input_folder = Path(config.input_folder)
+    if config.input_folder is None:
+        input_folder = (
+            Path(__file__).resolve().parents[2] / "assets" / "nap_vs_mp_2d" / "pngs"
+        )
+    else:
+        input_folder = Path(config.input_folder)
 
     ref_folder = input_folder / "reference"
     mp_folder = input_folder / "MP"

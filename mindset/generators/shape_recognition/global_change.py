@@ -26,7 +26,7 @@ class DrawLinedrawings(DrawStimuli):
         self.obj_longest_side = obj_longest_side
         self.convert_to_silhouettes = convert_to_silhouettes
 
-    def get_linedrawings(self, image_path, type):
+    def get_linedrawings(self, image_path, change_type="whole"):
         """produce whole, fragmented, or frankenstein version of a linedrawing."""
         img = cv2.imread(str(image_path), cv2.IMREAD_GRAYSCALE)
 
@@ -37,13 +37,7 @@ class DrawLinedrawings(DrawStimuli):
                 binary_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE
             )
             mask = np.ones_like(img) * 255
-
-            cv2.drawContours(mask, contours, -1, (0), thickness=cv2.FILLED)
-
-            [
-                cv2.drawContours(mask, [c], -1, (0), thickness=cv2.FILLED)
-                for c in contours
-            ]
+            cv2.drawContours(mask, contours, -1, 0, thickness=cv2.FILLED)
         else:
             mask = cv2.bitwise_not(binary_img)
 
@@ -52,18 +46,18 @@ class DrawLinedrawings(DrawStimuli):
         top_half = silhouette.crop((0, 0, width, height // 2))
         bottom_half = silhouette.crop((0, height // 2, width, height))
 
-        if type in ["frankenstein", "fragmented"]:
+        if change_type in ["frankenstein", "fragmented"]:
             top_half = top_half.transpose(Image.FLIP_LEFT_RIGHT)
 
         top_half_np = np.array(top_half)
         bottom_half_np = np.array(bottom_half)
-        if type == "frankenstein":
+        if change_type == "frankenstein":
             top = np.min(np.where(top_half_np[-1] == 0))
             bottom = np.min(np.where(bottom_half_np[0] == 0))
-        elif type == "fragmented":
+        elif change_type == "fragmented":
             top = np.min(np.where(top_half_np[-1] == 0))
             bottom = np.max(np.where(bottom_half_np[0] == 0))
-        else:  # type == "whole":
+        else:  # change_type == "whole":
             bottom = 0
             top = 0
         top_offset = max(0, bottom - top)
@@ -130,8 +124,8 @@ class GlobalChangeConfig(GeneratorConfig):
             "label": "object longest side (px)",
         },
     )
-    image_input_folder: str = field(
-        default="mindset/assets/linedrawings/cropped/",
+    image_input_folder: str | None = field(
+        default=None,
         metadata={"label": "input folder with images"},
     )
     convert_to_silhouettes: int = field(
@@ -139,7 +133,7 @@ class GlobalChangeConfig(GeneratorConfig):
     )
     antialiasing: bool = field(default=False, metadata={"label": "antialiasing"})
     output_folder: str = field(
-        default="data/shape_and_object_recognition/global_change",
+        default="data/shape_recognition/global_change",
         metadata={"label": "output folder"},
     )
 
@@ -149,7 +143,12 @@ class GlobalChangeConfig(GeneratorConfig):
 def generate_all(config: GlobalChangeConfig):
     """generate global change dataset with whole, fragmented, and frankenstein conditions."""
     output_folder = Path(config.output_folder)
-    image_input_folder = Path(config.image_input_folder)
+    if config.image_input_folder is None:
+        image_input_folder = (
+            Path(__file__).resolve().parents[2] / "assets" / "linedrawings" / "cropped"
+        )
+    else:
+        image_input_folder = Path(config.image_input_folder)
 
     all_categories = [p.stem for p in image_input_folder.glob("*")]
     conditions = ["whole", "fragmented", "frankenstein"]
@@ -177,7 +176,7 @@ def generate_all(config: GlobalChangeConfig):
             for t in conditions:
                 class_name = img_path.parent.stem
                 image_name = img_path.stem
-                img = ds.get_linedrawings(img_path, type=t)
+                img = ds.get_linedrawings(img_path, change_type=t)
                 path = Path(t) / class_name / f"{image_name}.png"
                 img.save(output_folder / path)
                 writer.writerow([path, class_name, ds.background, n])

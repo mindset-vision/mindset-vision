@@ -11,7 +11,6 @@ from pathlib import Path
 import cv2
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
-from torchvision.transforms import transforms
 from tqdm.auto import tqdm
 
 from mindset.drawing.base import (
@@ -28,10 +27,16 @@ characters = string.ascii_letters + string.digits + string.punctuation
 class DrawPatternedCanvas(DrawStimuli):
     """draws texturized linedrawings using character patterns."""
 
-    def __init__(self, obj_longest_side, transform_code, *args, **kwargs):
+    def __init__(self, obj_longest_side, transform_code=None, font_path=None, *args, **kwargs):
         self.transform_code = transform_code
         super().__init__(*args, **kwargs)
         self.obj_longest_side = obj_longest_side
+        if font_path is None:
+            self.font_path = (
+                Path(__file__).resolve().parents[2] / "assets" / "arial.ttf"
+            )
+        else:
+            self.font_path = Path(font_path)
 
     def get_canvas_char_pattered(
         self,
@@ -40,15 +45,15 @@ class DrawPatternedCanvas(DrawStimuli):
         font_size,
         spacing=0,
         rotation_angle=45,
-        font_path="mindset/assets/arial.ttf",
+        font_path=None,
         background=None,
     ):
         """create a canvas tiled with a repeated character pattern."""
-        font = ImageFont.truetype(font_path, font_size)
+        resolved_font_path = str(font_path or self.font_path)
+        font = ImageFont.truetype(resolved_font_path, font_size)
+        hypot = int(np.round(np.hypot(size[0], size[1])))
         img = self.create_canvas(
-            size=tuple(
-                [np.round(np.sqrt(size[0] ** 2 + size[1] ** 2)).astype(int)] * 2
-            ),
+            size=(hypot, hypot),
             background=background,
         )
 
@@ -65,14 +70,16 @@ class DrawPatternedCanvas(DrawStimuli):
             draw.text(
                 (1, y),
                 tile_string,
-                fill=self.line_args["fill"],
+                fill=self.fill,
                 font=font,
             )
         if rotation_angle > 0:
             img = img.rotate(rotation_angle, resample=Image.Resampling.NEAREST)
 
-        img = transforms.CenterCrop((size[1], size[0]))(img)
-        return img
+        target_w, target_h = size[0], size[1]
+        left = (img.width - target_w) // 2
+        top = (img.height - target_h) // 2
+        return img.crop((left, top, left + target_w, top + target_h))
 
     def draw_pattern(
         self,
@@ -125,8 +132,8 @@ class DrawPatternedCanvas(DrawStimuli):
 class TexturizedCharsConfig(GeneratorConfig):
     """config for texturized linedrawings (chars) dataset."""
 
-    linedrawing_input_folder: str = field(
-        default="mindset/assets/linedrawings/cropped/",
+    linedrawing_input_folder: str | None = field(
+        default=None,
         metadata={"label": "input folder with line drawings"},
     )
     num_samples: int = field(
@@ -156,9 +163,12 @@ class TexturizedCharsConfig(GeneratorConfig):
     font_size: list = field(
         default_factory=lambda: [15, 20], metadata={"label": "font size range"}
     )
+    font_path: str | None = field(
+        default=None, metadata={"label": "path to font file"}
+    )
     antialiasing: bool = field(default=False, metadata={"label": "antialiasing"})
     output_folder: str = field(
-        default="data/shape_and_object_recognition/texturized_linedrawings_chars",
+        default="data/shape_recognition/texturized_linedrawings_chars",
         metadata={"label": "output folder"},
     )
 
@@ -168,9 +178,14 @@ class TexturizedCharsConfig(GeneratorConfig):
 def generate_all(config: TexturizedCharsConfig):
     """generate texturized linedrawings (chars) dataset."""
     output_folder = Path(config.output_folder)
-    linedrawing_input_folder = Path(config.linedrawing_input_folder)
+    if config.linedrawing_input_folder is None:
+        linedrawing_input_folder = (
+            Path(__file__).resolve().parents[2] / "assets" / "linedrawings" / "cropped"
+        )
+    else:
+        linedrawing_input_folder = Path(config.linedrawing_input_folder)
 
-    all_categories = [p.stem for p in linedrawing_input_folder.glob("*")]
+    all_categories = [p.stem for p in linedrawing_input_folder.glob("*") if p.is_dir()]
     for cat in all_categories:
         (output_folder / cat).mkdir(exist_ok=True, parents=True)
 
@@ -179,13 +194,14 @@ def generate_all(config: TexturizedCharsConfig):
         canvas_size=config.canvas_size,
         antialiasing=config.antialiasing,
         obj_longest_side=config.object_longest_side,
+        font_path=config.font_path,
         width=1,
         transform_code=None,
     )
 
-    jpg_files = list(linedrawing_input_folder.rglob("*.jpg"))
-    png_files = list(linedrawing_input_folder.rglob("*.png"))
-    image_files = jpg_files + png_files
+    image_files = sorted(linedrawing_input_folder.rglob("*.jpg")) + sorted(
+        linedrawing_input_folder.rglob("*.png")
+    )
 
     with open(output_folder / "annotation.csv", "w", newline="") as annfile:
         writer = csv.writer(annfile)

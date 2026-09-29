@@ -111,6 +111,8 @@ class DrawPatternedCanvas(DrawStimuli):
                 perpendicular_radian,
                 self.density,
             )
+        else:
+            canvas_foreg_text = fg_canvas
 
         bg_canvas.paste(
             canvas_foreg_text,
@@ -139,8 +141,8 @@ class DrawPatternedCanvas(DrawStimuli):
 class TexturizedLinesConfig(GeneratorConfig):
     """config for texturized linedrawings (lines) dataset."""
 
-    linedrawing_input_folder: str = field(
-        default="mindset/assets/linedrawings/cropped/",
+    linedrawing_input_folder: str | None = field(
+        default=None,
         metadata={"label": "input folder with line drawings"},
     )
     num_samples: int = field(
@@ -173,7 +175,7 @@ class TexturizedLinesConfig(GeneratorConfig):
     )
     antialiasing: bool = field(default=False, metadata={"label": "antialiasing"})
     output_folder: str = field(
-        default="data/shape_and_object_recognition/texturized_linedrawings_lines",
+        default="data/shape_recognition/texturized_linedrawings_lines",
         metadata={"label": "output folder"},
     )
 
@@ -183,9 +185,14 @@ class TexturizedLinesConfig(GeneratorConfig):
 def generate_all(config: TexturizedLinesConfig):
     """generate texturized linedrawings (lines) dataset."""
     output_folder = Path(config.output_folder)
-    linedrawing_input_folder = Path(config.linedrawing_input_folder)
+    if config.linedrawing_input_folder is None:
+        linedrawing_input_folder = (
+            Path(__file__).resolve().parents[2] / "assets" / "linedrawings" / "cropped"
+        )
+    else:
+        linedrawing_input_folder = Path(config.linedrawing_input_folder)
 
-    all_categories = [p.stem for p in linedrawing_input_folder.glob("*")]
+    all_categories = [p.stem for p in linedrawing_input_folder.glob("*") if p.is_dir()]
     for cat in all_categories:
         (output_folder / cat).mkdir(exist_ok=True, parents=True)
 
@@ -203,9 +210,9 @@ def generate_all(config: TexturizedLinesConfig):
         transform_code=transf_code,
     )
 
-    jpg_files = list(linedrawing_input_folder.rglob("*.jpg"))
-    png_files = list(linedrawing_input_folder.rglob("*.png"))
-    image_files = jpg_files + png_files
+    image_files = sorted(linedrawing_input_folder.rglob("*.jpg")) + sorted(
+        linedrawing_input_folder.rglob("*.png")
+    )
 
     with open(output_folder / "annotation.csv", "w", newline="") as annfile:
         writer = csv.writer(annfile)
@@ -217,7 +224,7 @@ def generate_all(config: TexturizedLinesConfig):
             class_name = img_path.parent.stem
             image_name = img_path.stem
             for n in tqdm(range(config.num_samples), leave=False):
-                slope_line = np.deg2rad(random.uniform(*random.choice([(-60, 60)])))
+                slope_line = np.deg2rad(random.uniform(-60, 60))
                 line_length = random.randint(4, 8)
                 img = ds.draw_pattern(img_path, slope_line, line_length)
                 path = Path(class_name) / f"{image_name}_{n}.png"

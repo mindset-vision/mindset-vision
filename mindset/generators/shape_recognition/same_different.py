@@ -138,16 +138,6 @@ def regular_polygon(sides, radius=10, rotation=0, translation=None):
     return points, original_points
 
 
-def rotate(origin, point, angle):
-    """rotate a point counterclockwise by a given angle around a given origin."""
-    oy, ox = origin
-    py, px = point
-
-    qx = ox + int(math.cos(angle) * (px - ox)) - int(math.sin(angle) * (py - oy))
-    qy = oy + int(math.sin(angle) * (px - ox)) + int(math.cos(angle) * (py - oy))
-    return int(qy), int(qx)
-
-
 def sample_midpoints_lines(sizes, canvas_size):
     """sample random midpoints for two lines given their sizes."""
     size_1, size_2 = sizes
@@ -446,7 +436,7 @@ class DrawSameDifferentStimuli(DrawStimuli):
 # ---------------------------------------------------------------------------
 
 
-def is_overlapping(img: np.array, background_color: tuple, threshold: int = 2):
+def is_overlapping(img: np.ndarray, background_color: tuple, threshold: int = 2) -> bool:
     """detect whether two shapes overlap in an image."""
     img_c = img.copy()
     img_c[img == background_color] = 0
@@ -454,36 +444,37 @@ def is_overlapping(img: np.array, background_color: tuple, threshold: int = 2):
     gray = cv2.cvtColor(img_c, cv2.COLOR_RGB2GRAY)
     _, thresh = cv2.threshold(gray, threshold, 255, cv2.THRESH_BINARY)
 
-    cnts = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    cnts = cnts[0] if len(cnts) == 2 else cnts[1]
-
-    b_rects = []
-    for c in cnts:
-        b_rects.append(cv2.boundingRect(c))
-
-    return len(b_rects) != 2
+    cnts, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    return len(cnts) != 2
 
 
-get_irregular_polygon = lambda ds, label, **kwargs: ds.svrt_1_img(
-    category=label, regular=False, sides=None, thickness=1, **kwargs
-)
+def get_irregular_polygon(ds, label, **kwargs):
+    return ds.svrt_1_img(
+        category=label, regular=False, sides=None, thickness=1, **kwargs
+    )
 
-get_regular = lambda ds, label, **kwargs: ds.svrt_1_img(
-    category=label, regular=True, sides=None, thickness=1, **kwargs
-)
 
-get_open = lambda ds, label, **kwargs: ds.svrt_1_img(
-    category=label,
-    regular=False,
-    sides=None,
-    thickness=1,
-    closed=False,
-    **kwargs,
-)
+def get_regular(ds, label, **kwargs):
+    return ds.svrt_1_img(
+        category=label, regular=True, sides=None, thickness=1, **kwargs
+    )
 
-get_wider_line = lambda ds, label, **kwargs: ds.svrt_1_img(
-    category=label, regular=False, sides=None, thickness=2, **kwargs
-)
+
+def get_open(ds, label, **kwargs):
+    return ds.svrt_1_img(
+        category=label,
+        regular=False,
+        sides=None,
+        thickness=1,
+        closed=False,
+        **kwargs,
+    )
+
+
+def get_wider_line(ds, label, **kwargs):
+    return ds.svrt_1_img(
+        category=label, regular=False, sides=None, thickness=2, **kwargs
+    )
 
 
 def get_rnd_color(ds, label, **kwargs):
@@ -495,39 +486,37 @@ def get_rnd_color(ds, label, **kwargs):
     )
 
 
-get_filled = lambda ds, label, **kwargs: ds.svrt_1_img(
-    category=label,
-    regular=False,
-    sides=None,
-    thickness=1,
-    filled=True,
-    **kwargs,
-)
-
-get_straight_lines = lambda ds, label, **kwargs: ds.make_straight_lines_sd_diffrot(
-    category=label, line_thickness=1, **kwargs
-)
-
-get_rectangles = lambda ds, label, **kwargs: ds.make_rectangles_sd(
-    category=label, **kwargs
-)
-
-get_open_squares = lambda ds, label, **kwargs: ds.make_connected_open_squares(
-    category=label, line_width=1, **kwargs
-)
-
-get_closed_squares = lambda ds, label, **kwargs: ds.make_connected_open_squares(
-    category=label, line_width=1, is_closed=True, **kwargs
-)
+def get_filled(ds, label, **kwargs):
+    return ds.svrt_1_img(
+        category=label,
+        regular=False,
+        sides=None,
+        thickness=1,
+        filled=True,
+        **kwargs,
+    )
 
 
-def is_integer(n):
-    """check whether a value can be parsed as an integer."""
-    try:
-        int(n)
-        return True
-    except ValueError:
-        return False
+def get_straight_lines(ds, label, **kwargs):
+    return ds.make_straight_lines_sd_diffrot(
+        category=label, line_thickness=1, **kwargs
+    )
+
+
+def get_rectangles(ds, label, **kwargs):
+    return ds.make_rectangles_sd(category=label, **kwargs)
+
+
+def get_open_squares(ds, label, **kwargs):
+    return ds.make_connected_open_squares(
+        category=label, line_width=1, **kwargs
+    )
+
+
+def get_closed_squares(ds, label, **kwargs):
+    return ds.make_connected_open_squares(
+        category=label, line_width=1, is_closed=True, **kwargs
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -555,7 +544,7 @@ class SameDifferentConfig(GeneratorConfig):
         default="all", metadata={"label": "dataset type (all or specific name)"}
     )
     output_folder: str = field(
-        default="data/shape_and_object_recognition/same_different_task",
+        default="data/shape_recognition/same_different_task",
         metadata={"label": "output folder"},
     )
 
@@ -591,6 +580,13 @@ def generate_all(config: SameDifferentConfig):
         antialiasing=config.antialiasing,
     )
 
+    try:
+        fixed_size = int(config.size_shapes)
+        is_fixed_size = True
+    except ValueError:
+        fixed_size = None
+        is_fixed_size = False
+
     labels = ["same", "diff"]
     for label in labels:
         for ds_name in datasets:
@@ -615,10 +611,8 @@ def generate_all(config: SameDifferentConfig):
             for n in tqdm(range(config.num_samples), leave=False):
                 for label in labels:
                     while True:
-                        if is_integer(config.size_shapes):
-                            size1, size2 = int(config.size_shapes), int(
-                                config.size_shapes
-                            )
+                        if is_fixed_size:
+                            size1 = size2 = fixed_size
                         elif config.size_shapes == "rnd1":
                             size1 = np.random.randint(
                                 ds.canvas_size[0] // 15, ds.canvas_size[0] // 4

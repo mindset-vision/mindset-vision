@@ -18,6 +18,17 @@ from mindset.generators._base import GeneratorConfig, generator, register
 from mindset.utils import apply_antialiasing
 
 
+def _draw_dot(image, x, y, size, color):
+    half_size = size // 2
+    cv2.rectangle(
+        image,
+        (x - half_size, y - half_size),
+        (x + half_size, y + half_size),
+        color,
+        -1,
+    )
+
+
 class DrawDottedImage(DrawStimuli):
     """draws dotted versions of linedrawing images."""
 
@@ -31,26 +42,16 @@ class DrawDottedImage(DrawStimuli):
         img = resize_image_keep_aspect_ratio(img, self.obj_longest_side)
 
         _, binary_img = cv2.threshold(img, 240, 255, cv2.THRESH_BINARY_INV)
-        contours, b = cv2.findContours(
+        contours, _ = cv2.findContours(
             binary_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE
         )
         dotted_img = np.ones_like(img) * 255
-
-        def draw_dot(image, x, y, size, color):
-            half_size = size // 2
-            cv2.rectangle(
-                image,
-                (x - half_size, y - half_size),
-                (x + half_size, y + half_size),
-                color,
-                -1,
-            )
 
         for contour in contours:
             for i, point in enumerate(contour):
                 if i % dot_distance == 0:
                     x, y = point[0]
-                    draw_dot(dotted_img, x, y, dot_size, color=0)
+                    _draw_dot(dotted_img, x, y, dot_size, color=0)
 
         dotted_img = Image.fromarray(dotted_img)
         dotted_img = ImageOps.invert(dotted_img.convert("L"))
@@ -75,8 +76,8 @@ class DottedLinedrawingsConfig(GeneratorConfig):
             "label": "object longest side (px)",
         },
     )
-    linedrawing_input_folder: str = field(
-        default="mindset/assets/linedrawings/cropped/",
+    linedrawing_input_folder: str | None = field(
+        default=None,
         metadata={"label": "input folder with line drawings"},
     )
     dot_distance: int = field(
@@ -88,7 +89,7 @@ class DottedLinedrawingsConfig(GeneratorConfig):
     )
     antialiasing: bool = field(default=False, metadata={"label": "antialiasing"})
     output_folder: str = field(
-        default="data/shape_and_object_recognition/dotted_linedrawings",
+        default="data/shape_recognition/dotted_linedrawings",
         metadata={"label": "output folder"},
     )
 
@@ -98,7 +99,12 @@ class DottedLinedrawingsConfig(GeneratorConfig):
 def generate_all(config: DottedLinedrawingsConfig):
     """generate dotted linedrawings dataset."""
     output_folder = Path(config.output_folder)
-    linedrawing_input_folder = Path(config.linedrawing_input_folder)
+    if config.linedrawing_input_folder is None:
+        linedrawing_input_folder = (
+            Path(__file__).resolve().parents[2] / "assets" / "linedrawings" / "cropped"
+        )
+    else:
+        linedrawing_input_folder = Path(config.linedrawing_input_folder)
 
     all_categories = [p.stem for p in linedrawing_input_folder.glob("*") if p.is_dir()]
     for cat in all_categories:

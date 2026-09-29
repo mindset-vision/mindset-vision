@@ -1,7 +1,6 @@
 """viewpoint invariance dataset generator."""
 
 import csv
-import glob
 import re
 import uuid
 from dataclasses import dataclass, field
@@ -22,13 +21,12 @@ class DrawETH(DrawStimuli):
     def __init__(self, obj_longest_side, map_path, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.obj_longest_side = obj_longest_side
-        self.map_path = map_path
+        self.map_path = Path(map_path)
 
     def create_ETH(self, img_path):
         """load an ETH-80 image, crop to object bounds, and paste on canvas."""
-        path_parts = Path(img_path).parts
-        desired_path = str(Path(*path_parts[-3:])).rstrip(".png")
-        map_path = f"{self.map_path}/{desired_path}-map.png"
+        rel_path = Path(*Path(img_path).parts[-3:]).with_suffix("")
+        map_path = self.map_path / f"{rel_path}-map.png"
 
         map_pil = Image.open(map_path).convert("L")
 
@@ -64,8 +62,8 @@ class DrawETH(DrawStimuli):
 class ViewpointInvarianceConfig(GeneratorConfig):
     """config for viewpoint invariance dataset."""
 
-    eth_80_folder: str = field(
-        default="mindset/assets/viewpoint_invariance", metadata={"label": "ETH-80 dataset folder"}
+    eth_80_folder: str | None = field(
+        default=None, metadata={"label": "ETH-80 dataset folder"}
     )
     object_longest_side: int = field(
         default=200,
@@ -83,7 +81,7 @@ class ViewpointInvarianceConfig(GeneratorConfig):
         default_factory=lambda: [30, 90], metadata={"label": "inclination limits"}
     )
     output_folder: str = field(
-        default="data/shape_and_object_recognition/viewpoint_invariance",
+        default="data/shape_recognition/viewpoint_invariance",
         metadata={"label": "output folder"},
     )
 
@@ -93,15 +91,21 @@ class ViewpointInvarianceConfig(GeneratorConfig):
 def generate_all(config: ViewpointInvarianceConfig):
     """generate viewpoint invariance dataset from ETH-80."""
     output_folder = Path(config.output_folder)
+    if config.eth_80_folder is None:
+        eth_80_folder = (
+            Path(__file__).resolve().parents[2] / "assets" / "viewpoint_invariance"
+        )
+    else:
+        eth_80_folder = Path(config.eth_80_folder)
 
-    check_download_ETH_80_dataset(destination_dir=config.eth_80_folder)
+    check_download_ETH_80_dataset(destination_dir=str(eth_80_folder))
 
     ds = DrawETH(
         background=config.background_color,
         canvas_size=config.canvas_size,
         antialiasing=config.antialiasing,
         obj_longest_side=config.object_longest_side,
-        map_path=config.eth_80_folder + "/maps/",
+        map_path=eth_80_folder / "maps",
     )
 
     with open(output_folder / "annotation.csv", "w", newline="") as annfile:
@@ -110,16 +114,15 @@ def generate_all(config: ViewpointInvarianceConfig):
             ["Path", "Class", "ObjectID", "Azimuth", "Inclination", "BackgroundColor"]
         )
 
-        all_images = glob.glob(
-            config.eth_80_folder + "/images/*/*/*.png", recursive=True
-        )
+        all_images = sorted((eth_80_folder / "images").glob("*/*/*.png"))
 
         for img_path in tqdm(all_images):
-            class_num = Path(img_path).parts[-3]
-            object_id = int(Path(img_path).parts[-2])
+            object_id = int(img_path.parts[-2])
             match = re.search(
-                r"([a-zA-Z]+)\d+-0*(\d+)-0*(\d+).png$", Path(img_path).name
+                r"([a-zA-Z]+)\d+-0*(\d+)-0*(\d+).png$", img_path.name
             )
+            if not match:
+                continue
 
             class_name = match.group(1)
             inclination = int(match.group(2))
@@ -141,7 +144,7 @@ def generate_all(config: ViewpointInvarianceConfig):
             img_save_path = (
                 Path(class_name)
                 / str(object_id)
-                / f"{Path(img_path).stem}_{unique_hex}.png"
+                / f"{img_path.stem}_{unique_hex}.png"
             )
             img.save(output_folder / img_save_path)
             writer.writerow(

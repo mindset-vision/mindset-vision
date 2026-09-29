@@ -42,7 +42,7 @@ class DrawGriddedImages(DrawStimuli):
 
         img = np.array(
             paste_linedrawing_onto_canvas(
-                img, self.create_canvas(), self.line_args["fill"]
+                img, self.create_canvas(), self.fill
             )
         )
 
@@ -54,7 +54,7 @@ class DrawGriddedImages(DrawStimuli):
             mask[i : i + grid_thickness, :] = 1
 
         rotated_mask = np.array(
-            Image.fromarray(mask).rotate(rotation_degrees, expand=True, fillcolor=(0))
+            Image.fromarray(mask).rotate(rotation_degrees, expand=True, fillcolor=0)
         )
         rotated_mask = rotated_mask[
             rotated_mask.shape[0] // 2
@@ -79,8 +79,8 @@ class DrawGriddedImages(DrawStimuli):
 class SegmentedImagesConfig(GeneratorConfig):
     """config for segmented images dataset."""
 
-    linedrawing_input_folder: str = field(
-        default="mindset/assets/linedrawings/cropped",
+    linedrawing_input_folder: str | None = field(
+        default=None,
         metadata={"label": "input folder with line drawings"},
     )
     object_longest_side: int = field(
@@ -106,7 +106,7 @@ class SegmentedImagesConfig(GeneratorConfig):
     )
     antialiasing: bool = field(default=False, metadata={"label": "antialiasing"})
     output_folder: str = field(
-        default="data/shape_and_object_recognition/segmented_images",
+        default="data/shape_recognition/segmented_images",
         metadata={"label": "output folder"},
     )
 
@@ -116,9 +116,14 @@ class SegmentedImagesConfig(GeneratorConfig):
 def generate_all(config: SegmentedImagesConfig):
     """generate segmented images dataset with complementary grid deletions."""
     output_folder = Path(config.output_folder)
-    linedrawing_input_folder = Path(config.linedrawing_input_folder)
+    if config.linedrawing_input_folder is None:
+        linedrawing_input_folder = (
+            Path(__file__).resolve().parents[2] / "assets" / "linedrawings" / "cropped"
+        )
+    else:
+        linedrawing_input_folder = Path(config.linedrawing_input_folder)
 
-    all_categories = [p.stem for p in linedrawing_input_folder.glob("*")]
+    all_categories = [p.stem for p in linedrawing_input_folder.glob("*") if p.is_dir()]
     for ff in ["del", "del_complement"]:
         for cat in all_categories:
             (output_folder / ff / cat).mkdir(parents=True, exist_ok=True)

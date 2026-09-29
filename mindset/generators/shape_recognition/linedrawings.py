@@ -57,13 +57,13 @@ class LinedrawingsConfig(GeneratorConfig):
             "label": "object longest side (px)",
         },
     )
-    linedrawing_input_folder: str = field(
-        default="mindset/assets/linedrawings/cropped/",
+    linedrawing_input_folder: str | None = field(
+        default=None,
         metadata={"label": "input folder with line drawings"},
     )
     antialiasing: bool = field(default=False, metadata={"label": "antialiasing"})
     output_folder: str = field(
-        default="data/shape_and_object_recognition/linedrawings",
+        default="data/shape_recognition/linedrawings",
         metadata={"label": "output folder"},
     )
 
@@ -73,7 +73,12 @@ class LinedrawingsConfig(GeneratorConfig):
 def generate_all(config: LinedrawingsConfig):
     """generate linedrawings dataset from source images."""
     output_folder = Path(config.output_folder)
-    linedrawing_input_folder = Path(config.linedrawing_input_folder)
+    if config.linedrawing_input_folder is None:
+        linedrawing_input_folder = (
+            Path(__file__).resolve().parents[2] / "assets" / "linedrawings" / "cropped"
+        )
+    else:
+        linedrawing_input_folder = Path(config.linedrawing_input_folder)
 
     all_categories = [p.stem for p in linedrawing_input_folder.glob("*") if p.is_dir()]
     for cat in all_categories:
@@ -82,6 +87,7 @@ def generate_all(config: LinedrawingsConfig):
     ds = DrawLinedrawings(
         background=config.background_color,
         canvas_size=config.canvas_size,
+        antialiasing=config.antialiasing,
         obj_longest_side=config.object_longest_side,
     )
 

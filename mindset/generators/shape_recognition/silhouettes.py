@@ -41,13 +41,7 @@ class DrawLinedrawings(DrawStimuli):
                 binary_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE
             )
             mask = np.ones_like(img) * 255
-
-            cv2.drawContours(mask, contours, -1, (0), thickness=cv2.FILLED)
-
-            [
-                cv2.drawContours(mask, [c], -1, (0), thickness=cv2.FILLED)
-                for c in contours
-            ]
+            cv2.drawContours(mask, contours, -1, 0, thickness=cv2.FILLED)
         else:
             mask = cv2.bitwise_not(binary_img)
         mask = ImageOps.invert(Image.fromarray(mask).convert("L"))
@@ -75,8 +69,8 @@ class SilhouettesConfig(GeneratorConfig):
             "label": "object longest side (px)",
         },
     )
-    image_input_folder: str = field(
-        default="mindset/assets/linedrawings/cropped/",
+    image_input_folder: str | None = field(
+        default=None,
         metadata={"label": "input folder with images"},
     )
     input_image_type: str = field(
@@ -88,7 +82,7 @@ class SilhouettesConfig(GeneratorConfig):
     )
     antialiasing: bool = field(default=False, metadata={"label": "antialiasing"})
     output_folder: str = field(
-        default="data/shape_and_object_recognition/silhouettes",
+        default="data/shape_recognition/silhouettes",
         metadata={"label": "output folder"},
     )
 
@@ -98,9 +92,14 @@ class SilhouettesConfig(GeneratorConfig):
 def generate_all(config: SilhouettesConfig):
     """generate silhouettes dataset from source images."""
     output_folder = Path(config.output_folder)
-    image_input_folder = Path(config.image_input_folder)
+    if config.image_input_folder is None:
+        image_input_folder = (
+            Path(__file__).resolve().parents[2] / "assets" / "linedrawings" / "cropped"
+        )
+    else:
+        image_input_folder = Path(config.image_input_folder)
 
-    all_categories = [p.stem for p in image_input_folder.glob("*")]
+    all_categories = [p.stem for p in image_input_folder.glob("*") if p.is_dir()]
     for cat in all_categories:
         (output_folder / cat).mkdir(exist_ok=True, parents=True)
 
@@ -112,9 +111,9 @@ def generate_all(config: SilhouettesConfig):
         input_image_type=config.input_image_type,
     )
 
-    jpg_files = list(image_input_folder.rglob("*.jpg"))
-    png_files = list(image_input_folder.rglob("*.png"))
-    image_files = jpg_files + png_files
+    image_files = sorted(image_input_folder.rglob("*.jpg")) + sorted(
+        image_input_folder.rglob("*.png")
+    )
 
     with open(output_folder / "annotation.csv", "w", newline="") as annfile:
         writer = csv.writer(annfile)

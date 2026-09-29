@@ -54,7 +54,6 @@ class DrawCompletion(DrawStimuli):
                     outline=self.background,
                     fill=self.background,
                 )
-                center_notched = False
 
         draw.rectangle(
             [
@@ -131,12 +130,21 @@ def generate_all(config: AmodalCompletionConfig):
         (output_folder / cond).mkdir(exist_ok=True, parents=True)
 
 
-    check_square_fully_in_canvas = lambda cs: (
-        cs[0] - side_square // 2 > 0
-        and cs[0] + side_square // 2 < canvas_size[0]
-        and cs[1] - side_square // 2 > 0
-        and cs[1] + side_square // 2 < canvas_size[1]
-    )
+    def is_square_in_canvas(cs, side):
+        half = side // 2
+        return (
+            cs[0] - half > 0
+            and cs[0] + half < canvas_size[0]
+            and cs[1] - half > 0
+            and cs[1] + half < canvas_size[1]
+        )
+
+    def save_image(img, condition, top_shape, sample_idx):
+        unique_hex = uuid.uuid4().hex[:8]
+        name = f"{top_shape}_" if condition != "non_occluded" else ""
+        path = Path(condition) / f"{sample_idx}_{name}{unique_hex}.png"
+        img.save(output_folder / path)
+        return path
 
     with open(output_folder / "annotation.csv", "w", newline="") as annfile:
         writer = csv.writer(annfile)
@@ -167,37 +175,44 @@ def generate_all(config: AmodalCompletionConfig):
             diagonal_square = side_square * np.sqrt(2)
 
             # minimum distance between centers so that there is no overalap
-            base_center_dist = (radius_circle + diagonal_square / 2)
+            base_center_dist = radius_circle + diagonal_square / 2
 
             while True:
                 # determine circle position
-                base_center_circle = np.random.uniform(
-                    0 + radius_circle, canvas_size[0] - radius_circle, size=2
-                ).round().astype(int)
+                base_center_circle = (
+                    np.random.uniform(
+                        0 + radius_circle, canvas_size[0] - radius_circle, size=2
+                    )
+                    .round()
+                    .astype(int)
+                )
 
                 # trace position of the non occluding square along a random direction
                 theta = np.random.uniform(0, np.pi * 2)
                 center_square_dir = np.array([np.sin(theta), np.cos(theta)])
 
                 # scale the distance between centers by a random value
-
                 factor = np.random.uniform(1.05, 1.2) * base_center_dist
                 base_center_square = np.ceil(
                     base_center_circle + factor * center_square_dir
                 ).astype(int)
 
                 # if the non-occluding square is in the canvas, accept the image
-                if check_square_fully_in_canvas(base_center_square):
+                if is_square_in_canvas(base_center_square, side_square):
                     break
 
             pbar.update(1)
 
             # generate colors
             circle_col = (
-                generate_random_color() if config.circle_color == "random" else config.circle_color
+                generate_random_color()
+                if config.circle_color == "random"
+                else config.circle_color
             )
             square_col = (
-                generate_random_color() if config.square_color == "random" else config.square_color
+                generate_random_color()
+                if config.square_color == "random"
+                else config.square_color
             )
 
             def write_row(
@@ -207,11 +222,11 @@ def generate_all(config: AmodalCompletionConfig):
                 notched_path,
                 center_manipulated,
                 center_occluding,
-                center_control
+                center_control,
             ):
                 writer.writerow(
                     [
-                        2 * completed_samples + (manipulated_shape == 'square'),
+                        2 * completed_samples + (manipulated_shape == "square"),
                         manipulated_shape,
                         control_path,
                         occluded_path,
@@ -227,13 +242,6 @@ def generate_all(config: AmodalCompletionConfig):
                     ]
                 )
 
-            def save_image(img, condition, top_shape):
-                unique_hex = uuid.uuid4().hex[:8]
-                name = (top_shape + '_') if condition != 'non_occluded' else ''
-                path = Path(condition) / f"{completed_samples}_{name}{unique_hex}.png"
-                img.save(output_folder / path)
-                return path
-
             # Generate base image
             base_img = ds.draw(
                 base_center_circle,
@@ -243,9 +251,9 @@ def generate_all(config: AmodalCompletionConfig):
                 radius_circle,
                 side_square,
                 center_notched=None,
-                top='s',
+                top="s",
             )
-            control_path = save_image(base_img, 'non_occluded', None)
+            control_path = save_image(base_img, "non_occluded", None, completed_samples)
 
             # Generate conditions for the square-on-top-variant
             # First, determine the position of an occluded circle variant and generate it
@@ -264,7 +272,9 @@ def generate_all(config: AmodalCompletionConfig):
                 center_notched=None,
                 top='s',
             )
-            occluded_path = save_image(circle_occluded_img, 'occluded', 'circle')
+            occluded_path = save_image(
+                circle_occluded_img, "occluded", "circle", completed_samples
+            )
 
             # with the same information, we can generate the notched variant
             circle_notched_img = ds.draw(
@@ -275,12 +285,14 @@ def generate_all(config: AmodalCompletionConfig):
                 radius_circle,
                 side_square,
                 center_notched=center_occluding_square,
-                top='s',
+                top="s",
             )
-            notched_path = save_image(circle_notched_img, 'notched', 'circle')
+            notched_path = save_image(
+                circle_notched_img, "notched", "circle", completed_samples
+            )
 
             write_row(
-                'circle',
+                "circle",
                 control_path,
                 occluded_path,
                 notched_path,
@@ -304,9 +316,11 @@ def generate_all(config: AmodalCompletionConfig):
                 radius_circle,
                 side_square,
                 center_notched=None,
-                top='c',
+                top="c",
             )
-            occluded_path = save_image(square_occluded_img, 'occluded', 'square')
+            occluded_path = save_image(
+                square_occluded_img, "occluded", "square", completed_samples
+            )
 
             square_notched_img = ds.draw(
                 base_center_circle,
@@ -316,12 +330,14 @@ def generate_all(config: AmodalCompletionConfig):
                 radius_circle,
                 side_square,
                 center_notched=center_occluding_circle,
-                top='c',
+                top="c",
             )
-            notched_path = save_image(square_notched_img, 'notched', 'square')
+            notched_path = save_image(
+                square_notched_img, "notched", "square", completed_samples
+            )
 
             write_row(
-                'square',
+                "square",
                 control_path,
                 occluded_path,
                 notched_path,
@@ -329,10 +345,6 @@ def generate_all(config: AmodalCompletionConfig):
                 center_occluding_circle,
                 base_center_circle,
             )
-
-            # base_img.show()
-            # square_occluded_img.show()
-            # square_notched_img.show()
 
             completed_samples += 1
 

@@ -86,9 +86,9 @@ class DrawDecomposition(DrawStimuli):
         shape_color = (np.asarray(self.shape_color) * shape_grayscale).astype(int)
         parent.convert_color_to_color((255, 255, 255), shape_color)
         parent.rotate(image_rotation)
-        self.create_canvas()
         parent.add_background(self.background)
-        parent.shrink() if self.antialiasing else None
+        if self.antialiasing:
+            parent.shrink()
         return parent.canvas
 
 

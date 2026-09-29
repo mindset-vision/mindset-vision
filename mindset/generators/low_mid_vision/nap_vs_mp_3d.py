@@ -2,7 +2,6 @@
 
 import os
 import csv
-from sys import exception
 import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -271,19 +270,19 @@ def render_mesh(mesh, canvas_size, bg_color, shape_color, eye, target, up):
 @register("nap_vs_mp_3d", "low_mid_vision")
 @generator(NapVsMp3dConfig)
 def generate_all(config: NapVsMp3dConfig):
-
+    """generate nap vs mp 3d geons dataset."""
     # Check if one of the opengl platforms is supported
     is_render_configured = False
     try:
         pyrender.OffscreenRenderer(20, 20)
         is_render_configured = True
-    except:
+    except Exception:
         for platform in ['osmesa', 'egl']:
             try:
                 os.environ['PYOPENGL_PLATFORM'] = platform
                 pyrender.OffscreenRenderer(20, 20)
                 is_render_configured = True
-            except:
+            except Exception:
                 pass
     if not is_render_configured:
         raise AttributeError(
@@ -291,7 +290,6 @@ def generate_all(config: NapVsMp3dConfig):
             'https://pyrender.readthedocs.io/en/latest/examples/offscreen.html'
         )
 
-    """generate nap vs mp 3d geons dataset."""
     output_folder = Path(config.output_folder)
 
     for cond in ["reference", "mp", "nap"]:

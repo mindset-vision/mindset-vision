@@ -296,7 +296,7 @@ class ManipulatedOutlinesConfig(GeneratorConfig):
     )
     antialiasing: bool = field(default=False, metadata={"label": "antialiasing"})
     output_folder: str = field(
-        default="data/shape_and_object_recognition/manipulated_outlines",
+        default="data/shape_recognition/manipulated_outlines",
         metadata={"label": "output folder"},
     )
 

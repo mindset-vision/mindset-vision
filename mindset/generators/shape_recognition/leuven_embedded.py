@@ -1,9 +1,6 @@
 """leuven embedded figures dataset generator."""
 
 import csv
-import os
-import random
-import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -16,54 +13,24 @@ from mindset.generators._base import GeneratorConfig, generator, register
 from mindset.utils import apply_antialiasing
 
 
-def get_highest_number(folder_path):
-    """return the highest number found in filenames within a folder."""
-    filenames = os.listdir(folder_path)
-    highest_number = -1
-
-    for filename in filenames:
-        numbers = re.findall(r"\d+", filename)
-
-        for number_str in numbers:
-            number = int(number_str)
-            if number > highest_number:
-                highest_number = number
-
-    return highest_number
-
-
 def load_and_invert(path, canvas_size, background, antialiasing):
     """load an image, invert it, resize and apply background color."""
     try:
         img = invert(Image.open(path).convert("RGB"))
-
     except UnidentifiedImageError:
-        img = np.load(
+        arr = np.load(
             path.parent.parent / "shapes_npy" / path.name.replace(".png", ".npy"),
             allow_pickle=True,
         )
-        img = Image.fromarray(img)
+        img = Image.fromarray(arr)
 
     img = img.resize(canvas_size)
-    img = img.point(lambda x: 255 if x >= 10 else 0)
+    img_gray = np.array(img.convert("L").point(lambda x: 255 if x >= 10 else 0))
 
-    img = img.convert("RGB")
-
-    data = img.load()
-
-    width, height = img.size
-    for y in range(height):
-        for x in range(width):
-            r, g, b = data[x, y]
-            if r == 0 or g == 0 or b == 0:
-                if background == "rnd-uniform":
-                    background = (
-                        random.randint(0, 255),
-                        random.randint(0, 255),
-                        random.randint(0, 255),
-                    )
-                else:
-                    data[x, y] = tuple(background)
+    out = np.zeros((canvas_size[1], canvas_size[0], 3), dtype=np.uint8)
+    out[img_gray == 0] = tuple(background)
+    out[img_gray == 255] = [255, 255, 255]
+    img = Image.fromarray(out)
 
     return apply_antialiasing(img) if antialiasing else img
 
@@ -72,8 +39,12 @@ def load_and_invert(path, canvas_size, background, antialiasing):
 class LeuvenEmbeddedConfig(GeneratorConfig):
     """config for leuven embedded figures dataset."""
 
+    input_folder: str | None = field(
+        default=None,
+        metadata={"label": "input folder with leuven embedded assets"},
+    )
     output_folder: str = field(
-        default="data/shape_and_object_recognition/leuven_embedded_figures",
+        default="data/shape_recognition/leuven_embedded_figures",
         metadata={"label": "output folder"},
     )
 
@@ -83,7 +54,10 @@ class LeuvenEmbeddedConfig(GeneratorConfig):
 def generate_all(config: LeuvenEmbeddedConfig):
     """generate leuven embedded figures dataset with shapes and context stimuli."""
     output_folder = Path(config.output_folder)
-    left_ds = Path("mindset/assets") / "leuven_embedded"
+    if config.input_folder is None:
+        left_ds = Path(__file__).resolve().parents[2] / "assets" / "leuven_embedded"
+    else:
+        left_ds = Path(config.input_folder)
 
     figs_to_take = range(0, 16 * 4, 4)
     all_shapes_path = [
@@ -110,11 +84,11 @@ def generate_all(config: LeuvenEmbeddedConfig):
                 s, config.canvas_size, config.background_color, config.antialiasing
             )
             folder = output_folder_shape / str(idx)
-            n = get_highest_number(folder)
-            img.save(folder / f"{n + 1}.png")
+            img_rel = Path("shapes") / str(idx) / "1.png"
+            img.save(output_folder / img_rel)
             writer.writerow(
                 [
-                    f"shapes/{str(idx)}/{n + 1}.png",
+                    img_rel.as_posix(),
                     "shapes",
                     idx,
                     config.background_color,
@@ -125,14 +99,15 @@ def generate_all(config: LeuvenEmbeddedConfig):
             img = load_and_invert(
                 s, config.canvas_size, config.background_color, config.antialiasing
             )
-            folder = output_folder_context / str(idx // 4)
-            n = get_highest_number(folder)
-            img.save(folder / f"{n + 1}.png")
+            class_id = idx // 4
+            sample_in_class = (idx % 4) + 1
+            img_rel = Path("context") / str(class_id) / f"{sample_in_class}.png"
+            img.save(output_folder / img_rel)
             writer.writerow(
                 [
-                    f"context/{str(idx // 4)}/{n + 1}.png",
+                    img_rel.as_posix(),
                     "context",
-                    idx // 4,
+                    class_id,
                     config.background_color,
                 ]
             )

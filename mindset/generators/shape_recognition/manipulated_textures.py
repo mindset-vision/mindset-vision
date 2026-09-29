@@ -305,7 +305,7 @@ class ManipulatedTexturesConfig(GeneratorConfig):
     )
     antialiasing: bool = field(default=False, metadata={"label": "antialiasing"})
     output_folder: str = field(
-        default="data/shape_and_object_recognition/manipulated_textures",
+        default="data/shape_recognition/manipulated_textures",
         metadata={"label": "output folder"},
     )
 

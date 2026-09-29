@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 import cv2
-from PIL import Image, ImageOps
+from PIL import Image
 from tqdm.auto import tqdm
 
 from mindset.drawing.base import (
@@ -30,9 +30,7 @@ class DrawBakerStimuli(DrawStimuli):
         img = cv2.imread(str(image_path), cv2.IMREAD_GRAYSCALE)
         img = resize_image_keep_aspect_ratio(img, self.obj_longest_side)
         _, binary_img = cv2.threshold(img, 240, 255, cv2.THRESH_BINARY_INV)
-
-        mask = cv2.bitwise_not(binary_img)
-        mask = ImageOps.invert(Image.fromarray(mask).convert("L"))
+        mask = Image.fromarray(binary_img).convert("L")
 
         canvas = paste_linedrawing_onto_canvas(mask, self.create_canvas(), self.fill)
 
@@ -52,9 +50,13 @@ class GlobalChangeBaker2022Config(GeneratorConfig):
             "label": "object longest side (px)",
         },
     )
+    image_input_folder: str | None = field(
+        default=None,
+        metadata={"label": "input folder with images"},
+    )
     antialiasing: bool = field(default=False, metadata={"label": "antialiasing"})
     output_folder: str = field(
-        default="data/shape_and_object_recognition/global_change_baker2022",
+        default="data/shape_recognition/global_change_baker2022",
         metadata={"label": "output folder"},
     )
 
@@ -64,11 +66,12 @@ class GlobalChangeBaker2022Config(GeneratorConfig):
 def generate_all(config: GlobalChangeBaker2022Config):
     """generate global change baker2022 dataset from baker 2022 silhouettes."""
     output_folder = Path(config.output_folder)
-    image_input_folder = Path("mindset/assets/global_change")
-
-    all_categories = [p.stem for p in image_input_folder.glob("*")]
-    for cat in all_categories:
-        (output_folder / cat).mkdir(exist_ok=True, parents=True)
+    if config.image_input_folder is None:
+        image_input_folder = (
+            Path(__file__).resolve().parents[2] / "assets" / "global_change"
+        )
+    else:
+        image_input_folder = Path(config.image_input_folder)
 
     ds = DrawBakerStimuli(
         background=config.background_color,

@@ -6,8 +6,7 @@ import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
 
-import PIL.Image as Image
-from PIL import ImageDraw
+from PIL import Image, ImageDraw
 from tqdm.auto import tqdm
 
 from mindset.drawing.base import DrawStimuli, paste_linedrawing_onto_canvas

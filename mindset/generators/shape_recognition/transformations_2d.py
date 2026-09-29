@@ -55,8 +55,8 @@ class DrawTransform(DrawStimuli):
 class Transformations2DConfig(GeneratorConfig):
     """config for 2d transformations dataset."""
 
-    input_folder: str = field(
-        default="mindset/assets/linedrawings/cropped/",
+    input_folder: str | None = field(
+        default=None,
         metadata={"label": "input folder with line drawings"},
     )
     object_longest_side: int = field(
@@ -89,7 +89,7 @@ class Transformations2DConfig(GeneratorConfig):
         metadata={"label": "background color (RGB)"},
     )
     output_folder: str = field(
-        default="data/shape_and_object_recognition/2d_transformations",
+        default="data/shape_recognition/2d_transformations",
         metadata={"label": "output folder"},
     )
 
@@ -99,7 +99,12 @@ class Transformations2DConfig(GeneratorConfig):
 def generate_all(config: Transformations2DConfig):
     """generate 2d transformations dataset."""
     output_folder = Path(config.output_folder)
-    input_folder = Path(config.input_folder)
+    if config.input_folder is None:
+        input_folder = (
+            Path(__file__).resolve().parents[2] / "assets" / "linedrawings" / "cropped"
+        )
+    else:
+        input_folder = Path(config.input_folder)
 
     all_categories = [p.stem for p in input_folder.glob("*") if p.is_dir()]
     for cat in all_categories:

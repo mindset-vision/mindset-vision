@@ -132,14 +132,6 @@ def shift_line(line, width, height, max_shift):
     return x1, y1, x2, y2
 
 
-def draw_number_exclude_range(min, max, not_min, not_max):
-    """draw a random int in [min, max] excluding [not_min, not_max]."""
-    while True:
-        num = random.randint(min, max)
-        if num < not_min or num > not_max:
-            return num
-
-
 class DrawEmbeddedFigures(DrawStimuli):
     """draws embedded figures with camouflaging lines."""
 
@@ -155,8 +147,6 @@ class DrawEmbeddedFigures(DrawStimuli):
         num_rnd_lines=0,
     ):
         """draw a polygon with optional camouflage lines."""
-        original_canvas_size = self.canvas_size
-        self.canvas_size = tuple(np.array(self.canvas_size))
         canvas = self.create_canvas()
         draw = ImageDraw.Draw(canvas)
         points = center_and_scale(original_points, self.canvas_size, self.shape_size)
@@ -189,7 +179,6 @@ class DrawEmbeddedFigures(DrawStimuli):
                 x2, y2 = width, random.random() * height
             draw.line((x1, y1, x2, y2), **self.line_args)
 
-        self.canvas_size = original_canvas_size
         return apply_antialiasing(canvas) if self.antialiasing else canvas
 
 
@@ -206,7 +195,7 @@ class EmbeddedFiguresConfig(GeneratorConfig):
         metadata={"min": 10, "max": 200, "step": 5, "label": "shape size (px)"},
     )
     output_folder: str = field(
-        default="data/shape_and_object_recognition/embedded_figures",
+        default="data/shape_recognition/embedded_figures",
         metadata={"label": "output folder"},
     )
 
@@ -217,7 +206,7 @@ def generate_all(config: EmbeddedFiguresConfig):
     """generate embedded figures dataset."""
     output_folder = Path(config.output_folder)
 
-    shapes = list((n, p) for n, p in enumerate(polys))
+    shapes = list(enumerate(polys))
 
     ds = DrawEmbeddedFigures(
         shape_size=config.shape_size,

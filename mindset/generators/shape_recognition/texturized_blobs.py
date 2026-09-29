@@ -10,7 +10,6 @@ from pathlib import Path
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
-from torchvision.transforms import transforms
 from tqdm.auto import tqdm
 
 from mindset.drawing.base import DrawStimuli, get_mask_from_linedrawing
@@ -25,10 +24,16 @@ characters = string.ascii_letters + string.digits + string.punctuation
 class DrawPatternedCanvas(DrawStimuli):
     """draws texturized blob shapes using character patterns."""
 
-    def __init__(self, obj_longest_side, transform_code, *args, **kwargs):
+    def __init__(self, obj_longest_side, transform_code=None, font_path=None, *args, **kwargs):
         self.transform_code = transform_code
         super().__init__(*args, **kwargs)
         self.obj_longest_side = obj_longest_side
+        if font_path is None:
+            self.font_path = (
+                Path(__file__).resolve().parents[2] / "assets" / "arial.ttf"
+            )
+        else:
+            self.font_path = Path(font_path)
 
     def get_canvas_char_pattered(
         self,
@@ -37,13 +42,13 @@ class DrawPatternedCanvas(DrawStimuli):
         font_size,
         spacing=0,
         rotation_angle=45,
-        font_path="mindset/assets/arial.ttf",
+        font_path=None,
     ):
         """create a canvas tiled with a repeated character pattern."""
-        font = ImageFont.truetype(font_path, font_size)
-        img = self.create_canvas(
-            size=tuple([np.round(np.sqrt(size[0] ** 2 + size[1] ** 2)).astype(int)] * 2)
-        )
+        resolved_font_path = str(font_path or self.font_path)
+        font = ImageFont.truetype(resolved_font_path, font_size)
+        hypot = int(np.round(np.hypot(size[0], size[1])))
+        img = self.create_canvas(size=(hypot, hypot))
 
         bbox = font.getbbox(tile_char + " " * spacing)
         char_width = bbox[2]
@@ -58,14 +63,16 @@ class DrawPatternedCanvas(DrawStimuli):
             draw.text(
                 (1, y),
                 tile_string,
-                fill=self.line_args["fill"],
+                fill=self.fill,
                 font=font,
             )
         if rotation_angle > 0:
             img = img.rotate(rotation_angle, resample=Image.Resampling.NEAREST)
 
-        img = transforms.CenterCrop((size[1], size[0]))(img)
-        return img
+        target_w, target_h = size[0], size[1]
+        left = (img.width - target_w) // 2
+        top = (img.height - target_h) // 2
+        return img.crop((left, top, left + target_w, top + target_h))
 
     def draw_blob(self, blob_id):
         """draw a blob shape on a canvas."""
@@ -80,7 +87,6 @@ class DrawPatternedCanvas(DrawStimuli):
         blob.add_puddle(size=0.2, seed=blob_id)
 
         blob.register()
-        self.create_canvas()
         parent.add_background(self.background)
 
         return apply_antialiasing(parent.canvas) if self.antialiasing else parent.canvas
@@ -104,7 +110,6 @@ class DrawPatternedCanvas(DrawStimuli):
         blob.set_color((0, 0, 0, 255))
         blob.add_puddle(size=0.2, seed=blob_id)
         blob.register()
-        self.create_canvas()
         parent.add_background((255, 255, 255))
 
         mask = get_mask_from_linedrawing(
@@ -172,9 +177,12 @@ class TexturizedBlobsConfig(GeneratorConfig):
     font_size: list = field(
         default_factory=lambda: [15, 20], metadata={"label": "font size range"}
     )
+    font_path: str | None = field(
+        default=None, metadata={"label": "path to font file"}
+    )
     antialiasing: bool = field(default=False, metadata={"label": "antialiasing"})
     output_folder: str = field(
-        default="data/shape_and_object_recognition/texturized_blobs",
+        default="data/shape_recognition/texturized_blobs",
         metadata={"label": "output folder"},
     )
 
@@ -192,6 +200,7 @@ def generate_all(config: TexturizedBlobsConfig):
         canvas_size=config.canvas_size,
         antialiasing=config.antialiasing,
         obj_longest_side=config.object_longest_side,
+        font_path=config.font_path,
         width=1,
         transform_code=None,
     )

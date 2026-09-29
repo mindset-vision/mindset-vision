@@ -61,7 +61,7 @@ class WeberLawConfig(GeneratorConfig):
         default=2, metadata={"min": 1, "max": 20, "step": 1, "label": "line width (px)"}
     )
     output_folder: str = field(
-        default="data/low_mid_level_vision/weber_law",
+        default="data/low_mid_vision/weber_law",
         metadata={"label": "output folder"},
     )
 
@@ -85,6 +85,7 @@ def generate_all(config: WeberLawConfig):
     grayscale_conditions = range(
         config.min_grayscale, config.max_grayscale, config.interval_grayscale
     )
+    w = config.width
 
     with open(output_folder / "annotation.csv", "w", newline="") as annfile:
         writer = csv.writer(annfile)
@@ -95,7 +96,6 @@ def generate_all(config: WeberLawConfig):
         for ln in tqdm(lengths_conditions):
             for gr in grayscale_conditions:
                 for n in range(config.num_samples_per_condition):
-                    w = config.width
                     unique_hex = uuid.uuid4().hex[:8]
                     img_path = f"{ln}_{gr}_{unique_hex}.png"
                     img = ds.gen_stim(ln, w, gr)

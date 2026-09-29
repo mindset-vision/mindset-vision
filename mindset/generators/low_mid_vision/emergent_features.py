@@ -1,10 +1,10 @@
 """emergent features dataset generator."""
-
 import csv
+import math
+import random
 from dataclasses import dataclass, field
 from pathlib import Path
 
-import matplotlib.pyplot as plt
 import numpy as np
 from PIL import ImageDraw
 from tqdm.auto import tqdm
@@ -63,7 +63,6 @@ class DrawEmergentFeaturesdots(DrawStimuli):
                     "orientation",
                     "linearity",
                 ]
-                a = self.draw_all_dots(pp_single[0])
                 pps = [
                     pp_empty,
                     pp_empty_single,
@@ -80,26 +79,6 @@ class DrawEmergentFeaturesdots(DrawStimuli):
                 return sets, ppsdict
             except ConstrainedError:
                 continue
-
-    def from_radians_get_line(self, radius, r):
-        """convert radians to line endpoint coordinates."""
-        return [
-            (radius * np.cos(r), radius * np.sin(r)),
-            (-radius * np.cos(r), -radius * np.sin(r)),
-        ]
-
-    def loc_to_int(self, loc):
-        """convert location coordinates to integers."""
-        return [tuple([int(i) for i in locc]) for locc in loc]
-
-    def center_at_cavas(self, loc):
-        """center coordinates at canvas midpoint."""
-        return self.loc_to_int(np.array(loc) + np.array(self.canvas_size) / 2)
-
-    def add_circles_to_loc(self, l, draw):
-        """add circles at both endpoints of a location pair."""
-        self.circle(draw, l[0], self.line_args["width"] // 2)
-        self.circle(draw, l[1], self.line_args["width"] // 2)
 
     def get_pair_points(self, one_point=None):
         """generate a pair of random points with minimum distance constraint."""
@@ -200,7 +179,7 @@ class DrawEmergentFeaturesdots(DrawStimuli):
                 x0, y0, radius_circles, x1, y1, radius_circles
             )
 
-            if np.random.randint(1) == 0:
+            if random.random() < 0.5:
                 xx_equi, yy_equi = xor0, yor0
             else:
                 xx_equi, yy_equi = xor1, yor1
@@ -219,19 +198,6 @@ class DrawEmergentFeaturesdots(DrawStimuli):
                 raise ConstrainedError("Can't generate orientation points")
 
         return ((x0, y0), (xx_equi, yy_equi)), ((x1, y1), (xx_equi, yy_equi))
-
-    def plot_all_points(self, pps):
-        """plot all point sets as dot images."""
-        ims = [self.draw_all_dots(pp) for idx, pp in enumerate(pps)]
-        self.plot_all_imgs(ims)
-
-    def plot_all_imgs(self, im):
-        """plot all images in a grid."""
-        fig, ax = plt.subplots(2, int(np.ceil(len(im) / 2)))
-        ax = np.array([ax]) if len(im) == 1 else ax.flatten()
-        [i.axis("off") for i in ax.flatten()]
-        for idx, i in enumerate(im):
-            ax[idx].imshow(i)
 
     def get_linearity_o_points(self, pp=None, **kwargs):
         """generate collinear points from orientation point set."""
@@ -275,21 +241,6 @@ class DrawEmergentFeaturesdots(DrawStimuli):
             (xx_lin, yy_lin),
         )
 
-    def draw_set(self, pps):
-        """draw incremental sets of dots from point configurations."""
-        r = self.line_args["width"]
-        images_set = []
-        for idx, s in enumerate(pps[0]):
-            images = []
-            for im_pp in pps:
-                im = self.create_canvas()
-                draw = ImageDraw.Draw(im)
-                for p in im_pp[0 : idx + 1]:
-                    self.circle(draw, (p[0], p[1]), radius=r)
-                images.append(im)
-            images_set.append(images)
-        return images_set
-
     def draw_all_dots(self, pps):
         """draw all dots on a canvas and optionally apply antialiasing."""
         r = self.line_args["width"]
@@ -301,26 +252,20 @@ class DrawEmergentFeaturesdots(DrawStimuli):
 
     def intersections(self, x0, y0, r0, x1, y1, r1):
         """find intersection points of two circles."""
-        import math
-
         d = math.sqrt((x1 - x0) ** 2 + (y1 - y0) ** 2)
 
-        if d > r0 + r1:
-            return {}
-        if d < abs(r0 - r1):
-            return {}
-        if d == 0 and r0 == r1:
-            return {}
-        else:
-            a = (r0**2 - r1**2 + d**2) / (2 * d)
-            h = math.sqrt(r0**2 - a**2)
-            x2 = x0 + a * (x1 - x0) / d
-            y2 = y0 + a * (y1 - y0) / d
-            x3 = x2 + h * (y1 - y0) / d
-            y3 = y2 - h * (x1 - x0) / d
-            x4 = x2 - h * (y1 - y0) / d
-            y4 = y2 + h * (x1 - x0) / d
-            return int(x3), int(y3), int(x4), int(y4)
+        if d > r0 + r1 or d < abs(r0 - r1) or (d == 0 and r0 == r1):
+            raise ConstrainedError("Circles do not intersect")
+
+        a = (r0**2 - r1**2 + d**2) / (2 * d)
+        h = math.sqrt(max(0.0, r0**2 - a**2))
+        x2 = x0 + a * (x1 - x0) / d
+        y2 = y0 + a * (y1 - y0) / d
+        x3 = x2 + h * (y1 - y0) / d
+        y3 = y2 - h * (x1 - x0) / d
+        x4 = x2 - h * (y1 - y0) / d
+        y4 = y2 + h * (x1 - x0) / d
+        return int(x3), int(y3), int(x4), int(y4)
 
 
 # ---------------------------------------------------------------------------
