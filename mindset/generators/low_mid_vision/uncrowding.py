@@ -393,7 +393,7 @@ class _BaseUncrowdingConfig(GeneratorConfig):
         metadata={"label": "vernier inside samples (None for all arrangements)"},
     )
     num_samples_vernier_outside: int | None = field(
-        default=None,
+        default=3_000,
         metadata={"label": "vernier outside samples (None for all arrangements)"},
     )
     vernier_offset: list[int] | int = field(
@@ -466,8 +466,8 @@ def _sample_conditions(
     conditions: list[dict], num_requested: int | None
 ) -> list[dict]:
     """subsample conditions if requested, otherwise return all conditions."""
-    if num_requested is not None and int(num_requested) < len(conditions):
-        return random.sample(conditions, k=int(num_requested))
+    if num_requested is not None:
+        return random.choices(conditions, k=int(num_requested))
     return list(conditions)
 
 
@@ -581,7 +581,7 @@ def generate_shapes(config: UncrowdingShapesConfig):
 
             for v_offset in config.vernier_offset:
                 for v_type in (0, 1):
-                    for n, cond in enumerate(mode_conditions):
+                    for n, cond in enumerate(tqdm(mode_conditions, desc='Conditions')):
                         grid = cond["grid"]
                         r, c = cond["num_rows"], cond["num_cols"]
                         s_a = cond["center_shape"]
@@ -767,7 +767,7 @@ def generate_distributions(config: UncrowdingDistributionsConfig):
 
             for v_offset in config.vernier_offset:
                 for v_type in (0, 1):
-                    for n, cond in enumerate(mode_conditions):
+                    for n, cond in enumerate(tqdm(mode_conditions, desc='Conditions')):
                         grid = cond["grid"]
                         r, c = cond["num_rows"], cond["num_cols"]
                         shape = cond["base_shape"]
