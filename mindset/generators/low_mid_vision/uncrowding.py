@@ -4,7 +4,6 @@ import csv
 import math
 import random
 import uuid
-from itertools import combinations
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -388,14 +387,6 @@ class _BaseUncrowdingConfig(GeneratorConfig):
         default_factory=lambda: [1, 3, 5, 7],
         metadata={"label": "col counts (odd numbers <= 7)"},
     )
-    num_samples_vernier_inside: int | None = field(
-        default=None,
-        metadata={"label": "vernier inside samples (None for all arrangements)"},
-    )
-    num_samples_vernier_outside: int | None = field(
-        default=None,
-        metadata={"label": "vernier outside samples (None for all arrangements)"},
-    )
     vernier_offset: list[int] | int = field(
         default=4,
         metadata={"min": 2, "max": 8, "label": "vernier horizontal offset/separation (px)"},
@@ -466,8 +457,8 @@ def _sample_conditions(
     conditions: list[dict], num_requested: int | None
 ) -> list[dict]:
     """subsample conditions if requested, otherwise return all conditions."""
-    if num_requested is not None and int(num_requested) < len(conditions):
-        return random.sample(conditions, k=int(num_requested))
+    if num_requested is not None:
+        return random.choices(conditions, k=int(num_requested))
     return list(conditions)
 
 
@@ -497,6 +488,14 @@ class UncrowdingShapesConfig(_BaseUncrowdingConfig):
     shapes: list[str] = field(
         default_factory=lambda: ["square", "circle", "hexagon", "star"],
         metadata={"label": "shapes to combine"},
+    )
+    num_samples_vernier_inside: int | None = field(
+        default=None,
+        metadata={"label": "vernier inside samples (None for all arrangements)"},
+    )
+    num_samples_vernier_outside: int | None = field(
+        default=3_000,
+        metadata={"label": "vernier outside samples (None for all arrangements)"},
     )
     bar_width: int = field(
         default=2,
@@ -581,7 +580,7 @@ def generate_shapes(config: UncrowdingShapesConfig):
 
             for v_offset in config.vernier_offset:
                 for v_type in (0, 1):
-                    for n, cond in enumerate(mode_conditions):
+                    for n, cond in enumerate(tqdm(mode_conditions, desc='Conditions')):
                         grid = cond["grid"]
                         r, c = cond["num_rows"], cond["num_cols"]
                         s_a = cond["center_shape"]
@@ -658,6 +657,14 @@ class UncrowdingDistributionsConfig(_BaseUncrowdingConfig):
         default_factory=lambda: ["square", "hexagon", "star"],
         metadata={"label": "base shapes to use (circles excluded due to rotational symmetry)"},
     )
+    num_samples_per_configuration: int = field(
+        default=5,
+        metadata={"min": 1, "max": 10000, "label": "samples per distribution configuration"},
+    )
+    num_samples_vernier_outside: int = field(
+        default=5,
+        metadata={"min": 1, "max": 10000, "label": "samples per configuration for outside vernier condition"},
+    )
     bar_width: int = field(
         default=3,
         metadata={"min": 2, "max": 5, "label": "vernier stroke width (px)"},
@@ -692,44 +699,23 @@ def generate_distributions(config: UncrowdingDistributionsConfig):
 
     conditions = []
     for r, c in grid_sizes:
-        for arr in get_valid_arrangements(r, c):
-            grid = generate_grid_layout(r, c, arr)
-            pat_str = serialize_grid(grid)
+        grid = generate_grid_layout(r, c, "uniform")
+        pat_str = serialize_grid(grid)
 
-            for shape in base_shapes:
-                if arr == "uniform":
-                    for (loc_a, scale_a) in zip(config.loc, config.scale):
-                        conditions.append(
-                            {
-                                "num_rows": r,
-                                "num_cols": c,
-                                "arrangement": arr,
-                                "grid": grid,
-                                "pat_str": pat_str,
-                                "base_shape": shape,
-                                "loc_a": loc_a,
-                                "scale_a": scale_a,
-                                "loc_b": 'none',
-                                "scale_b": 'none',
-                            }
-                        )
-                else:
-                    dist_comb = combinations(zip(config.loc, config.scale), 2)
-                    for (loc_a, scale_a), (loc_b, scale_b) in dist_comb:
-                        conditions.append(
-                            {
-                                "num_rows": r,
-                                "num_cols": c,
-                                "arrangement": arr,
-                                "grid": grid,
-                                "pat_str": pat_str,
-                                "base_shape": shape,
-                                "loc_a": loc_a,
-                                "scale_a": scale_a,
-                                "loc_b": loc_b,
-                                "scale_b": scale_b,
-                            }
-                        )
+        for shape in base_shapes:
+            for loc, scale in zip(config.loc, config.scale):
+                conditions.append(
+                    {
+                        "num_rows": r,
+                        "num_cols": c,
+                        "arrangement": "uniform",
+                        "grid": grid,
+                        "pat_str": pat_str,
+                        "base_shape": shape,
+                        "loc": loc,
+                        "scale": scale,
+                    }
+                )
 
     csv_path = output_folder / "annotation.csv"
     with open(csv_path, "w", newline="") as annfile:
@@ -747,10 +733,8 @@ def generate_distributions(config: UncrowdingDistributionsConfig):
                 "BaseShape",
                 "Dimension",
                 "GridPattern",
-                "LocA",
-                "ScaleA",
-                "LocB",
-                "ScaleB",
+                "Loc",
+                "Scale",
                 "BackgroundColor",
                 "ShapeSize",
                 "IterNum",
@@ -758,89 +742,75 @@ def generate_distributions(config: UncrowdingDistributionsConfig):
         )
 
         for v_mode in tqdm(["outside", "inside"], desc="Mode"):
-            num_req = (
+            num_samples = (
                 config.num_samples_vernier_outside
                 if v_mode == "outside"
-                else config.num_samples_vernier_inside
+                else config.num_samples_per_configuration
             )
-            mode_conditions = _sample_conditions(conditions, num_req)
-
             for v_offset in config.vernier_offset:
                 for v_type in (0, 1):
-                    for n, cond in enumerate(mode_conditions):
-                        grid = cond["grid"]
+                    for cond in tqdm(conditions, desc=f"Conditions ({v_mode})", leave=False):
                         r, c = cond["num_rows"], cond["num_cols"]
                         shape = cond["base_shape"]
-                        arr = cond["arrangement"]
-
-                        loc_a = cond["loc_a"]
-                        scale_a = cond["scale_a"]
-                        loc_b = cond["loc_b"]
-                        scale_b = cond["scale_b"]
-
-                        cell_shapes = [[shape] * c for _ in range(r)]
-                        cell_rotations = [[0.0] * c for _ in range(r)]
-                        cell_scales = [[1.0] * c for _ in range(r)]
-
+                        loc = cond["loc"]
+                        scale = cond["scale"]
                         r_c, c_c = r // 2, c // 2
-                        for i in range(r):
-                            for j in range(c):
-                                if i == r_c and j == c_c:
-                                    # Central flanker enclosing Vernier: strictly fixed
-                                    cell_rotations[i][j] = 0.0
-                                    cell_scales[i][j] = 1.0
-                                elif (arr == "uniform") or (grid[i, j] == 1):
-                                    val = loc_a if scale_a <= 1e-7 else random.gauss(loc_a, scale_a)
-                                    if config.dimension == "rotation":
-                                        cell_rotations[i][j] = val
-                                    elif config.dimension == "scale":
-                                        cell_scales[i][j] = max(0.1, min(1.0, val))
-                                else:
-                                    val = loc_b if scale_b <= 1e-7 else random.gauss(loc_b, scale_b)
-                                    if config.dimension == "rotation":
-                                        cell_rotations[i][j] = val
-                                    elif config.dimension == "scale":
-                                        cell_scales[i][j] = max(0.1, min(1.0, val))
 
-                        img = generate_uncrowding_stimulus(
-                            drawer=drawer,
-                            cell_shapes=cell_shapes,
-                            cell_rotations=cell_rotations,
-                            cell_scales=cell_scales,
-                            vernier_type=v_type,
-                            vernier_offset=v_offset,
-                            vernier_in_out=v_mode,
-                            shape_size=config.shape_size,
-                            canvas_size=config.canvas_size,
-                        )
+                        for n in range(num_samples):
+                            cell_shapes = [[shape] * c for _ in range(r)]
+                            cell_rotations = [[0.0] * c for _ in range(r)]
+                            cell_scales = [[1.0] * c for _ in range(r)]
 
-                        stem = (
-                            f"{v_mode}_v{v_type}_offset{v_offset}_"
-                            f"{r}x{c}_{arr}_{shape}_{config.dimension}_"
-                            f"cfg_loc_a{loc_a}_scale_a{scale_a}_loc_b{loc_b}_scale_b{scale_b}_{n}"
-                        )
-                        rel_path = _save_stimulus(img, output_folder, v_mode, v_type, stem)
-                        writer.writerow(
-                            [
-                                rel_path.as_posix(),
-                                "two_distributions",
-                                v_mode,
-                                v_type,
-                                v_offset,
-                                r,
-                                c,
-                                arr,
-                                shape,
-                                config.dimension,
-                                cond["pat_str"],
-                                loc_a,
-                                scale_a,
-                                loc_b,
-                                scale_b,
-                                drawer.background,
-                                config.shape_size,
-                                n,
-                            ]
-                        )
+                            for i in range(r):
+                                for j in range(c):
+                                    if i == r_c and j == c_c:
+                                        # Central flanker enclosing Vernier: strictly fixed
+                                        cell_rotations[i][j] = 0.0
+                                        cell_scales[i][j] = 1.0
+                                    else:
+                                        val = loc if scale <= 1e-7 else random.gauss(loc, scale)
+                                        if config.dimension == "rotation":
+                                            cell_rotations[i][j] = val
+                                        elif config.dimension == "scale":
+                                            cell_scales[i][j] = max(0.1, min(1.0, val))
+
+                            img = generate_uncrowding_stimulus(
+                                drawer=drawer,
+                                cell_shapes=cell_shapes,
+                                cell_rotations=cell_rotations,
+                                cell_scales=cell_scales,
+                                vernier_type=v_type,
+                                vernier_offset=v_offset,
+                                vernier_in_out=v_mode,
+                                shape_size=config.shape_size,
+                                canvas_size=config.canvas_size,
+                            )
+
+                            stem = (
+                                f"{v_mode}_v{v_type}_offset{v_offset}_"
+                                f"{r}x{c}_uniform_{shape}_{config.dimension}_"
+                                f"loc{loc}_scale{scale}_{n}"
+                            )
+                            rel_path = _save_stimulus(img, output_folder, v_mode, v_type, stem)
+                            writer.writerow(
+                                [
+                                    rel_path.as_posix(),
+                                    "two_distributions",
+                                    v_mode,
+                                    v_type,
+                                    v_offset,
+                                    r,
+                                    c,
+                                    "uniform",
+                                    shape,
+                                    config.dimension,
+                                    cond["pat_str"],
+                                    loc,
+                                    scale,
+                                    drawer.background,
+                                    config.shape_size,
+                                    n,
+                                ]
+                            )
 
     return str(output_folder)
