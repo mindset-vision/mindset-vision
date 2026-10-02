@@ -267,8 +267,7 @@ def test_uncrowding_distributions_generator(tmp_path):
         base_shapes=["square", "star"],
         row_counts=[1, 3],
         col_counts=[1, 3],
-        num_samples_vernier_inside=2,
-        num_samples_vernier_outside=2,
+        num_samples_per_configuration=2,
         output_folder=str(output_dir),
     )
 
@@ -283,13 +282,16 @@ def test_uncrowding_distributions_generator(tmp_path):
         assert len(reader) > 0
         for row in reader:
             assert row["ConditionType"] == "two_distributions"
+            assert row["GridArrangement"] == "uniform"
             assert row["VernierInOut"] in ("inside", "outside")
             assert row["Dimension"] == "rotation"
             assert row["BaseShape"] in ("square", "star")
-            assert float(row["LocA"]) in (0.0, 45.0)
-            assert float(row["ScaleA"]) in (0.0, 5.0)
-            assert float(row["LocB"]) in (0.0, 45.0) if row['LocB'] != 'none' else True
-            assert float(row["ScaleB"]) in (0.0, 5.0) if row['ScaleB'] != 'none' else True
+            assert float(row["Loc"]) in (0.0, 45.0)
+            assert float(row["Scale"]) in (0.0, 5.0)
+            assert "LocA" not in row
+            assert "ScaleA" not in row
+            assert "LocB" not in row
+            assert "ScaleB" not in row
             img_file = output_dir / row["Path"]
             assert img_file.exists()
 
@@ -304,8 +306,7 @@ def test_uncrowding_distributions_scale_generator(tmp_path):
         base_shapes=["hexagon"],
         row_counts=[1, 3],
         col_counts=[1, 3],
-        num_samples_vernier_inside=1,
-        num_samples_vernier_outside=1,
+        num_samples_per_configuration=1,
         output_folder=str(output_dir),
     )
 
@@ -320,10 +321,13 @@ def test_uncrowding_distributions_scale_generator(tmp_path):
         assert len(reader) > 0
         for row in reader:
             assert row["Dimension"] == "scale"
-            assert float(row["LocA"]) in (0.5, 0.6)
-            assert float(row["ScaleA"]) in (0.5, 0.05)
-            assert float(row["LocB"]) in (0.5, 0.6) if row['LocB'] != 'none' else True
-            assert float(row["ScaleB"]) in (0.5, 0.05) if row['ScaleB'] != 'none' else True
+            assert row["GridArrangement"] == "uniform"
+            assert float(row["Loc"]) in (0.5, 0.6)
+            assert float(row["Scale"]) in (0.5, 0.05)
+            assert "LocA" not in row
+            assert "ScaleA" not in row
+            assert "LocB" not in row
+            assert "ScaleB" not in row
             img_file = output_dir / row["Path"]
             assert img_file.exists()
 
@@ -443,8 +447,7 @@ def test_uncrowding_distributions_central_flanker_fixed(monkeypatch, tmp_path):
         base_shapes=["square"],
         row_counts=[1, 3],
         col_counts=[1, 3],
-        num_samples_vernier_inside=10,
-        num_samples_vernier_outside=10,
+        num_samples_per_configuration=1,
         output_folder=str(output_dir / "rot"),
     )
     generate_distributions(config_rot)
@@ -470,8 +473,7 @@ def test_uncrowding_distributions_central_flanker_fixed(monkeypatch, tmp_path):
         base_shapes=["square"],
         row_counts=[1, 3],
         col_counts=[1, 3],
-        num_samples_vernier_inside=10,
-        num_samples_vernier_outside=10,
+        num_samples_per_configuration=1,
         output_folder=str(output_dir / "scale"),
     )
     generate_distributions(config_scale)
@@ -486,3 +488,58 @@ def test_uncrowding_distributions_central_flanker_fixed(monkeypatch, tmp_path):
         if (r, c) == (3, 3):
             surround_scales = [scales[i][j] for i in range(r) for j in range(c) if (i, j) != (r_c, c_c)]
             assert any((sc == 0.5 if sc != 'none' else True) for sc in surround_scales )
+
+
+def test_cli_parsing_num_samples_per_configuration():
+    """verify CLI parser handles --num-samples-per-configuration for distributions."""
+    from mindset.cli import _parse_generator_args
+
+    args = _parse_generator_args(
+        UncrowdingDistributionsConfig, ["--num-samples-per-configuration", "7"]
+    )
+    assert args["num_samples_per_configuration"] == 7
+
+
+def test_cli_parsing_num_samples_vernier_outside_distributions():
+    """verify CLI parser handles --num-samples-vernier-outside for distributions."""
+    from mindset.cli import _parse_generator_args
+
+    args = _parse_generator_args(
+        UncrowdingDistributionsConfig, ["--num-samples-vernier-outside", "12"]
+    )
+    assert args["num_samples_vernier_outside"] == 12
+
+
+def test_uncrowding_distributions_independent_outside_sampling(tmp_path):
+    """verify that outside and inside vernier conditions respect independent sample counts."""
+    output_dir = tmp_path / "independent_sampling"
+    config = UncrowdingDistributionsConfig(
+        dimension="rotation",
+        loc=[0.0],
+        scale=[0.0],
+        base_shapes=["square"],
+        row_counts=[1],
+        col_counts=[1],
+        vernier_offset=[4],
+        num_samples_per_configuration=2,
+        num_samples_vernier_outside=4,
+        output_folder=str(output_dir),
+    )
+    generate_distributions(config)
+
+    csv_path = output_dir / "annotation.csv"
+    assert csv_path.exists()
+
+    with open(csv_path) as f:
+        reader = list(csv.DictReader(f))
+
+    inside_rows = [r for r in reader if r["VernierInOut"] == "inside"]
+    outside_rows = [r for r in reader if r["VernierInOut"] == "outside"]
+
+    # 1 grid size * 1 shape * 1 (loc,scale) * 1 offset * 2 vernier types (0, 1) = 2 condition sets
+    # Inside: 2 condition sets * 2 samples = 4
+    # Outside: 2 condition sets * 4 samples = 8
+    assert len(inside_rows) == 4
+    assert len(outside_rows) == 8
+    assert {int(r["IterNum"]) for r in inside_rows} == {0, 1}
+    assert {int(r["IterNum"]) for r in outside_rows} == {0, 1, 2, 3}
