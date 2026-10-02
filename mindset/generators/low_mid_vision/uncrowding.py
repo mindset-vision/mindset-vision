@@ -4,7 +4,7 @@ import csv
 import math
 import random
 import uuid
-from itertools import combinations
+from itertools import permutations
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -714,7 +714,7 @@ def generate_distributions(config: UncrowdingDistributionsConfig):
                             }
                         )
                 else:
-                    dist_comb = combinations(zip(config.loc, config.scale), 2)
+                    dist_comb = permutations(zip(config.loc, config.scale), 2)
                     for (loc_a, scale_a), (loc_b, scale_b) in dist_comb:
                         conditions.append(
                             {
