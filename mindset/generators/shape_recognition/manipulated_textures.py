@@ -424,8 +424,8 @@ def generate_all(config: ManipulatedTexturesConfig):
                         t_asset,
                         t_text,
                         t_angle,
-                        ds.background,
                         config.texture_color,
+                        config.background_color,
                         path,
                     ]
                 )
