@@ -238,7 +238,7 @@ def generate_all(config: ThatcherFaceConfig):
             )
 
             transforms.CenterCrop((config.canvas_size[1], config.canvas_size[0]))(
-                Image.fromarray(cv2.flip(cv_image, 0))
+                Image.fromarray(cv2.rotate(cv_image, cv2.ROTATE_180))
             ).save(output_folder / "thatcherized_inverted" / f"{image_name}.png")
             writer.writerow(
                 [
@@ -256,7 +256,7 @@ def generate_all(config: ThatcherFaceConfig):
             )
 
             transforms.CenterCrop((config.canvas_size[1], config.canvas_size[0]))(
-                Image.open(image_path).rotate(180).transpose(Image.FLIP_LEFT_RIGHT)
+                Image.open(image_path).rotate(180)
             ).save(output_folder / "inverted" / f"{image_name}.png")
             writer.writerow(
                 [pathlib.Path("inverted") / f"{image_name}.png", "inverted", idx]
