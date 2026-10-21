@@ -228,7 +228,7 @@ def generate_all(config: ThatcherFaceConfig):
 
             transforms.CenterCrop((config.canvas_size[1], config.canvas_size[0]))(
                 Image.fromarray(cv_image)
-            ).save(output_folder / "thatcherized_straight" / f"{idx}.png")
+            ).save(output_folder / "thatcherized_straight" / f"{image_name}.png")
             writer.writerow(
                 [
                     pathlib.Path("thatcherized_straight") / f"{image_name}.png",
@@ -239,7 +239,7 @@ def generate_all(config: ThatcherFaceConfig):
 
             transforms.CenterCrop((config.canvas_size[1], config.canvas_size[0]))(
                 Image.fromarray(cv2.flip(cv_image, 0))
-            ).save(output_folder / "thatcherized_inverted" / f"{idx}.png")
+            ).save(output_folder / "thatcherized_inverted" / f"{image_name}.png")
             writer.writerow(
                 [
                     pathlib.Path("thatcherized_inverted") / f"{image_name}.png",
@@ -251,7 +251,9 @@ def generate_all(config: ThatcherFaceConfig):
             transforms.CenterCrop((config.canvas_size[1], config.canvas_size[0]))(
                 Image.open(image_path)
             ).save(output_folder / "straight" / f"{image_name}.png")
-            writer.writerow([pathlib.Path("straight") / f"{idx}.png", "straight", idx])
+            writer.writerow(
+                [pathlib.Path("straight") / f"{image_name}.png", "straight", idx]
+            )
 
             transforms.CenterCrop((config.canvas_size[1], config.canvas_size[0]))(
                 Image.open(image_path).rotate(180).transpose(Image.FLIP_LEFT_RIGHT)
