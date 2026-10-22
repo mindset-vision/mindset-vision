@@ -21,6 +21,8 @@ class DrawCompositeTexture:
         bg_kwargs = bg_params.copy()
 
         fg_kwargs["target_region"] = "foreground"
+        # leave the foreground layer transparent outside the texture so the background layer shows through
+        fg_kwargs["transparent_background"] = True
         bg_kwargs["target_region"] = "background"
 
         self.ds_fg = DrawManipulatedTexture(**fg_kwargs)

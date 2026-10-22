@@ -32,6 +32,7 @@ class DrawManipulatedTexture(BaseDrawManipulatedObject):
         texture_font="Sans",
         outline_color=(255, 255, 255),
         outline_width=0,
+        transparent_background=False,
         *args,
         **kwargs,
     ):
@@ -48,6 +49,7 @@ class DrawManipulatedTexture(BaseDrawManipulatedObject):
         self.texture_font = str(texture_font)
         self.outline_color = outline_color
         self.outline_width = outline_width
+        self.transparent_background = transparent_background
 
     def _render_texture(self, ctx, outer_polygons):
         """render vector texture inside polygon mask or inverted background mask."""
@@ -210,9 +212,10 @@ class DrawManipulatedTexture(BaseDrawManipulatedObject):
         ctx = cairo.Context(surface)
         ctx.set_antialias(cairo.ANTIALIAS_BEST)
 
-        bg_r, bg_g, bg_b = self._normalize_color(self.background)
-        ctx.set_source_rgb(bg_r, bg_g, bg_b)
-        ctx.paint()
+        if not self.transparent_background:
+            bg_r, bg_g, bg_b = self._normalize_color(self.background)
+            ctx.set_source_rgb(bg_r, bg_g, bg_b)
+            ctx.paint()
 
         if outer_polygons or linestrings:
             self._render_texture(ctx, outer_polygons)
