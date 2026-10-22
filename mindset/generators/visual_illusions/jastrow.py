@@ -205,6 +205,9 @@ def generate_all(config: JastrowConfig):
                 for top_color in on_top_cols:
                     arc_curvature, width, size_red, size_blue = get_random_params()
                     size_blue = size_red if type_name == "illusory" else size_blue
+                    if type_name == "random_same_size":
+                        # the drawer uses the mean for both arcs; record what is drawn
+                        size_red = size_blue = (size_red + size_blue) / 2
                     img = ds.generate_jastrow_illusion(
                         arc_curvature,
                         width,
