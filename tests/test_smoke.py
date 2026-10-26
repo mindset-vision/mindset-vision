@@ -152,3 +152,48 @@ def test_generate_manipulated_outlines(tmp_path):
     assert (out / "annotation.csv").exists()
     assert len(list(out.rglob("*.png"))) > 0
 
+
+def test_jastrow_random_same_size_annotation(tmp_path, monkeypatch):
+    """record the sizes passed to the drawer, not the original random sizes."""
+    import csv
+    import random
+
+    from mindset.generators.visual_illusions import jastrow
+
+    size_red, size_blue = 0.01, 0.05
+    size = (size_red + size_blue) / 2
+    monkeypatch.setattr(
+        jastrow, "get_random_params", lambda: (50, 0.1, size_red, size_blue)
+    )
+    monkeypatch.setattr(jastrow.random, "uniform", random.Random(0).uniform)
+    drawn_sizes = []
+    draw = jastrow.DrawJastrow.generate_jastrow_illusion
+
+    def record_sizes(self, arc, width, red, blue, top_color, type_stimulus):
+        drawn_sizes.append((red, blue))
+        return draw(self, arc, width, red, blue, top_color, type_stimulus)
+
+    monkeypatch.setattr(jastrow.DrawJastrow, "generate_jastrow_illusion", record_sizes)
+    out = tmp_path / "jastrow-same-size"
+    jastrow.generate_all(
+        jastrow.JastrowConfig(
+            num_samples_illusory=0,
+            num_samples_random=0,
+            num_samples_aligned=0,
+            num_samples_random_same_size=1,
+            output_folder=str(out),
+        )
+    )
+
+    with (out / "annotation.csv").open() as f:
+        rows = list(csv.DictReader(f))
+    assert len(rows) == 2
+    assert drawn_sizes == [(size, size)] * 2
+    for row in rows:
+        assert row["Type"] == "random_same_size"
+        assert float(row["SizeRed"]) == float(row["SizeBlue"]) == size
+        assert float(row["SizeRedMinusBlue"]) == 0
+        path = Path(row["Path"])
+        assert path.name.startswith(f"red{size:.2f}_blue{size:.2f}_0_")
+        assert (out / path).is_file()
+
