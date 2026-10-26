@@ -152,3 +152,57 @@ def test_generate_manipulated_outlines(tmp_path):
     assert (out / "annotation.csv").exists()
     assert len(list(out.rglob("*.png"))) > 0
 
+
+def test_thatcher_face_annotation_paths(tmp_path, monkeypatch):
+    """keep non-index filenames tied to the same face in all four conditions."""
+    import csv
+    from types import SimpleNamespace
+
+    from PIL import Image
+
+    from mindset.generators.visual_illusions import thatcher_face
+
+    faces = tmp_path / "faces"
+    faces.mkdir()
+    colors = {"face-alice": (200, 30, 40), "face-bob": (20, 160, 70)}
+    for name, color in colors.items():
+        Image.new("RGB", (64, 64), color).save(faces / f"{name}.png")
+    names = [path.stem for path in faces.glob("*")]
+
+    # Supply landmarks directly; path bookkeeping does not need the trained model.
+    landmarks = [(32, 32)] * 68
+    landmarks[36:42] = [(18, 18), (24, 22)] * 3
+    landmarks[42:48] = [(40, 18), (46, 22)] * 3
+    landmarks[48:68] = [(26, 38), (38, 44)] * 10
+    monkeypatch.setattr(
+        thatcher_face.cv2.face,
+        "createFacemarkLBF",
+        lambda: SimpleNamespace(loadModel=lambda path: None),
+    )
+    monkeypatch.setattr(
+        thatcher_face, "get_image_facial_landmarks", lambda path, facemark: landmarks
+    )
+    out = tmp_path / "thatcher-faces"
+    thatcher_face.generate_all(
+        thatcher_face.ThatcherFaceConfig(
+            face_folder=str(faces), output_folder=str(out), canvas_size=(64, 64)
+        )
+    )
+
+    with (out / "annotation.csv").open() as f:
+        rows = list(csv.DictReader(f))
+    assert len(rows) == 8
+    for face_id, name in enumerate(names):
+        face_rows = [row for row in rows if int(row["FaceId"]) == face_id]
+        assert {row["Condition"] for row in face_rows} == {
+            "straight",
+            "inverted",
+            "thatcherized_straight",
+            "thatcherized_inverted",
+        }
+        for row in face_rows:
+            path = Path(row["Path"])
+            assert path == Path(row["Condition"]) / f"{name}.png"
+            with Image.open(out / path) as image:
+                assert image.getpixel((0, 0)) == colors[name]
+
